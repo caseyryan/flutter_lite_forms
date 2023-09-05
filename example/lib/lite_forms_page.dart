@@ -35,9 +35,13 @@ class LiteFormsPage extends StatelessWidget {
                         }
                         return null;
                       },
+                      initialValue: 'Gogi',
+                      initialValueDeserializer: (value) {
+                        return 'User $value';
+                      },
                       serializer: (value) {
                         print(value);
-                        return '$value+blabla3';
+                        return '$value+`RRR`';
                       },
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: InputDecoration(

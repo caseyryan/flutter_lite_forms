@@ -77,17 +77,21 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     required String formName,
     required String fieldName,
     required Object? value,
+    bool isInitialValue = false,
   }) {
     _FormGroupWrapper? group = _groups[formName];
     if (group != null) {
-      group.tryFindField(fieldName)?._value = value;
+      group.tryFindField(fieldName)?.updateValue(
+            value,
+            isInitialValue,
+          );
     }
   }
 
   FormGroupField<T> registerFormField<T>({
     required String formName,
     required String fieldName,
-    required LiteFormValueSerializer serializer,
+    required LiteFormValueConvertor serializer,
   }) {
     createFormIfNull(formName: formName);
     final groupWrapper = _groups[formName]!;

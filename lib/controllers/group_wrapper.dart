@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 part of 'lite_form_controller.dart';
 
 class _FormGroupWrapper {
@@ -8,7 +10,7 @@ class _FormGroupWrapper {
 
   FormGroupField<T> tryRegisterField<T>({
     required String name,
-    required LiteFormValueSerializer serializer,
+    required LiteFormValueConvertor serializer,
   }) {
     if (!_fields.containsKey(name)) {
       _fields[name] = FormGroupField<T>(
@@ -45,7 +47,7 @@ class _FormGroupWrapper {
 
 class FormGroupField<T> {
   final String name;
-  LiteFormValueSerializer? _serializer;
+  LiteFormValueConvertor? _serializer;
 
   TextEditingController? _textEditingController;
   TextEditingController? get textEditingController => _textEditingController;
@@ -75,8 +77,20 @@ class FormGroupField<T> {
 
   Object? _value;
 
-  void updateValue(Object? value) {
+  void updateValue(
+    Object? value, [
+    bool isInitialValue = false,
+  ]) {
     _value = value;
+    if (value != null) {
+      if (isInitialValue) {
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          try {
+            textEditingController?.text = _value.toString();
+          } catch (e) {}
+        });
+      } 
+    }
   }
 
   Object? get serializedValue {

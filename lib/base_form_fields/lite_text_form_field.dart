@@ -6,11 +6,12 @@ import 'package:lite_forms/controllers/lite_form_controller.dart';
 
 import '../lite_forms.dart';
 
-class LiteTextFormField<T> extends StatelessWidget {
+class LiteTextFormField<T> extends StatefulWidget {
   LiteTextFormField({
     super.key,
     required this.name,
-    this.serializer = nonConvertingSerializer,
+    this.serializer = nonConvertingValueConvertor,
+    this.initialValueDeserializer,
     this.validator,
     this.controller,
     this.restorationId,
@@ -66,7 +67,8 @@ class LiteTextFormField<T> extends StatelessWidget {
 
   final String name;
   final TextEditingController? controller;
-  final LiteFormValueSerializer serializer;
+  final LiteFormValueConvertor serializer;
+  final LiteFormValueConvertor? initialValueDeserializer;
   final FormFieldValidator<String>? validator;
   final String? restorationId;
   final String? initialValue;
@@ -119,74 +121,95 @@ class LiteTextFormField<T> extends StatelessWidget {
   final EditableTextContextMenuBuilder? contextMenuBuilder;
 
   @override
+  State<LiteTextFormField<T>> createState() => _LiteTextFormFieldState<T>();
+}
+
+class _LiteTextFormFieldState<T> extends State<LiteTextFormField<T>> {
+  bool _hasSetInitialValue = false;
+
+  @override
   Widget build(BuildContext context) {
     final group = LiteFormGroup.of(context);
     final field = liteFormController.registerFormField(
-      fieldName: name,
+      fieldName: widget.name,
       formName: group!.name,
-      serializer: serializer,
+      serializer: widget.serializer,
     );
     final textEditingController = field.getOrCreateTextEditingController(
-      controller: controller,
+      controller: widget.controller,
     );
+
+    final value =
+        widget.initialValueDeserializer?.call(widget.initialValue)?.toString() ??
+            widget.initialValue;
+
+    if (!_hasSetInitialValue) {
+      _hasSetInitialValue = true;
+      liteFormController.onValueChanged(
+        fieldName: widget.name,
+        formName: group.name,
+        value: value,
+        isInitialValue: true,
+      );
+    }
+
     return TextFormField(
-      restorationId: restorationId,
-      scrollController: scrollController,
-      validator: validator,
-      autocorrect: autocorrect,
-      autofillHints: autofillHints,
-      autofocus: autofocus,
-      autovalidateMode: autovalidateMode,
-      buildCounter: buildCounter,
-      contextMenuBuilder: contextMenuBuilder,
+      restorationId: widget.restorationId,
+      scrollController: widget.scrollController,
+      validator: widget.validator,
+      autocorrect: widget.autocorrect,
+      autofillHints: widget.autofillHints,
+      autofocus: widget.autofocus,
+      autovalidateMode: widget.autovalidateMode,
+      buildCounter: widget.buildCounter,
+      contextMenuBuilder: widget.contextMenuBuilder,
       controller: textEditingController,
-      cursorColor: cursorColor,
-      cursorHeight: cursorHeight,
-      cursorRadius: cursorRadius,
-      cursorWidth: cursorWidth,
-      decoration: decoration,
-      enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
-      enableInteractiveSelection: enableInteractiveSelection,
-      enableSuggestions: enableSuggestions,
-      enabled: enabled,
-      expands: expands,
-      focusNode: focusNode,
-      initialValue: initialValue,
-      inputFormatters: inputFormatters,
-      keyboardAppearance: keyboardAppearance,
-      keyboardType: keyboardType,
-      maxLength: maxLength,
-      maxLines: maxLength,
-      maxLengthEnforcement: maxLengthEnforcement,
-      minLines: minLines,
-      mouseCursor: mouseCursor,
-      obscureText: obscureText,
-      obscuringCharacter: obscuringCharacter,
+      cursorColor: widget.cursorColor,
+      cursorHeight: widget.cursorHeight,
+      cursorRadius: widget.cursorRadius,
+      cursorWidth: widget.cursorWidth,
+      decoration: widget.decoration,
+      enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
+      enableInteractiveSelection: widget.enableInteractiveSelection,
+      enableSuggestions: widget.enableSuggestions,
+      enabled: widget.enabled,
+      expands: widget.expands,
+      focusNode: widget.focusNode,
+      inputFormatters: widget.inputFormatters,
+      keyboardAppearance: widget.keyboardAppearance,
+      keyboardType: widget.keyboardType,
+      maxLength: widget.maxLength,
+      maxLines: widget.maxLength,
+      maxLengthEnforcement: widget.maxLengthEnforcement,
+      minLines: widget.minLines,
+      mouseCursor: widget.mouseCursor,
+      obscureText: widget.obscureText,
+      obscuringCharacter: widget.obscuringCharacter,
       onChanged: (value) {
         liteFormController.onValueChanged(
           formName: group.name,
-          fieldName: name,
+          fieldName: widget.name,
           value: value,
         );
       },
-      onEditingComplete: onEditingComplete,
-      onFieldSubmitted: onFieldSubmitted,
-      onTap: onTap,
-      onTapOutside: onTapOutside,
-      scrollPadding: scrollPadding,
-      readOnly: readOnly,
-      scrollPhysics: scrollPhysics,
-      selectionControls: selectionControls,
-      smartDashesType: smartDashesType,
-      smartQuotesType: smartQuotesType,
-      showCursor: showCursor,
-      strutStyle: strutStyle,
-      style: style,
-      textAlign: textAlign,
-      textAlignVertical: textAlignVertical,
-      textCapitalization: textCapitalization,
-      textDirection: textDirection,
-      textInputAction: textInputAction,
+      onEditingComplete: widget.onEditingComplete,
+      onFieldSubmitted: widget.onFieldSubmitted,
+      onTap: widget.onTap,
+      onTapOutside: widget.onTapOutside,
+      scrollPadding: widget.scrollPadding,
+      readOnly: widget.readOnly,
+      scrollPhysics: widget.scrollPhysics,
+      selectionControls: widget.selectionControls,
+      smartDashesType: widget.smartDashesType,
+      smartQuotesType: widget.smartQuotesType,
+      showCursor: widget.showCursor,
+      strutStyle: widget.strutStyle,
+      style: widget.style,
+      textAlign: widget.textAlign,
+      textAlignVertical: widget.textAlignVertical,
+      textCapitalization: widget.textCapitalization,
+      textDirection: widget.textDirection,
+      textInputAction: widget.textInputAction,
     );
   }
 }
