@@ -1,4 +1,7 @@
 {
     "dart.flutterSdkPath": "/Users/konstantin/FlutterProjects/flutter_ui_kit/.fvm/flutter_sdk",
-    "git-blame.gitWebUrl": ""
+    "git-blame.gitWebUrl": "",
+    "cSpell.words": [
+        "autocorrect"
+    ]
 }
