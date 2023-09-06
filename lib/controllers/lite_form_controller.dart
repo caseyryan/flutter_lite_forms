@@ -62,12 +62,13 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     }
   }
 
-  
+
   Object? tryGetValueForField({
     required String formName,
     required String fieldName,
   }) {
-    return _groups[formName]?.tryFindField(fieldName)?._value;
+    final field = _groups[formName]?.tryFindField(fieldName);
+    return field?._value;
   }
 
   bool validateForm({

@@ -92,7 +92,7 @@ class FormGroupField<T> {
       if (isInitialValue) {
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           try {
-            textEditingController?.text = _value.toString();
+            textEditingController?.text = view ?? _value.toString();
           } catch (e) {}
         });
       } else {

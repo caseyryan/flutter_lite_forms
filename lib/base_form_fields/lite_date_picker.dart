@@ -48,6 +48,7 @@ class LiteDatePicker extends StatefulWidget {
 
 class _LiteDatePickerState extends State<LiteDatePicker> {
   LiteFormGroup? _group;
+  bool _hasSetInitialValue = false;
 
   Future<DateTime?> onShowPicker({
     required BuildContext context,
@@ -113,6 +114,18 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     final dateFormat = widget.format ??
         liteFormController.config?.defaultPickerFormat ??
         DateFormat('dd MMM, yyyy');
+    if (value != null) {
+      if (!_hasSetInitialValue) {
+        _hasSetInitialValue = true;
+        liteFormController.onValueChanged(
+          formName: _group!.name,
+          fieldName: widget.name,
+          value: value,
+          view: dateFormat.format(value),
+          isInitialValue: true,
+        );
+      }
+    }
 
     return GestureDetector(
       onTap: () async {
@@ -131,7 +144,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
         child: IgnorePointer(
           child: LiteTextFormField(
             name: widget.name,
-            initialValue: value != null ? dateFormat.format(value) : null,
+            // initialValue: value != null ? dateFormat.format(value) : null,
             onChanged: (value) {
               liteFormController.onValueChanged(
                 formName: _group!.name,

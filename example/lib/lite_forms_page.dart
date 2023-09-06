@@ -28,23 +28,24 @@ class LiteFormsPage extends StatelessWidget {
                 delegate: SliverChildListDelegate(
                   [
                     const SizedBox(height: 20.0),
-                    // LiteTextFormField( 
-                    //   name: 'login',
-                    //   validator: (value) {
-                    //     if (value?.isNotEmpty != true) {
-                    //       return 'Field is required';
-                    //     }
-                    //     return null;
-                    //   },
-                    //   initialValue: 'Kostyan',
-                    //   initialValueDeserializer: (value) {
-                    //     return 'User $value';
-                    //   },
-                    //   serializer: (value) {
-                    //     return 'Serialized value: $value';
-                    //   },
-                    //   autovalidateMode: AutovalidateMode.onUserInteraction,
-                    // ),
+                    LiteTextFormField( 
+                      name: 'login',
+                      validator: (value) {
+                        if (value?.isNotEmpty != true) {
+                          return 'Field is required';
+                        }
+                        return null;
+                      },
+                      initialValue: 'Kostyan',
+                      initialValueDeserializer: (value) {
+                        return 'User $value';
+                      },
+                      serializer: (value) {
+                        return 'Serialized value: $value';
+                      },
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                    ),
+                    const SizedBox(height: 20.0),
                     LiteDatePicker(
                       name: 'dateOfBirth',
                       initialValue: DateTime.now(),
