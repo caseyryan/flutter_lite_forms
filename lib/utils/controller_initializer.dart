@@ -7,8 +7,7 @@ import 'package:lite_state/lite_state.dart';
 /// [config] allows you to configure the look and feel
 /// for all of your form fields by default.
 /// Doing this you won't have to set decorations, paddings
-/// and other common stuff for your forms everywhere. Just
-/// call this method somewhere in the beginning and you're all set
+/// and other common stuff for your forms everywhere
 void initializeLiteForms({
   LiteFormsConfiguration? config,
 }) {

@@ -35,12 +35,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
 
   LiteFormsConfiguration? _config;
   LiteFormsConfiguration? get config => _config;
-
-  /// this method allows you to configure the look and feel 
-  /// for all of your form fields by default. 
-  /// Doing this you won't have to set decorations, paddings
-  /// and other common stuff for your forms everywhere. Just 
-  /// call this method somewhere in the beginning and you're all set
+  
   void configureLiteFormUI({
     LiteFormsConfiguration? config,
   }) {
