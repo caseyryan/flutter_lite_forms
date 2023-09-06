@@ -77,9 +77,15 @@ class FormGroupField<T> {
 
   Object? _value;
 
+  /// [view] is a String that will be displayed
+  /// to a user. This must be null for text inputs 
+  /// since they are updated on user input but for 
+  /// other inputs e.g. a LiteDatePicker this must be a 
+  /// formatted date representation
   void updateValue(
     Object? value, [
     bool isInitialValue = false,
+    String? view,
   ]) {
     _value = value;
     if (value != null) {
@@ -89,7 +95,11 @@ class FormGroupField<T> {
             textEditingController?.text = _value.toString();
           } catch (e) {}
         });
-      } 
+      } else {
+        if (view != null) {
+          textEditingController?.text = view;
+        }
+      }
     }
   }
 

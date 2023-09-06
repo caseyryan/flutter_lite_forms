@@ -2,6 +2,7 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables
 
 import 'package:example/login_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
@@ -27,38 +28,34 @@ class LiteFormsPage extends StatelessWidget {
                 delegate: SliverChildListDelegate(
                   [
                     const SizedBox(height: 20.0),
-                    LiteTextFormField<String>(
-                      name: 'login',
-                      validator: (value) {
-                        if (value?.isNotEmpty != true) {
-                          return 'Field is required';
-                        }
-                        return null;
-                      },
-                      initialValue: 'Gogi',
-                      initialValueDeserializer: (value) {
-                        return 'User $value';
-                      },
-                      serializer: (value) {
-                        print(value);
-                        return '$value+`RRR`';
-                      },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: InputDecoration(
-                        filled: false,
-                        hintText: 'Login',
-                        errorStyle: TextStyle(
-                          fontSize: 0.0,
-                          color: Colors.transparent,
-                        ),
-                        border: OutlineInputBorder(),
-                      ),
+                    // LiteTextFormField( 
+                    //   name: 'login',
+                    //   validator: (value) {
+                    //     if (value?.isNotEmpty != true) {
+                    //       return 'Field is required';
+                    //     }
+                    //     return null;
+                    //   },
+                    //   initialValue: 'Kostyan',
+                    //   initialValueDeserializer: (value) {
+                    //     return 'User $value';
+                    //   },
+                    //   serializer: (value) {
+                    //     return 'Serialized value: $value';
+                    //   },
+                    //   autovalidateMode: AutovalidateMode.onUserInteraction,
+                    // ),
+                    LiteDatePicker(
+                      name: 'dateOfBirth',
+                      initialValue: DateTime.now(),
                     ),
                     MaterialButton(
                       onPressed: () {
                         if (validateLiteForm(formName)) {
                           final formData = getFormData(formName);
-                          print(formData);
+                          if (kDebugMode) {
+                            print(formData);
+                          }
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) {

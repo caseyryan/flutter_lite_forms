@@ -26,15 +26,6 @@ class LoginPage extends StatelessWidget {
                     const SizedBox(height: 20.0),
                     LiteTextFormField(
                       name: 'login',
-                      decoration: InputDecoration(
-                        filled: false,
-                        hintText: 'Login',
-                        errorStyle: TextStyle(
-                          fontSize: 0.0,
-                          color: Colors.transparent,
-                        ),
-                        border: OutlineInputBorder(),
-                      ),
                     ),
                   ],
                 ),
