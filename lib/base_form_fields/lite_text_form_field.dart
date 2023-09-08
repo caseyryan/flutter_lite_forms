@@ -8,7 +8,7 @@ import 'package:lite_forms/utils/value_validator.dart';
 
 import '../lite_forms.dart';
 
-class LiteTextFormField<T> extends StatefulWidget {
+class LiteTextFormField extends StatefulWidget {
   LiteTextFormField({
     super.key,
     required this.name,
@@ -148,10 +148,10 @@ class LiteTextFormField<T> extends StatefulWidget {
   final double paddingRight;
 
   @override
-  State<LiteTextFormField<T>> createState() => _LiteTextFormFieldState<T>();
+  State<LiteTextFormField> createState() => _LiteTextFormFieldState();
 }
 
-class _LiteTextFormFieldState<T> extends State<LiteTextFormField<T>> {
+class _LiteTextFormFieldState<T> extends State<LiteTextFormField> {
   bool _hasSetInitialValue = false;
 
   @override

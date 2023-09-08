@@ -50,6 +50,10 @@ class LiteFormsPage extends StatelessWidget {
                     LiteDatePicker(
                       name: 'dateOfBirth',
                       initialValue: DateTime.now(),
+                      validator: (value) async {
+                        // return 'Date is incorrect';
+                        return null;
+                      },
                     ),
                     MaterialButton(
                       onPressed: () async {
