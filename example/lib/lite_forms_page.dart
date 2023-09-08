@@ -44,12 +44,16 @@ class LiteFormsPage extends StatelessWidget {
                       serializer: (value) {
                         return 'Serialized value: $value';
                       },
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      autovalidateMode: AutovalidateMode.always,
                     ),
                     const SizedBox(height: 20.0),
                     LiteDatePicker(
+                      textAlign: TextAlign.center,
+                      dateInputType: DateInputType.both,
                       name: 'dateOfBirth',
                       initialValue: DateTime.now(),
+                      // maxDate: DateTime.now(),
+                      // minDate: DateTime.now().subtract(Duration(days: 2)),
                       validator: (value) async {
                         // return 'Date is incorrect';
                         return null;

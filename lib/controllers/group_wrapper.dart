@@ -11,7 +11,6 @@ class _FormGroupWrapper {
   bool get isBeingValidated {
     return _fields.values.any((e) => e._isBeingValidated);
   }
-  
 
   FormGroupField<T> tryRegisterField<T>({
     required String name,
@@ -46,11 +45,12 @@ class _FormGroupWrapper {
 
   Future<bool> validate() async {
     for (var field in _fields.values) {
-      /// casting field to a dynamic is a required hack to 
-      /// disable flutter runtime type check for its validator 
+      /// casting field to a dynamic is a required hack to
+      /// disable flutter runtime type check for its validator
       /// which will never pass
       await field._checkError();
     }
+
     /// This call will trigger inner form validators
     /// that will catch the possible errors from asynchronous validators
     return _validateNativeForm();
@@ -128,7 +128,14 @@ class FormGroupField<T> {
       }
     }
     if (_isSelfValidating) {
-      
+      _checkError().then((value) {
+        return _parent?._validateNativeForm();
+      });
+    }
+  }
+
+  void _validateOnlyAlwaysValidating() {
+    if (_autovalidateMode == AutovalidateMode.always) {
       _checkError().then((value) {
         return _parent?._validateNativeForm();
       });
@@ -137,13 +144,10 @@ class FormGroupField<T> {
 
   int _numValidations = 0;
 
-  bool get _isBeingValidated  =>_numValidations > 0;
-
-  
+  bool get _isBeingValidated => _numValidations > 0;
 
   bool get _isSelfValidating {
     switch (_autovalidateMode) {
-      
       case AutovalidateMode.disabled:
       case null:
         return false;
@@ -153,13 +157,15 @@ class FormGroupField<T> {
     }
   }
 
-
   Future _checkError() async {
-    _numValidations ++;
+    _numValidations++;
     dynamic fieldAsDynamic = this as dynamic;
     final error = await fieldAsDynamic._validator?.call(_value);
     _setError(error?.toString());
-    _numValidations --;
+    _numValidations--;
+    if (error?.isNotEmpty == true) {
+      liteFormController.rebuild();
+    }
   }
 
   String? _error;

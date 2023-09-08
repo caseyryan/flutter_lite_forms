@@ -68,12 +68,31 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     }
   }
 
+  void checkAlwaysValidatingFields({
+    required String formName,
+  }) {
+    if (_formGroups[formName]?._fields.isNotEmpty == true) {
+      for (var element in _formGroups[formName]!._fields.values) {
+        element._validateOnlyAlwaysValidating();
+      }
+    }
+  }
+
   Object? tryGetValueForField({
     required String formName,
     required String fieldName,
   }) {
-    final field = _formGroups[formName]?.tryFindField(fieldName);
-    return field?._value;
+    return tryGetField(
+      formName: formName,
+      fieldName: fieldName,
+    )?._value;
+  }
+
+  FormGroupField? tryGetField({
+    required String formName,
+    required String fieldName,
+  }) {
+    return _formGroups[formName]?.tryFindField(fieldName);
   }
 
   Future<bool> validateForm({

@@ -11,6 +11,7 @@ class LiteFormGroup extends InheritedWidget {
     required Widget child,
   }) : super(
           child: _LiteGroupWrapper(
+            name: name,
             onDispose: () {
               liteFormController.onFormDisposed(
                 formName: name,
@@ -24,6 +25,7 @@ class LiteFormGroup extends InheritedWidget {
                   formName: name,
                   formState: formState,
                 );
+
                 return child;
               },
             ),
@@ -52,8 +54,10 @@ class _LiteGroupWrapper extends StatefulWidget {
   const _LiteGroupWrapper({
     required this.child,
     required this.onDispose,
+    required this.name,
   });
 
+  final String name;
   final Widget child;
   final VoidCallback onDispose;
 
@@ -72,6 +76,9 @@ class __LiteGroupWrapperState extends State<_LiteGroupWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    liteFormController.checkAlwaysValidatingFields(
+      formName: widget.name,
+    );
     return Form(
       key: _formKey,
       child: widget.child,

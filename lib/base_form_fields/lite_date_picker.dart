@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
-import 'package:lite_forms/base_form_fields/exports.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
+import 'package:lite_forms/lite_forms.dart';
 import 'package:lite_forms/utils/string_extensions.dart';
-import 'package:lite_forms/utils/value_serializer.dart';
 import 'package:lite_forms/utils/value_validator.dart';
 
 class LiteDatePicker extends StatefulWidget {
@@ -15,6 +14,8 @@ class LiteDatePicker extends StatefulWidget {
     this.initialValueDeserializer,
     this.validator,
     this.initialValue,
+    this.maxDate,
+    this.minDate,
     this.format,
     this.pickerBackgroundColor,
     this.autovalidateMode,
@@ -37,6 +38,8 @@ class LiteDatePicker extends StatefulWidget {
 
   final String name;
   final DateTime? initialValue;
+  final DateTime? maxDate;
+  final DateTime? minDate;
   final intl.DateFormat? format;
   final DateInputType dateInputType;
   final Color? pickerBackgroundColor;
@@ -82,7 +85,15 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
   LiteFormGroup? _group;
   bool _hasSetInitialValue = false;
 
-  Future<DateTime?> onShowPicker({
+  @override
+  void didUpdateWidget(covariant LiteDatePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.dateInputType != oldWidget.dateInputType) {
+      _hasSetInitialValue = false;
+    }
+  }
+
+  Future<DateTime?> _onShowPickerPressed({
     required BuildContext context,
     DateTime? currentValue,
   }) async {
@@ -92,36 +103,50 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
           fieldName: widget.name,
         ) as DateTime? ??
         widget.initialValue);
+    DateTime? minDate = widget.minDate;
+    DateTime? maxDate = widget.maxDate;
+    if (currentValue != null) {
+      if (maxDate != null) {
+        if (currentValue.isAfter(maxDate)) {
+          currentValue = maxDate.subtract(const Duration(seconds: 1));
+        }
+      }
+      if (minDate != null) {
+        if (currentValue.isBefore(minDate)) {
+          currentValue = minDate.add(const Duration(seconds: 1));
+        }
+      }
+    }
     DateTime? newValue;
     switch (widget.dateInputType) {
       case DateInputType.date:
-        newValue = await _showCupertinoDatePicker(
+        newValue = await _showDatePicker(
           context: context,
           pickerBackgroundColor:
               widget.pickerBackgroundColor ?? theme.scaffoldBackgroundColor,
           initialDate: currentValue,
-          // minimumDate: widget.minimumDate,
-          // maximumDate: widget.maximumDate,
+          minimumDate: minDate,
+          maximumDate: maxDate,
         );
         break;
       case DateInputType.time:
-        newValue = await _showCupertinoTimePicker(
+        newValue = await _showTimePicker(
           context: context,
           pickerBackgroundColor:
               widget.pickerBackgroundColor ?? theme.scaffoldBackgroundColor,
           initialDate: currentValue,
-          // minimumDate: widget.minimumDate,
-          // maximumDate: widget.maximumDate,
+          minimumDate: maxDate,
+          maximumDate: minDate,
         );
         break;
       case DateInputType.both:
-        newValue = await _showCupertinoDateTimePicker(
+        newValue = await _showDateTimePicker(
           context: context,
           pickerBackgroundColor:
               widget.pickerBackgroundColor ?? theme.scaffoldBackgroundColor,
           initialDate: currentValue,
-          // minimumDate: widget.minimumDate,
-          // maximumDate: widget.maximumDate,
+          minimumDate: minDate,
+          maximumDate: maxDate,
         );
         break;
       default:
@@ -129,6 +154,28 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     }
     final DateTime? finalValue = newValue ?? currentValue;
     return finalValue;
+  }
+
+  intl.DateFormat get _dateFormat {
+    if (widget.dateInputType == DateInputType.date) {
+      return widget.format ??
+          liteFormController.config?.defaultDatePickerFormat ??
+          intl.DateFormat('dd MMMM, yyyy');
+    }
+
+    if (widget.dateInputType == DateInputType.time) {
+      return widget.format ??
+          liteFormController.config?.defaultTimePickerFormat ??
+          intl.DateFormat('hh:mm');
+    }
+
+    if (widget.dateInputType == DateInputType.both) {
+      return widget.format ??
+          liteFormController.config?.defaultDateTimePickerFormat ??
+          intl.DateFormat('dd MMMM, yyyy | hh:mm');
+    }
+
+    return intl.DateFormat('dd MMMM, yyyy');
   }
 
   @override
@@ -145,9 +192,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
         widget.initialValueDeserializer?.call(widget.initialValue) as DateTime? ??
             widget.initialValue;
 
-    final dateFormat = widget.format ??
-        liteFormController.config?.defaultPickerFormat ??
-        intl.DateFormat('dd MMMM, yyyy');
+    final dateFormat = _dateFormat;
     if (value != null) {
       if (!_hasSetInitialValue) {
         _hasSetInitialValue = true;
@@ -178,7 +223,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
 
     return GestureDetector(
       onTap: () async {
-        final dateTime = await onShowPicker(
+        final dateTime = await _onShowPickerPressed(
           context: context,
         );
         liteFormController.onValueChanged(
@@ -217,24 +262,13 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
               textInputAction: widget.textInputAction,
             ),
           ),
-          // child: LiteTextFormField(
-          //   name: widget.name,
-          //   autovalidateMode: widget.autovalidateMode,
-          //   onChanged: (value) {
-          //     liteFormController.onValueChanged(
-          //       formName: _group!.name,
-          //       fieldName: widget.name,
-          //       value: value,
-          //     );
-          //   },
-          // ),
         ),
       ),
     );
   }
 }
 
-Future<DateTime?> _showCupertinoDatePicker({
+Future<DateTime?> _showDatePicker({
   required BuildContext context,
   required Color pickerBackgroundColor,
   DateTime? initialDate,
@@ -242,7 +276,7 @@ Future<DateTime?> _showCupertinoDatePicker({
   DateTime? minimumDate,
   DateTime? maximumDate,
 }) async {
-  return await _showCupertinoPicker(
+  return await _showPicker(
     context: context,
     pickerBackgroundColor: pickerBackgroundColor,
     mode: CupertinoDatePickerMode.date,
@@ -253,7 +287,7 @@ Future<DateTime?> _showCupertinoDatePicker({
   );
 }
 
-Future<DateTime?> _showCupertinoDateTimePicker({
+Future<DateTime?> _showDateTimePicker({
   required BuildContext context,
   required Color pickerBackgroundColor,
   DateTime? initialDate,
@@ -261,7 +295,7 @@ Future<DateTime?> _showCupertinoDateTimePicker({
   DateTime? minimumDate,
   DateTime? maximumDate,
 }) async {
-  return await _showCupertinoPicker(
+  return await _showPicker(
     context: context,
     pickerBackgroundColor: pickerBackgroundColor,
     mode: CupertinoDatePickerMode.dateAndTime,
@@ -272,7 +306,7 @@ Future<DateTime?> _showCupertinoDateTimePicker({
   );
 }
 
-Future<DateTime?> _showCupertinoTimePicker({
+Future<DateTime?> _showTimePicker({
   required BuildContext context,
   required Color pickerBackgroundColor,
   DateTime? initialDate,
@@ -280,7 +314,7 @@ Future<DateTime?> _showCupertinoTimePicker({
   DateTime? minimumDate,
   DateTime? maximumDate,
 }) async {
-  return await _showCupertinoPicker(
+  return await _showPicker(
     context: context,
     mode: CupertinoDatePickerMode.time,
     pickerBackgroundColor: pickerBackgroundColor,
@@ -291,22 +325,7 @@ Future<DateTime?> _showCupertinoTimePicker({
   );
 }
 
-// Widget _buildHeader(
-//   String? header,
-// ) {
-//   if (header == null || header.isEmpty) {
-//     return SizedBox.shrink();
-//   }
-//   return Material(
-//     // color: theme.color.backgroundSecondary,
-//     child: Description(
-//       text: header,
-//       textAlign: TextAlign.center,
-//     ),
-//   );
-// }
-
-Future<DateTime?> _showCupertinoPicker({
+Future<DateTime?> _showPicker({
   required BuildContext context,
   required CupertinoDatePickerMode mode,
   required Color pickerBackgroundColor,
@@ -330,11 +349,12 @@ Future<DateTime?> _showCupertinoPicker({
                 Row(
                   children: [
                     CupertinoButton(
-                      child: const Text(
+                      child: Text(
                         'Cancel',
-                        style: TextStyle(
-                          color: Colors.black38,
-                        ),
+                        style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+                              color: CupertinoDynamicColor.resolve(
+                                  CupertinoColors.placeholderText, context),
+                            ),
                       ),
                       onPressed: () {
                         Navigator.of(context).pop(null);
@@ -350,9 +370,6 @@ Future<DateTime?> _showCupertinoPicker({
                     ),
                   ],
                 ),
-                // _buildHeader(
-                //   header,
-                // ),
                 SizedBox(
                   height: 280,
                   child: CupertinoDatePicker(
@@ -362,7 +379,7 @@ Future<DateTime?> _showCupertinoPicker({
                     minimumDate: minimumDate,
                     maximumDate: maximumDate,
                     onDateTimeChanged: (DateTime value) {
-                      dateTime = value;
+                      dateTime = value.clamp(minimumDate, maximumDate);
                       setState(() {});
                     },
                   ),
