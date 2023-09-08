@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:lite_forms/base_form_fields/exports.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
+import 'package:lite_forms/utils/value_validator.dart';
 
 class LiteDatePicker extends StatefulWidget {
   const LiteDatePicker({
@@ -15,6 +16,7 @@ class LiteDatePicker extends StatefulWidget {
     this.initialValue,
     this.format,
     this.pickerBackgroundColor,
+    this.autovalidateMode,
     this.dateInputType = DateInputType.date,
   });
 
@@ -23,6 +25,7 @@ class LiteDatePicker extends StatefulWidget {
   final DateFormat? format;
   final DateInputType dateInputType;
   final Color? pickerBackgroundColor;
+  final AutovalidateMode? autovalidateMode;
 
   /// Allows you to prepare the data for some general usage like sending it
   /// to an api endpoint. E.g. you have a Date Picker which returns a DateTime object
@@ -40,7 +43,7 @@ class LiteDatePicker extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueConvertor? initialValueDeserializer;
-  final FormFieldValidator<String>? validator;
+  final LiteFormFieldValidator<String>? validator;
 
   @override
   State<LiteDatePicker> createState() => _LiteDatePickerState();
@@ -106,6 +109,8 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
       fieldName: widget.name,
       formName: _group!.name,
       serializer: widget.serializer,
+      validator: widget.validator,
+      autovalidateMode: widget.autovalidateMode,
     );
     DateTime? value =
         widget.initialValueDeserializer?.call(widget.initialValue) as DateTime? ??
@@ -113,7 +118,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
 
     final dateFormat = widget.format ??
         liteFormController.config?.defaultPickerFormat ??
-        DateFormat('dd MMM, yyyy');
+        DateFormat('dd MMMM, yyyy');
     if (value != null) {
       if (!_hasSetInitialValue) {
         _hasSetInitialValue = true;
@@ -144,7 +149,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
         child: IgnorePointer(
           child: LiteTextFormField(
             name: widget.name,
-            // initialValue: value != null ? dateFormat.format(value) : null,
+            autovalidateMode: widget.autovalidateMode,
             onChanged: (value) {
               liteFormController.onValueChanged(
                 formName: _group!.name,

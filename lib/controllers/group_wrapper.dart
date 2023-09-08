@@ -8,16 +8,27 @@ class _FormGroupWrapper {
   /// required to call native validators
   FormState? _formState;
 
+  bool get isBeingValidated {
+    return _fields.values.any((e) => e._isBeingValidated);
+  }
+  
+
   FormGroupField<T> tryRegisterField<T>({
     required String name,
     required LiteFormValueConvertor serializer,
+    required LiteFormFieldValidator<T>? validator,
+    required AutovalidateMode? autovalidateMode,
   }) {
     if (!_fields.containsKey(name)) {
       _fields[name] = FormGroupField<T>(
         name: name,
       );
     }
-    _fields[name]?._serializer = serializer;
+    final field = _fields[name]! as FormGroupField<T>;
+    field._serializer = serializer;
+    field._validator = validator;
+    field._autovalidateMode = autovalidateMode;
+    field._parent = this;
     return _fields[name] as FormGroupField<T>;
   }
 
@@ -33,7 +44,19 @@ class _FormGroupWrapper {
     return map;
   }
 
-  bool validate() {
+  Future<bool> validate() async {
+    for (var field in _fields.values) {
+      /// casting field to a dynamic is a required hack to 
+      /// disable flutter runtime type check for its validator 
+      /// which will never pass
+      await field._checkError();
+    }
+    /// This call will trigger inner form validators
+    /// that will catch the possible errors from asynchronous validators
+    return _validateNativeForm();
+  }
+
+  bool _validateNativeForm() {
     return _formState?.validate() ?? true;
   }
 
@@ -48,6 +71,9 @@ class _FormGroupWrapper {
 class FormGroupField<T> {
   final String name;
   LiteFormValueConvertor? _serializer;
+  LiteFormFieldValidator<T>? _validator;
+  AutovalidateMode? _autovalidateMode;
+  _FormGroupWrapper? _parent;
 
   TextEditingController? _textEditingController;
   TextEditingController? get textEditingController => _textEditingController;
@@ -78,11 +104,11 @@ class FormGroupField<T> {
   Object? _value;
 
   /// [view] is a String that will be displayed
-  /// to a user. This must be null for text inputs 
-  /// since they are updated on user input but for 
-  /// other inputs e.g. a LiteDatePicker this must be a 
+  /// to a user. This must be null for text inputs
+  /// since they are updated on user input but for
+  /// other inputs e.g. a LiteDatePicker this must be a
   /// formatted date representation
-  void updateValue(
+  void onChange(
     Object? value, [
     bool isInitialValue = false,
     String? view,
@@ -101,6 +127,45 @@ class FormGroupField<T> {
         }
       }
     }
+    if (_isSelfValidating) {
+      
+      _checkError().then((value) {
+        return _parent?._validateNativeForm();
+      });
+    }
+  }
+
+  int _numValidations = 0;
+
+  bool get _isBeingValidated  =>_numValidations > 0;
+
+  
+
+  bool get _isSelfValidating {
+    switch (_autovalidateMode) {
+      
+      case AutovalidateMode.disabled:
+      case null:
+        return false;
+      case AutovalidateMode.always:
+      case AutovalidateMode.onUserInteraction:
+        return true;
+    }
+  }
+
+
+  Future _checkError() async {
+    _numValidations ++;
+    dynamic fieldAsDynamic = this as dynamic;
+    final error = await fieldAsDynamic._validator?.call(_value);
+    _setError(error?.toString());
+    _numValidations --;
+  }
+
+  String? _error;
+  String? get error => _error;
+  void _setError(String? error) {
+    _error = error;
   }
 
   Object? get serializedValue {

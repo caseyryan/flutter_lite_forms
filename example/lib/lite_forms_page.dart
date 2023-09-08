@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 // ignore_for_file: prefer_const_literals_to_create_immutables
 
 import 'package:example/login_page.dart';
@@ -30,8 +30,9 @@ class LiteFormsPage extends StatelessWidget {
                     const SizedBox(height: 20.0),
                     LiteTextFormField( 
                       name: 'login',
-                      validator: (value) {
+                      validator: (value) async {
                         if (value?.isNotEmpty != true) {
+                          await Future.delayed(Duration(milliseconds: 1000));
                           return 'Field is required';
                         }
                         return null;
@@ -51,12 +52,13 @@ class LiteFormsPage extends StatelessWidget {
                       initialValue: DateTime.now(),
                     ),
                     MaterialButton(
-                      onPressed: () {
-                        if (validateLiteForm(formName)) {
+                      onPressed: () async {
+                        if (await validateLiteForm(formName)) {
                           final formData = getFormData(formName);
                           if (kDebugMode) {
                             print(formData);
                           }
+                          
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) {

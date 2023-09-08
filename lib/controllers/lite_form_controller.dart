@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lite_forms/utils/controller_initializer.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
+import 'package:lite_forms/utils/value_validator.dart';
 import 'package:lite_state/lite_state.dart';
 
 part 'group_wrapper.dart';
@@ -14,8 +17,16 @@ void clearLiteForm(String formName) {
   liteFormController.clearForm(formName);
 }
 
-bool validateLiteForm(String formName) {
-  return liteFormController.validateForm(
+/// Allows to check if a form is in the process of being validated
+bool isFormBeingValidated(String formName) {
+  return liteFormController._isFormBeingValidated(formName);
+}
+
+/// This method is made asynchronous because
+/// validators in LiteForms can be asynchronous unlike
+/// many in other form packages
+Future<bool> validateLiteForm(String formName) async {
+  return await liteFormController.validateForm(
     formName: formName,
   );
 }
@@ -31,11 +42,11 @@ LiteFormController get liteFormController {
 }
 
 class LiteFormController extends LiteStateController<LiteFormController> {
-  final Map<String, _FormGroupWrapper> _groups = {};
+  final Map<String, _FormGroupWrapper> _formGroups = {};
 
   LiteFormsConfiguration? _config;
   LiteFormsConfiguration? get config => _config;
-  
+
   void configureLiteFormUI({
     LiteFormsConfiguration? config,
   }) {
@@ -49,39 +60,41 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     required String formName,
     FormState? formState,
   }) {
-    if (!_groups.containsKey(formName)) {
-      _groups[formName] = _FormGroupWrapper();
+    if (!_formGroups.containsKey(formName)) {
+      _formGroups[formName] = _FormGroupWrapper();
     }
     if (formState != null) {
-      _groups[formName]?._formState = formState;
+      _formGroups[formName]?._formState = formState;
     }
   }
-
 
   Object? tryGetValueForField({
     required String formName,
     required String fieldName,
   }) {
-    final field = _groups[formName]?.tryFindField(fieldName);
+    final field = _formGroups[formName]?.tryFindField(fieldName);
     return field?._value;
   }
 
-  bool validateForm({
+  Future<bool> validateForm({
     required String formName,
-  }) {
-    return _groups[formName]?.validate() ?? true;
+  }) async {
+    startLoading();
+    final result = await _formGroups[formName]?.validate() ?? true;
+    stopLoading();
+    return result;
   }
 
   Map<String, dynamic> getFormData(String formName) {
-    return _groups[formName]?.getFormData() ?? {};
+    return _formGroups[formName]?.getFormData() ?? {};
   }
 
   void onFormDisposed({
     required String formName,
     required bool autoDispose,
   }) {
-    if (_groups.containsKey(formName)) {
-      final wrapper = _groups[formName];
+    if (_formGroups.containsKey(formName)) {
+      final wrapper = _formGroups[formName];
       wrapper?.clearDependencies();
       if (autoDispose) {
         clearForm(formName);
@@ -90,13 +103,13 @@ class LiteFormController extends LiteStateController<LiteFormController> {
   }
 
   void clearForm(String formName) {
-    _groups.remove(formName);
+    _formGroups.remove(formName);
   }
 
   /// [view] is a String that will be displayed
-  /// to a user. This must be null for text inputs 
-  /// since they are updated on user input but for 
-  /// other inputs e.g. a LiteDatePicker this must be a 
+  /// to a user. This must be null for text inputs
+  /// since they are updated on user input but for
+  /// other inputs e.g. a LiteDatePicker this must be a
   /// formatted date representation
   void onValueChanged({
     required String formName,
@@ -105,9 +118,9 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     String? view,
     bool isInitialValue = false,
   }) {
-    _FormGroupWrapper? group = _groups[formName];
+    _FormGroupWrapper? group = _formGroups[formName];
     if (group != null) {
-      group.tryFindField(fieldName)?.updateValue(
+      group.tryFindField(fieldName)?.onChange(
             value,
             isInitialValue,
             view,
@@ -115,18 +128,26 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     }
   }
 
-  /// Registers a form field for a specified form. If the 
+  bool _isFormBeingValidated(String formName) {
+    return _formGroups[formName]?.isBeingValidated == true;
+  }
+
+  /// Registers a form field for a specified form. If the
   /// form field is already registered, it does nothing
   FormGroupField<T> registerFormField<T>({
     required String formName,
     required String fieldName,
     required LiteFormValueConvertor serializer,
+    required LiteFormFieldValidator<T>? validator,
+    required AutovalidateMode? autovalidateMode,
   }) {
     createFormIfNull(formName: formName);
-    final groupWrapper = _groups[formName]!;
+    final groupWrapper = _formGroups[formName]!;
     return groupWrapper.tryRegisterField(
       name: fieldName,
       serializer: serializer,
+      validator: validator,
+      autovalidateMode: autovalidateMode,
     );
   }
 

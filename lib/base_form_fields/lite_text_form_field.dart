@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/utils/string_extensions.dart';
+import 'package:lite_forms/utils/value_validator.dart';
 
 import '../lite_forms.dart';
 
@@ -91,7 +92,7 @@ class LiteTextFormField<T> extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueConvertor? initialValueDeserializer;
-  final FormFieldValidator<String>? validator;
+  final LiteFormFieldValidator<String>? validator;
   final String? restorationId;
   final String? initialValue;
   final FocusNode? focusNode;
@@ -160,6 +161,8 @@ class _LiteTextFormFieldState<T> extends State<LiteTextFormField<T>> {
       fieldName: widget.name,
       formName: group!.name,
       serializer: widget.serializer,
+      validator: widget.validator,
+      autovalidateMode: widget.autovalidateMode,
     );
     final textEditingController = field.getOrCreateTextEditingController(
       controller: widget.controller,
@@ -202,11 +205,13 @@ class _LiteTextFormFieldState<T> extends State<LiteTextFormField<T>> {
       child: TextFormField(
         restorationId: widget.restorationId,
         scrollController: widget.scrollController,
-        validator: widget.validator,
+        validator: widget.validator != null ? (value) {
+          return field.error;
+        } : null,
         autocorrect: widget.autocorrect,
         autofillHints: widget.autofillHints,
         autofocus: widget.autofocus,
-        autovalidateMode: widget.autovalidateMode,
+        autovalidateMode: null,
         buildCounter: widget.buildCounter,
         contextMenuBuilder: widget.contextMenuBuilder,
         controller: textEditingController,
