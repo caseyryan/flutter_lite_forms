@@ -160,10 +160,11 @@ class FormGroupField<T> {
   Future _checkError() async {
     _numValidations++;
     dynamic fieldAsDynamic = this as dynamic;
+    final lastError = _error;
     final error = await fieldAsDynamic._validator?.call(_value);
     _setError(error?.toString());
     _numValidations--;
-    if (error?.isNotEmpty == true) {
+    if (error != lastError) {
       liteFormController.rebuild();
     }
   }

@@ -13,6 +13,10 @@ class LiteTextFormField extends StatefulWidget {
   LiteTextFormField({
     super.key,
     required this.name,
+    this.useSmoothError = false,
+    this.smoothErrorPadding = const EdgeInsets.only(
+      top: 6.0,
+    ),
     this.hintText,
     this.serializer = nonConvertingValueConvertor,
     this.initialValueDeserializer,
@@ -76,6 +80,12 @@ class LiteTextFormField extends StatefulWidget {
   final String name;
   final String? hintText;
   final TextEditingController? controller;
+  final EdgeInsets? smoothErrorPadding;
+
+  /// if true, this will use a smoothly animated error
+  /// that uses AnimateSize to display, unlike the standard
+  /// Flutter's input error
+  final bool useSmoothError;
 
   /// Allows you to prepare the data for some general usage like sending it
   /// to an api endpoint. E.g. you have a Date Picker which returns a DateTime object
@@ -189,13 +199,15 @@ class _LiteTextFormFieldState<T> extends State<LiteTextFormField> {
         hintText = widget.name.splitByCamelCase();
       }
     }
-    var decoration = widget.decoration ?? liteFormController.config?.inputDecoration ?? const InputDecoration();
+    var decoration = widget.decoration ??
+        liteFormController.config?.inputDecoration ??
+        const InputDecoration();
     if (hintText?.isNotEmpty == true) {
       decoration = decoration.copyWith(
         hintText: hintText,
       );
     }
-    
+
     return Padding(
       padding: EdgeInsets.only(
         top: widget.paddingTop,
@@ -208,9 +220,11 @@ class _LiteTextFormFieldState<T> extends State<LiteTextFormField> {
           TextFormField(
             restorationId: widget.restorationId,
             scrollController: widget.scrollController,
-            validator: widget.validator != null ? (value) {
-              return field.error;
-            } : null,
+            validator: widget.validator != null
+                ? (value) {
+                    return field.error;
+                  }
+                : null,
             autocorrect: widget.autocorrect,
             autofillHints: widget.autofillHints,
             autofocus: widget.autofocus,
@@ -222,7 +236,14 @@ class _LiteTextFormFieldState<T> extends State<LiteTextFormField> {
             cursorHeight: widget.cursorHeight,
             cursorRadius: widget.cursorRadius,
             cursorWidth: widget.cursorWidth,
-            decoration: decoration,
+            decoration: widget.useSmoothError
+                ? decoration.copyWith(
+                    errorStyle: const TextStyle(
+                      fontSize: .01,
+                      color: Colors.transparent,
+                    ),
+                  )
+                : decoration,
             enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
             enableInteractiveSelection: widget.enableInteractiveSelection,
             enableSuggestions: widget.enableSuggestions,
@@ -265,10 +286,16 @@ class _LiteTextFormFieldState<T> extends State<LiteTextFormField> {
             textDirection: widget.textDirection,
             textInputAction: widget.textInputAction,
           ),
-          LiteFormErrorLine(
-            fieldName: widget.name,
-            formName: group.name,
-          ),
+          if (widget.useSmoothError)
+            LiteFormErrorLine(
+              fieldName: widget.name,
+              formName: group.name,
+              decoration: decoration,
+              paddingBottom: widget.smoothErrorPadding?.bottom,
+              paddingTop: widget.smoothErrorPadding?.top,
+              paddingLeft: widget.smoothErrorPadding?.left,
+              paddingRight: widget.smoothErrorPadding?.right,
+            ),
         ],
       ),
     );

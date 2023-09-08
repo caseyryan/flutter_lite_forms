@@ -29,6 +29,7 @@ class LiteFormsPage extends StatelessWidget {
                   [
                     const SizedBox(height: 20.0),
                     LiteTextFormField( 
+                      useSmoothError: true,
                       name: 'login',
                       validator: (value) async {
                         if (value?.isNotEmpty != true) {

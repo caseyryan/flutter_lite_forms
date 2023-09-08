@@ -11,8 +11,8 @@ class LiteFormErrorLine extends StatefulWidget {
     this.paddingBottom,
     this.paddingRight,
     this.paddingLeft,
-    this.style,
     this.isExpanded = true,
+    this.decoration,
     this.textAlign = TextAlign.left,
   }) : super(key: key);
 
@@ -23,16 +23,14 @@ class LiteFormErrorLine extends StatefulWidget {
   final double? paddingLeft;
   final double? paddingRight;
   final TextAlign textAlign;
-  final TextStyle? style;
   final bool isExpanded;
+  final InputDecoration? decoration;
 
   @override
   State<LiteFormErrorLine> createState() => _LiteFormErrorLineState();
 }
 
 class _LiteFormErrorLineState extends State<LiteFormErrorLine> {
-  
-
   @override
   Widget build(BuildContext context) {
     return LiteState<LiteFormController>(
@@ -42,25 +40,25 @@ class _LiteFormErrorLineState extends State<LiteFormErrorLine> {
           formName: widget.formName,
         );
         final hasText = field?.error?.isNotEmpty == true;
-        return AnimatedPadding(
-          padding: EdgeInsets.only(
-            bottom: !hasText ? 0.0 : widget.paddingBottom ?? 0.0,
-            top: !hasText ? 0.0 : widget.paddingTop ?? 0.0,
-            right: !hasText ? 0.0 : widget.paddingRight ?? 0.0,
-            left: !hasText ? 0.0 : widget.paddingLeft ?? 0.0,
-          ),
+        return AnimatedOpacity(
+          opacity: hasText ? 1.0 : 0.0,
           duration: kThemeAnimationDuration,
-          child: AnimatedOpacity(
-            opacity: hasText ? 1.0 : 0.0,
+          child: AnimatedSize(
+            alignment: Alignment.topLeft,
             duration: kThemeAnimationDuration,
-            child: AnimatedSize(
-              duration: kThemeAnimationDuration,
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: !hasText ? 0.0 : widget.paddingBottom ?? 0.0,
+                top: !hasText ? 0.0 : widget.paddingTop ?? 0.0,
+                right: !hasText ? 0.0 : widget.paddingRight ?? 0.0,
+                left: !hasText ? 0.0 : widget.paddingLeft ?? 0.0,
+              ),
               child: SizedBox(
-                width: (widget.isExpanded && hasText) ? double.infinity : null,
+                width: widget.isExpanded ? double.infinity : null,
                 height: !hasText ? 0.0 : null,
                 child: Text(
                   field?.error ?? '',
-                  style: widget.style,
+                  style: widget.decoration?.errorStyle,
                   textAlign: widget.textAlign,
                 ),
               ),
