@@ -50,10 +50,10 @@ class LiteFormsPage extends StatelessWidget {
                     const SizedBox(height: 20.0),
                     LiteDatePicker(
                       textAlign: TextAlign.center,
-                      dateInputType: DateInputType.time,
+                      dateInputType: DateInputType.both,
                       name: 'dateOfBirth',
                       initialValue: DateTime.now(),
-                      pickerType: LiteDatePickerType.material,
+                      pickerType: LiteDatePickerType.cupertino,
                       validator: (value) async {
                         // return 'Date is incorrect';
                         return null;

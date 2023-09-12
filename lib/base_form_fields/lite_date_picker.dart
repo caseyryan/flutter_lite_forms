@@ -10,7 +10,7 @@ import 'package:lite_forms/utils/string_extensions.dart';
 import 'package:lite_forms/utils/value_validator.dart';
 
 enum LiteDatePickerType {
-  iOS,
+  cupertino,
   material,
   adaptive,
 }
@@ -107,9 +107,6 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
   LiteFormGroup? _group;
   bool _hasSetInitialValue = false;
 
-  /// used only for a material time / date time picker
-  DateTime? _selectedDateTime;
-
   @override
   void didUpdateWidget(covariant LiteDatePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -124,17 +121,17 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     } else {
       if (widget.pickerType == LiteDatePickerType.adaptive) {
         if (Platform.isIOS) {
-          return LiteDatePickerType.iOS;
+          return LiteDatePickerType.cupertino;
         }
-      } else if (widget.pickerType == LiteDatePickerType.iOS) {
-        return LiteDatePickerType.iOS;
+      } else if (widget.pickerType == LiteDatePickerType.cupertino) {
+        return LiteDatePickerType.cupertino;
       }
     }
     return LiteDatePickerType.material;
   }
 
   bool get _isIos {
-    return _type == LiteDatePickerType.iOS;
+    return _type == LiteDatePickerType.cupertino;
   }
 
   Future<DateTime?> _onShowPickerPressed({
@@ -212,16 +209,23 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     if (widget.dateInputType == DateInputType.time) {
       return widget.format ??
           liteFormController.config?.defaultTimePickerFormat ??
-          local_intl.DateFormat('hh:mm');
+          local_intl.DateFormat(_timeFormat);
     }
 
     if (widget.dateInputType == DateInputType.both) {
       return widget.format ??
           liteFormController.config?.defaultDateTimePickerFormat ??
-          local_intl.DateFormat('dd MMMM, yyyy | hh:mm');
+          local_intl.DateFormat('dd MMMM, yyyy | $_timeFormat');
     }
 
     return local_intl.DateFormat('dd MMMM, yyyy');
+  }
+
+  String get _timeFormat {
+    if (widget.use24HourFormat) {
+      return 'HH:mm';
+    }
+    return 'hh:mm';
   }
 
   Future<DateTime?> _showDatePicker({
@@ -360,39 +364,65 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     }
     minimumDate ??= DateTime(0);
     maximumDate ??= DateTime(2100);
-    _selectedDateTime = DateTime.now().clamp(minimumDate, maximumDate);
 
-    if (mode == CupertinoDatePickerMode.time) {
-      final timeOfDay = await showTimePicker(
+    if (mode == CupertinoDatePickerMode.date) {
+      return await showDatePicker(
         context: context,
-        initialEntryMode: widget.initialEntryMode,
-        initialTime: TimeOfDay.fromDateTime(dateTime),
-        builder: widget.use24HourFormat
-            ? (BuildContext context, Widget? child) {
-                return MediaQuery(
-                  data: MediaQuery.of(context).copyWith(
-                    alwaysUse24HourFormat: true,
-                  ),
-                  child: child!,
-                );
-              }
-            : null,
-      );
-      if (timeOfDay == null) {
-        return null;
-      }
-      return _selectedDateTime!.copyWith(
-        hour: timeOfDay.hour,
-        minute: timeOfDay.minute,
+        initialDate: dateTime,
+        firstDate: minimumDate,
+        lastDate: maximumDate,
       );
     }
 
-    return showDatePicker(
-      context: context,
-      initialDate: dateTime,
-      firstDate: minimumDate,
-      lastDate: maximumDate,
+    /// used only for a material time / date time picker
+    DateTime? selectedTime = DateTime.now().clamp(
+      minimumDate,
+      maximumDate,
     );
+
+    final timeOfDay = await showTimePicker(
+      context: context,
+      initialEntryMode: widget.initialEntryMode,
+      initialTime: TimeOfDay.fromDateTime(dateTime),
+      builder: widget.use24HourFormat
+          ? (BuildContext context, Widget? child) {
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  alwaysUse24HourFormat: true,
+                ),
+                child: child!,
+              );
+            }
+          : null,
+    );
+    if (timeOfDay == null) {
+      return null;
+    }
+    selectedTime = selectedTime.copyWith(
+      hour: timeOfDay.hour,
+      minute: timeOfDay.minute,
+    );
+    if (mode == CupertinoDatePickerMode.time) {
+      return selectedTime;
+    }
+    if (mounted) {
+      final selectedDate = await showDatePicker(
+        context: context,
+        initialDate: dateTime,
+        firstDate: minimumDate,
+        lastDate: maximumDate,
+      );
+      if (selectedDate == null) {
+        return selectedTime;
+      }
+
+      return selectedDate.copyWith(
+        hour: selectedTime.hour,
+        minute: selectedTime.minute,
+        second: 0,
+      );
+    }
+    return null;
   }
 
   @override
