@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   lite_state: ^2.3.0
+  flutter_multi_formatter: ^2.11.7
 
 dev_dependencies:
   flutter_test:

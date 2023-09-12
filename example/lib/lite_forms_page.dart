@@ -29,6 +29,8 @@ class LiteFormsPage extends StatelessWidget {
                   [
                     const SizedBox(height: 20.0),
                     LiteTextFormField( 
+                      maxLines: 20,
+                      textEntryType: LiteTextEntryType.onModalRoute,
                       useSmoothError: true,
                       name: 'login',
                       validator: (value) async {
@@ -54,6 +56,7 @@ class LiteFormsPage extends StatelessWidget {
                       name: 'dateOfBirth',
                       initialValue: DateTime.now(),
                       pickerType: LiteDatePickerType.cupertino,
+                      autovalidateMode: AutovalidateMode.disabled,
                       validator: (value) async {
                         // return 'Date is incorrect';
                         return null;

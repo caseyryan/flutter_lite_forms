@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
+import 'package:lite_forms/lite_forms.dart';
 import 'package:lite_state/lite_state.dart';
 
 /// Wrap your form with this group
@@ -8,10 +10,12 @@ class LiteFormGroup extends InheritedWidget {
     Key? key,
     required this.name,
     this.autoDispose = true,
+    this.allowUnfocusOnTapOutside,
     required Widget child,
   }) : super(
           child: _LiteGroupWrapper(
             name: name,
+            allowUnfocusOnTapOutside: allowUnfocusOnTapOutside,
             onDispose: () {
               liteFormController.onFormDisposed(
                 formName: name,
@@ -44,6 +48,12 @@ class LiteFormGroup extends InheritedWidget {
   /// clearLiteForm method
   final bool autoDispose;
 
+  /// if true it will automatically unfocus any active focus node
+  /// on tap outside. null by default, which equivalent to true
+  /// You can also set this globally via a config 
+  /// value passed into a [initializeLiteForms] function,
+  final bool? allowUnfocusOnTapOutside;
+
   @override
   bool updateShouldNotify(LiteFormGroup oldWidget) => false;
   static LiteFormGroup? of(BuildContext context) =>
@@ -55,11 +65,13 @@ class _LiteGroupWrapper extends StatefulWidget {
     required this.child,
     required this.onDispose,
     required this.name,
+    required this.allowUnfocusOnTapOutside,
   });
 
   final String name;
   final Widget child;
   final VoidCallback onDispose;
+  final bool? allowUnfocusOnTapOutside;
 
   @override
   State<_LiteGroupWrapper> createState() => __LiteGroupWrapperState();
@@ -79,9 +91,21 @@ class __LiteGroupWrapperState extends State<_LiteGroupWrapper> {
     liteFormController.checkAlwaysValidatingFields(
       formName: widget.name,
     );
-    return Form(
-      key: _formKey,
-      child: widget.child,
+    bool isUnfocuserEnabled = false;
+    if (!kIsWeb) {
+      isUnfocuserEnabled = widget.allowUnfocusOnTapOutside ??
+          liteFormController.config?.allowUnfocusOnTapOutside ??
+          true;
+    }
+    return Unfocuser(
+      isEnabled: isUnfocuserEnabled,
+      child: Container(
+        color: Colors.transparent,
+        child: Form(
+          key: _formKey,
+          child: widget.child,
+        ),
+      ),
     );
   }
 }

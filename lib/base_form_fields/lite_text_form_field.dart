@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
@@ -9,10 +10,25 @@ import 'package:lite_forms/utils/value_validator.dart';
 import '../lite_forms.dart';
 import 'error_line.dart';
 
+enum LiteTextEntryType {
+  normal,
+  onModalRoute,
+}
+
+class TextEntryModalRouteSettings {
+  final double backgroundOpacity;
+  final TextCapitalization textCapitalization;
+  TextEntryModalRouteSettings({
+    this.textCapitalization = TextCapitalization.sentences,
+    this.backgroundOpacity = 0.95,
+  });
+}
+
 class LiteTextFormField extends StatefulWidget {
   LiteTextFormField({
     super.key,
     required this.name,
+    this.textEntryType = LiteTextEntryType.normal,
     this.useSmoothError = false,
     this.smoothErrorPadding = const EdgeInsets.only(
       top: 6.0,
@@ -49,7 +65,6 @@ class LiteTextFormField extends StatefulWidget {
     this.expands = false,
     this.maxLength,
     this.onChanged,
-    this.onTap,
     this.onTapOutside,
     this.onEditingComplete,
     this.onFieldSubmitted,
@@ -75,12 +90,23 @@ class LiteTextFormField extends StatefulWidget {
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
     this.paddingRight = 0.0,
+    this.modalRouteSettings,
   });
 
   final String name;
   final String? hintText;
   final TextEditingController? controller;
+
+  /// makes sense only if [textEntryType] is [LiteTextEntryType.onModalRoute]
+  final TextEntryModalRouteSettings? modalRouteSettings;
+
+  /// makes sense only of [useSmoothError] is true
   final EdgeInsets? smoothErrorPadding;
+
+  /// if you pass [LiteTextEntryType.onModalRoute]
+  /// then when you tap a text field a separate full screen
+  /// route will be opened to enter a text
+  final LiteTextEntryType textEntryType;
 
   /// if true, this will use a smoothly animated error
   /// that uses AnimateSize to display, unlike the standard
@@ -131,7 +157,6 @@ class LiteTextFormField extends StatefulWidget {
   bool expands = false;
   final int? maxLength;
   final ValueChanged<String>? onChanged;
-  final GestureTapCallback? onTap;
   final TapRegionCallback? onTapOutside;
   final VoidCallback? onEditingComplete;
   final ValueChanged<String>? onFieldSubmitted;
@@ -162,20 +187,51 @@ class LiteTextFormField extends StatefulWidget {
   State<LiteTextFormField> createState() => _LiteTextFormFieldState();
 }
 
-class _LiteTextFormFieldState<T> extends State<LiteTextFormField> {
+class _LiteTextFormFieldState extends State<LiteTextFormField> {
   bool _hasSetInitialValue = false;
+  late FormGroupField<String> _field;
+  late String _formName;
+
+  VoidCallback? _getTapMethod() {
+    if (widget.textEntryType == LiteTextEntryType.onModalRoute) {
+      return _openTextEntryRoute;
+    }
+    return null;
+  }
+
+  Future _openTextEntryRoute() async {
+    if (mounted) {
+      final result = await Navigator.of(context).push(
+        _TextEntryRoute(
+          modalRouteSettings: widget.modalRouteSettings,
+          hintText: widget.hintText,
+          selection: _field.textEditingController?.selection,
+          text: _field.textEditingController?.text ?? '',
+        ),
+      );
+      if (result is String) {
+        liteFormController.onValueChanged(
+          formName: _formName,
+          fieldName: widget.name,
+          value: result,
+          isInitialValue: true,
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final group = LiteFormGroup.of(context);
-    final field = liteFormController.registerFormField(
+    _formName = group!.name;
+    _field = liteFormController.registerFormField(
       fieldName: widget.name,
-      formName: group!.name,
+      formName: _formName,
       serializer: widget.serializer,
       validator: widget.validator,
       autovalidateMode: widget.autovalidateMode,
     );
-    final textEditingController = field.getOrCreateTextEditingController(
+    final textEditingController = _field.getOrCreateTextEditingController(
       controller: widget.controller,
     );
 
@@ -222,7 +278,7 @@ class _LiteTextFormFieldState<T> extends State<LiteTextFormField> {
             scrollController: widget.scrollController,
             validator: widget.validator != null
                 ? (value) {
-                    return field.error;
+                    return _field.error;
                   }
                 : null,
             autocorrect: widget.autocorrect,
@@ -269,7 +325,7 @@ class _LiteTextFormFieldState<T> extends State<LiteTextFormField> {
             },
             onEditingComplete: widget.onEditingComplete,
             onFieldSubmitted: widget.onFieldSubmitted,
-            onTap: widget.onTap,
+            onTap: _getTapMethod(),
             onTapOutside: widget.onTapOutside,
             scrollPadding: widget.scrollPadding,
             readOnly: widget.readOnly,
@@ -298,6 +354,175 @@ class _LiteTextFormFieldState<T> extends State<LiteTextFormField> {
             ),
         ],
       ),
+    );
+  }
+}
+
+class _TextEntryRoute extends ModalRoute {
+  _TextEntryRoute({
+    required this.selection,
+    required this.text,
+    this.modalRouteSettings,
+    this.hintText,
+  });
+
+  final TextEntryModalRouteSettings? modalRouteSettings;
+  final String? hintText;
+  final String text;
+  final TextSelection? selection;
+
+  @override
+  Color? get barrierColor => null;
+
+  @override
+  bool get barrierDismissible => false;
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    return _TextEntryPage(
+      animation: animation,
+      modalRouteSettings: modalRouteSettings,
+      hintText: hintText,
+      selection: selection,
+      text: text,
+    );
+  }
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  bool get opaque => false;
+
+  @override
+  Duration get transitionDuration => kThemeAnimationDuration;
+}
+
+class _TextEntryPage extends StatefulWidget {
+  const _TextEntryPage({
+    required this.animation,
+    required this.selection,
+    required this.text,
+    this.modalRouteSettings,
+    this.hintText,
+  });
+
+  final TextEntryModalRouteSettings? modalRouteSettings;
+  final Animation<double> animation;
+  final String? hintText;
+  final TextSelection? selection;
+  final String text;
+
+  @override
+  State<_TextEntryPage> createState() => __TextEntryPageState();
+}
+
+class __TextEntryPageState extends State<_TextEntryPage> {
+  late TextEditingController _textEditingController;
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextEntryModalRouteSettings? routeSettings = widget.modalRouteSettings ??
+        liteFormController.config?.defaultTextEntryModalRouteSettings;
+    _textEditingController = TextEditingController(
+      text: widget.text,
+    );
+    if (widget.selection != null) {
+      _textEditingController.selection = widget.selection!;
+    }
+    final brightness = Theme.of(context).brightness;
+    final moveAnimation = Tween<double>(
+      begin: 10.0,
+      end: 0.0,
+    ).animate(
+      CurvedAnimation(
+        curve: Curves.easeInOutExpo,
+        parent: widget.animation,
+      ),
+    );
+    final opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: routeSettings?.backgroundOpacity ?? 1.0,
+    ).animate(
+      CurvedAnimation(
+        curve: Curves.easeInOutExpo,
+        parent: widget.animation,
+      ),
+    );
+    return AnimatedBuilder(
+      animation: widget.animation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0.0, moveAnimation.value),
+          child: Opacity(
+            opacity: opacityAnimation.value,
+            child: Scaffold(
+              appBar: CupertinoNavigationBar(
+                backgroundColor: Colors.transparent,
+                leading: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  child: const Icon(
+                    Icons.close,
+                    color: CupertinoColors.label,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                trailing: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  child: const Icon(Icons.check),
+                  onPressed: () {
+                    Navigator.of(context).pop(
+                      _textEditingController.text,
+                    );
+                  },
+                ),
+                brightness: brightness,
+                padding: const EdgeInsetsDirectional.all(
+                  8.0,
+                ),
+              ),
+              body: Column(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 8.0,
+                        left: 8.0,
+                        right: 8.0,
+                      ),
+                      child: TextFormField(
+                        textCapitalization:
+                            routeSettings?.textCapitalization ?? TextCapitalization.sentences,
+                        decoration: InputDecoration.collapsed(
+                          hintText: widget.hintText,
+                        ),
+                        controller: _textEditingController,
+                        autofocus: true,
+                        maxLines: 1000000,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
