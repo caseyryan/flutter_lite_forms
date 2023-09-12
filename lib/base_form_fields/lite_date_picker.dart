@@ -1,10 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' as intl;
 import 'package:lite_forms/controllers/lite_form_controller.dart';
+import 'package:lite_forms/intl_local/lib/intl.dart' as local_intl;
 import 'package:lite_forms/lite_forms.dart';
 import 'package:lite_forms/utils/string_extensions.dart';
 import 'package:lite_forms/utils/value_validator.dart';
+
+enum LiteDatePickerType {
+  iOS,
+  material,
+  adaptive,
+}
 
 class LiteDatePicker extends StatefulWidget {
   const LiteDatePicker({
@@ -33,14 +42,23 @@ class LiteDatePicker extends StatefulWidget {
     this.textDirection,
     this.restorationId,
     this.textAlignVertical,
+    this.use24HourFormat = true,
     this.textAlign = TextAlign.start,
+    this.pickerType = LiteDatePickerType.adaptive,
+    this.initialEntryMode = TimePickerEntryMode.dial,
   });
 
+  /// The look and feel of the picker
+  /// [LiteDatePickerType.adaptive] is selected by default
+  /// this means the picker will be automatically
+  /// set up according to the selected operating system
+  final LiteDatePickerType pickerType;
   final String name;
+  final bool use24HourFormat;
   final DateTime? initialValue;
   final DateTime? maxDate;
   final DateTime? minDate;
-  final intl.DateFormat? format;
+  final local_intl.DateFormat? format;
   final DateInputType dateInputType;
   final Color? pickerBackgroundColor;
   final AutovalidateMode? autovalidateMode;
@@ -58,6 +76,10 @@ class LiteDatePicker extends StatefulWidget {
   final TextDirection? textDirection;
   final TextAlign textAlign;
   final TextAlignVertical? textAlignVertical;
+
+  /// initial mode for a material picker. Makes sense only if
+  /// [pickerType] is [LiteDatePickerType.material]
+  final TimePickerEntryMode initialEntryMode;
 
   /// Allows you to prepare the data for some general usage like sending it
   /// to an api endpoint. E.g. you have a Date Picker which returns a DateTime object
@@ -85,12 +107,34 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
   LiteFormGroup? _group;
   bool _hasSetInitialValue = false;
 
+  /// used only for a material time / date time picker
+  DateTime? _selectedDateTime;
+
   @override
   void didUpdateWidget(covariant LiteDatePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.dateInputType != oldWidget.dateInputType) {
       _hasSetInitialValue = false;
     }
+  }
+
+  LiteDatePickerType get _type {
+    if (kIsWeb) {
+      return LiteDatePickerType.material;
+    } else {
+      if (widget.pickerType == LiteDatePickerType.adaptive) {
+        if (Platform.isIOS) {
+          return LiteDatePickerType.iOS;
+        }
+      } else if (widget.pickerType == LiteDatePickerType.iOS) {
+        return LiteDatePickerType.iOS;
+      }
+    }
+    return LiteDatePickerType.material;
+  }
+
+  bool get _isIos {
+    return _type == LiteDatePickerType.iOS;
   }
 
   Future<DateTime?> _onShowPickerPressed({
@@ -137,6 +181,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
           initialDate: currentValue,
           minimumDate: maxDate,
           maximumDate: minDate,
+          use24HourFormat: widget.use24HourFormat,
         );
         break;
       case DateInputType.both:
@@ -147,6 +192,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
           initialDate: currentValue,
           minimumDate: minDate,
           maximumDate: maxDate,
+          use24HourFormat: widget.use24HourFormat,
         );
         break;
       default:
@@ -156,26 +202,197 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     return finalValue;
   }
 
-  intl.DateFormat get _dateFormat {
+  local_intl.DateFormat get _dateFormat {
     if (widget.dateInputType == DateInputType.date) {
       return widget.format ??
           liteFormController.config?.defaultDatePickerFormat ??
-          intl.DateFormat('dd MMMM, yyyy');
+          local_intl.DateFormat('dd MMMM, yyyy');
     }
 
     if (widget.dateInputType == DateInputType.time) {
       return widget.format ??
           liteFormController.config?.defaultTimePickerFormat ??
-          intl.DateFormat('hh:mm');
+          local_intl.DateFormat('hh:mm');
     }
 
     if (widget.dateInputType == DateInputType.both) {
       return widget.format ??
           liteFormController.config?.defaultDateTimePickerFormat ??
-          intl.DateFormat('dd MMMM, yyyy | hh:mm');
+          local_intl.DateFormat('dd MMMM, yyyy | hh:mm');
     }
 
-    return intl.DateFormat('dd MMMM, yyyy');
+    return local_intl.DateFormat('dd MMMM, yyyy');
+  }
+
+  Future<DateTime?> _showDatePicker({
+    required BuildContext context,
+    required Color pickerBackgroundColor,
+    DateTime? initialDate,
+    String? header,
+    DateTime? minimumDate,
+    DateTime? maximumDate,
+  }) async {
+    return await _showPicker(
+      context: context,
+      pickerBackgroundColor: pickerBackgroundColor,
+      mode: CupertinoDatePickerMode.date,
+      header: header,
+      initialDate: initialDate,
+      minimumDate: minimumDate,
+      maximumDate: maximumDate,
+    );
+  }
+
+  Future<DateTime?> _showDateTimePicker({
+    required BuildContext context,
+    required Color pickerBackgroundColor,
+    DateTime? initialDate,
+    String? header,
+    DateTime? minimumDate,
+    DateTime? maximumDate,
+    bool use24HourFormat = true,
+  }) async {
+    return await _showPicker(
+      context: context,
+      pickerBackgroundColor: pickerBackgroundColor,
+      mode: CupertinoDatePickerMode.dateAndTime,
+      initialDate: initialDate,
+      header: header,
+      minimumDate: minimumDate,
+      maximumDate: maximumDate,
+      use24HourFormat: use24HourFormat,
+    );
+  }
+
+  Future<DateTime?> _showTimePicker({
+    required BuildContext context,
+    required Color pickerBackgroundColor,
+    DateTime? initialDate,
+    String? header,
+    DateTime? minimumDate,
+    DateTime? maximumDate,
+    bool use24HourFormat = true,
+  }) async {
+    return await _showPicker(
+      context: context,
+      mode: CupertinoDatePickerMode.time,
+      pickerBackgroundColor: pickerBackgroundColor,
+      header: header,
+      initialDate: initialDate,
+      minimumDate: minimumDate,
+      maximumDate: maximumDate,
+      use24HourFormat: use24HourFormat,
+    );
+  }
+
+  Future<DateTime?> _showPicker({
+    required BuildContext context,
+    required CupertinoDatePickerMode mode,
+    required Color pickerBackgroundColor,
+    String? header,
+    DateTime? initialDate,
+    DateTime? minimumDate,
+    DateTime? maximumDate,
+    bool use24HourFormat = true,
+  }) async {
+    var dateTime = initialDate ?? DateTime.now();
+    if (_isIos) {
+      return await showCupertinoModalPopup(
+        context: context,
+        builder: (c) {
+          return StatefulBuilder(
+            builder: (c2, setState) {
+              return Container(
+                color: pickerBackgroundColor,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        CupertinoButton(
+                          child: Text(
+                            'Cancel',
+                            style:
+                                CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+                                      color: CupertinoDynamicColor.resolve(
+                                        CupertinoColors.placeholderText,
+                                        context,
+                                      ),
+                                    ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(null);
+                          },
+                        ),
+                        const Spacer(),
+                        CupertinoButton(
+                          key: const Key('picker_done_button'),
+                          onPressed: () {
+                            Navigator.of(context).pop(dateTime);
+                          },
+                          child: const Text('Done'),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 280,
+                      child: CupertinoDatePicker(
+                        use24hFormat: use24HourFormat,
+                        key: const Key('cupertino_picker'),
+                        mode: mode,
+                        initialDateTime: dateTime,
+                        minimumDate: minimumDate,
+                        maximumDate: maximumDate,
+                        onDateTimeChanged: (DateTime value) {
+                          dateTime = value.clamp(minimumDate, maximumDate);
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      );
+    }
+    minimumDate ??= DateTime(0);
+    maximumDate ??= DateTime(2100);
+    _selectedDateTime = DateTime.now().clamp(minimumDate, maximumDate);
+
+    if (mode == CupertinoDatePickerMode.time) {
+      final timeOfDay = await showTimePicker(
+        context: context,
+        initialEntryMode: widget.initialEntryMode,
+        initialTime: TimeOfDay.fromDateTime(dateTime),
+        builder: widget.use24HourFormat
+            ? (BuildContext context, Widget? child) {
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    alwaysUse24HourFormat: true,
+                  ),
+                  child: child!,
+                );
+              }
+            : null,
+      );
+      if (timeOfDay == null) {
+        return null;
+      }
+      return _selectedDateTime!.copyWith(
+        hour: timeOfDay.hour,
+        minute: timeOfDay.minute,
+      );
+    }
+
+    return showDatePicker(
+      context: context,
+      initialDate: dateTime,
+      firstDate: minimumDate,
+      lastDate: maximumDate,
+    );
   }
 
   @override
@@ -266,129 +483,4 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
       ),
     );
   }
-}
-
-Future<DateTime?> _showDatePicker({
-  required BuildContext context,
-  required Color pickerBackgroundColor,
-  DateTime? initialDate,
-  String? header,
-  DateTime? minimumDate,
-  DateTime? maximumDate,
-}) async {
-  return await _showPicker(
-    context: context,
-    pickerBackgroundColor: pickerBackgroundColor,
-    mode: CupertinoDatePickerMode.date,
-    header: header,
-    initialDate: initialDate,
-    minimumDate: minimumDate,
-    maximumDate: maximumDate,
-  );
-}
-
-Future<DateTime?> _showDateTimePicker({
-  required BuildContext context,
-  required Color pickerBackgroundColor,
-  DateTime? initialDate,
-  String? header,
-  DateTime? minimumDate,
-  DateTime? maximumDate,
-}) async {
-  return await _showPicker(
-    context: context,
-    pickerBackgroundColor: pickerBackgroundColor,
-    mode: CupertinoDatePickerMode.dateAndTime,
-    initialDate: initialDate,
-    header: header,
-    minimumDate: minimumDate,
-    maximumDate: maximumDate,
-  );
-}
-
-Future<DateTime?> _showTimePicker({
-  required BuildContext context,
-  required Color pickerBackgroundColor,
-  DateTime? initialDate,
-  String? header,
-  DateTime? minimumDate,
-  DateTime? maximumDate,
-}) async {
-  return await _showPicker(
-    context: context,
-    mode: CupertinoDatePickerMode.time,
-    pickerBackgroundColor: pickerBackgroundColor,
-    header: header,
-    initialDate: initialDate,
-    minimumDate: minimumDate,
-    maximumDate: maximumDate,
-  );
-}
-
-Future<DateTime?> _showPicker({
-  required BuildContext context,
-  required CupertinoDatePickerMode mode,
-  required Color pickerBackgroundColor,
-  String? header,
-  DateTime? initialDate,
-  DateTime? minimumDate,
-  DateTime? maximumDate,
-}) async {
-  var dateTime = initialDate ?? DateTime.now();
-  return await showCupertinoModalPopup(
-    context: context,
-    builder: (c) {
-      return StatefulBuilder(
-        builder: (c2, setState) {
-          return Container(
-            color: pickerBackgroundColor,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    CupertinoButton(
-                      child: Text(
-                        'Cancel',
-                        style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
-                              color: CupertinoDynamicColor.resolve(
-                                  CupertinoColors.placeholderText, context),
-                            ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop(null);
-                      },
-                    ),
-                    const Spacer(),
-                    CupertinoButton(
-                      key: const Key('picker_done_button'),
-                      onPressed: () {
-                        Navigator.of(context).pop(dateTime);
-                      },
-                      child: const Text('Done'),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 280,
-                  child: CupertinoDatePicker(
-                    key: const Key('cupertino_picker'),
-                    mode: mode,
-                    initialDateTime: dateTime,
-                    minimumDate: minimumDate,
-                    maximumDate: maximumDate,
-                    onDateTimeChanged: (DateTime value) {
-                      dateTime = value.clamp(minimumDate, maximumDate);
-                      setState(() {});
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
 }

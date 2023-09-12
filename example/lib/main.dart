@@ -2,7 +2,7 @@
 
 import 'package:example/lite_forms_page.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:lite_forms/intl_local/lib/intl.dart';
 import 'package:lite_forms/utils/controller_initializer.dart';
 
 void main() {
