@@ -4,8 +4,16 @@ import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
 import 'package:lite_state/lite_state.dart';
 
-/// Wrap your form with this group
 class LiteFormGroup extends InheritedWidget {
+  /// Wrap your form with this group. Inside you can use any
+  /// LiteForm fields. Here's the list of basic LiteFormFields ->
+  /// 
+  /// [LiteTextFormField] : used to create a text input, including a multiline one and 
+  /// an input with a separate route to enter text.
+  /// 
+  /// [LiteDatePicker] : a flexible and powerful date picker which 
+  /// can use a cupertino or a material style, or use an adaptive view.
+  /// It can be used to pick date, date and time, or time only
   LiteFormGroup({
     Key? key,
     required this.name,
@@ -43,14 +51,14 @@ class LiteFormGroup extends InheritedWidget {
   /// if [autoDispose] is true, the form will be automatically
   /// disposed when a containing widget is disposed.
   /// True by default.
-  /// If you change it to false, the worm will be stored during the
+  /// If you change it to false, the form will be stored during the
   /// whole app lifecycle or unless you call
   /// clearLiteForm method
   final bool autoDispose;
 
   /// if true it will automatically unfocus any active focus node
   /// on tap outside. null by default, which equivalent to true
-  /// You can also set this globally via a config 
+  /// You can also set this globally via a config
   /// value passed into a [initializeLiteForms] function,
   final bool? allowUnfocusOnTapOutside;
 

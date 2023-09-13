@@ -55,7 +55,12 @@ class LiteDatePicker extends StatefulWidget {
   final LiteDatePickerType pickerType;
   final String name;
   final bool use24HourFormat;
-  final DateTime? initialValue;
+  /// It is assumed that the initial value is DateTime? but you might 
+  /// also pass something else, for example a iso8601 String, and the 
+  /// form field must be ok with it as long as you also pass an [initialValueDeserializer] 
+  /// which will convert initial value into a DateTime object or else you will get an 
+  /// exception
+  final Object? initialValue;
   final DateTime? maxDate;
   final DateTime? minDate;
   final local_intl.DateFormat? format;
@@ -143,7 +148,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
           formName: _group!.name,
           fieldName: widget.name,
         ) as DateTime? ??
-        widget.initialValue);
+        widget.initialValue as dynamic);
     DateTime? minDate = widget.minDate;
     DateTime? maxDate = widget.maxDate;
     if (currentValue != null) {
@@ -437,7 +442,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     );
     DateTime? value =
         widget.initialValueDeserializer?.call(widget.initialValue) as DateTime? ??
-            widget.initialValue;
+            widget.initialValue as DateTime?;
 
     final dateFormat = _dateFormat;
     if (value != null) {

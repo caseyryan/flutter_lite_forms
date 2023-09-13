@@ -102,6 +102,7 @@ class FormGroupField<T> {
   }
 
   Object? _value;
+  Object? get value => _value;
 
   /// [view] is a String that will be displayed
   /// to a user. This must be null for text inputs

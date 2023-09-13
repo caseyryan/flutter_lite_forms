@@ -1,10 +1,11 @@
 // ignore_for_file: depend_on_referenced_packages
 
-import 'package:example/lite_forms_page.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/exports.dart';
 import 'package:lite_forms/intl_local/lib/intl.dart';
 import 'package:lite_forms/utils/controller_initializer.dart';
+
+import 'start_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -53,7 +54,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const LiteFormsPage(),
+      home: const StartPage(),
     );
   }
 }

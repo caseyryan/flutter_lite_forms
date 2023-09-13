@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/lite_text_form_field.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
+import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/intl_local/lib/intl.dart';
 import 'package:lite_state/lite_state.dart';
 
@@ -14,6 +15,9 @@ void initializeLiteForms({
 }) {
   initControllersLazy({
     LiteFormController: () => LiteFormController(),
+    /// this controller is used as a helper to rebuild some parts of the UI
+    /// related to the inners parts of the form fields
+    LiteFromRebuildController: () => LiteFromRebuildController(),
   });
   if (config != null) {
     liteFormController.configureLiteFormUI(

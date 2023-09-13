@@ -25,7 +25,7 @@ class TextEntryModalRouteSettings {
 }
 
 class LiteTextFormField extends StatefulWidget {
-  LiteTextFormField({
+  const LiteTextFormField({
     super.key,
     required this.name,
     this.textEntryType = LiteTextEntryType.normal,
@@ -131,30 +131,30 @@ class LiteTextFormField extends StatefulWidget {
   final LiteFormValueConvertor? initialValueDeserializer;
   final LiteFormFieldValidator<String>? validator;
   final String? restorationId;
-  final String? initialValue;
+  final Object? initialValue;
   final FocusNode? focusNode;
   final InputDecoration? decoration;
   final TextInputType? keyboardType;
-  TextCapitalization textCapitalization = TextCapitalization.none;
+  final TextCapitalization textCapitalization;
   final TextInputAction? textInputAction;
   final TextStyle? style;
   final StrutStyle? strutStyle;
   final TextDirection? textDirection;
-  TextAlign textAlign = TextAlign.start;
+  final TextAlign textAlign;
   final TextAlignVertical? textAlignVertical;
-  bool autofocus = false;
-  bool readOnly = false;
+  final bool autofocus;
+  final bool readOnly;
   final bool? showCursor;
-  String obscuringCharacter = '•';
-  bool obscureText = false;
-  bool autocorrect = true;
+  final String obscuringCharacter;
+  final bool obscureText;
+  final bool autocorrect;
   final SmartDashesType? smartDashesType;
   final SmartQuotesType? smartQuotesType;
-  bool enableSuggestions = true;
+  final bool enableSuggestions;
   final MaxLengthEnforcement? maxLengthEnforcement;
-  int? maxLines = 1;
+  final int? maxLines;
   final int? minLines;
-  bool expands = false;
+  final bool expands;
   final int? maxLength;
   final ValueChanged<String>? onChanged;
   final TapRegionCallback? onTapOutside;
@@ -162,12 +162,12 @@ class LiteTextFormField extends StatefulWidget {
   final ValueChanged<String>? onFieldSubmitted;
   final List<TextInputFormatter>? inputFormatters;
   final bool? enabled;
-  double cursorWidth = 2.0;
+  final double cursorWidth;
   final double? cursorHeight;
   final Radius? cursorRadius;
   final Color? cursorColor;
   final Brightness? keyboardAppearance;
-  EdgeInsets scrollPadding = const EdgeInsets.all(20.0);
+  final EdgeInsets scrollPadding;
   final bool? enableInteractiveSelection;
   final TextSelectionControls? selectionControls;
   final InputCounterWidgetBuilder? buildCounter;
@@ -175,7 +175,7 @@ class LiteTextFormField extends StatefulWidget {
   final Iterable<String>? autofillHints;
   final AutovalidateMode? autovalidateMode;
   final ScrollController? scrollController;
-  bool enableIMEPersonalizedLearning = true;
+  final bool enableIMEPersonalizedLearning;
   final MouseCursor? mouseCursor;
   final EditableTextContextMenuBuilder? contextMenuBuilder;
   final double paddingTop;
@@ -207,6 +207,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
           hintText: widget.hintText,
           selection: _field.textEditingController?.selection,
           text: _field.textEditingController?.text ?? '',
+          maxLines: widget.maxLines,
         ),
       );
       if (result is String) {
@@ -235,9 +236,11 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
       controller: widget.controller,
     );
 
-    final value =
+    /// If a form was stored before, then the initial value passed from the 
+    /// constructor will have no effect and the previous value will be used instead
+    final value = _field.value ??
         widget.initialValueDeserializer?.call(widget.initialValue)?.toString() ??
-            widget.initialValue;
+        widget.initialValue?.toString();
 
     if (!_hasSetInitialValue) {
       _hasSetInitialValue = true;
@@ -310,7 +313,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
             keyboardAppearance: widget.keyboardAppearance,
             keyboardType: widget.keyboardType,
             maxLength: widget.maxLength,
-            maxLines: widget.maxLength,
+            maxLines: widget.maxLines,
             maxLengthEnforcement: widget.maxLengthEnforcement,
             minLines: widget.minLines,
             mouseCursor: widget.mouseCursor,
@@ -362,6 +365,7 @@ class _TextEntryRoute extends ModalRoute {
   _TextEntryRoute({
     required this.selection,
     required this.text,
+    required this.maxLines,
     this.modalRouteSettings,
     this.hintText,
   });
@@ -370,6 +374,7 @@ class _TextEntryRoute extends ModalRoute {
   final String? hintText;
   final String text;
   final TextSelection? selection;
+  final int? maxLines;
 
   @override
   Color? get barrierColor => null;
@@ -392,6 +397,7 @@ class _TextEntryRoute extends ModalRoute {
       hintText: hintText,
       selection: selection,
       text: text,
+      maxLines: maxLines,
     );
   }
 
@@ -410,6 +416,7 @@ class _TextEntryPage extends StatefulWidget {
     required this.animation,
     required this.selection,
     required this.text,
+    required this.maxLines,
     this.modalRouteSettings,
     this.hintText,
   });
@@ -419,6 +426,7 @@ class _TextEntryPage extends StatefulWidget {
   final String? hintText;
   final TextSelection? selection;
   final String text;
+  final int? maxLines;
 
   @override
   State<_TextEntryPage> createState() => __TextEntryPageState();
@@ -431,6 +439,13 @@ class __TextEntryPageState extends State<_TextEntryPage> {
   void dispose() {
     _textEditingController.dispose();
     super.dispose();
+  }
+
+  TextInputAction? get _textInputAction {
+    if (widget.maxLines == 1) {
+      return TextInputAction.done;
+    }
+    return TextInputAction.newline;
   }
 
   @override
@@ -506,12 +521,16 @@ class __TextEntryPageState extends State<_TextEntryPage> {
                         right: 8.0,
                       ),
                       child: TextFormField(
-                        textCapitalization:
-                            routeSettings?.textCapitalization ?? TextCapitalization.sentences,
+                        textCapitalization: routeSettings?.textCapitalization ??
+                            TextCapitalization.sentences,
                         decoration: InputDecoration.collapsed(
                           hintText: widget.hintText,
                         ),
                         controller: _textEditingController,
+                        onFieldSubmitted: (value) {
+                          Navigator.of(context).pop(value);
+                        },
+                        textInputAction: _textInputAction,
                         autofocus: true,
                         maxLines: 1000000,
                       ),

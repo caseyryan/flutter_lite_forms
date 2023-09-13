@@ -1,18 +1,20 @@
 // ignore_for_file: prefer_const_constructors
 // ignore_for_file: prefer_const_literals_to_create_immutables
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: LiteFormGroup(
-        name: 'loginForm',
+        name: 'profileForm',
         autoDispose: true,
         child: CustomScrollView(
           slivers: [
@@ -25,7 +27,18 @@ class LoginPage extends StatelessWidget {
                   [
                     const SizedBox(height: 20.0),
                     LiteTextFormField(
-                      name: 'login',
+                      name: 'firstName',
+                    ),
+                    MaterialButton(
+                      onPressed: () async {
+                        /// Here we print the data of from the previous form
+                        /// It is possible because it had an autoDispose value set to false.
+                        final data = liteFormController.getFormData('signupForm');
+                        if (kDebugMode) {
+                          print(data);
+                        }
+                      },
+                      child: Text('Print Signup Form'),
                     ),
                   ],
                 ),
