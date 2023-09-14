@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lite_forms/base_form_fields/lite_form_group.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_state/lite_state.dart';
 
@@ -39,7 +40,10 @@ class _LiteFormErrorLineState extends State<LiteFormErrorLine> {
           fieldName: widget.fieldName,
           formName: widget.formName,
         );
-        final hasText = field?.error?.isNotEmpty == true;
+        final group = LiteFormGroup.of(context)!;
+        final errorText = group.translationBuilder(field?.error);
+        final hasText = errorText?.isNotEmpty == true;
+        
         return AnimatedOpacity(
           opacity: hasText ? 1.0 : 0.0,
           duration: kThemeAnimationDuration,
@@ -57,7 +61,7 @@ class _LiteFormErrorLineState extends State<LiteFormErrorLine> {
                 width: widget.isExpanded ? double.infinity : null,
                 height: !hasText ? 0.0 : null,
                 child: Text(
-                  field?.error ?? '',
+                  errorText ?? '',
                   style: widget.decoration?.errorStyle,
                   textAlign: widget.textAlign,
                 ),

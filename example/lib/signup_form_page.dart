@@ -65,7 +65,9 @@ class SignupFormPage extends StatelessWidget {
                     const SizedBox(height: 20.0),
                     LitePasswordField(
                       name: 'password',
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       paddingBottom: 20.0,
+                      initialValue: 'Hedgehog2*',
                       settings: PasswordSettings(
                         // validator: (value) async {
                         //   if (value?.isNotEmpty != true) {
@@ -74,7 +76,19 @@ class SignupFormPage extends StatelessWidget {
                         //   return null;
                         // },
                         requirements: PasswordRequirements.defaultRequirements(),
-                        // checkerBuilder: (digitsOk, upperCaseOk, lowerCaseOk, specialCharsOk) {
+                        // checkerBuilder: (
+                        //   digitsOk,
+                        //   upperCaseOk,
+                        //   lowerCaseOk,
+                        //   specialCharsOk,
+                        //   lengthOk,
+                        //   passwordsMatch,
+                        // ) {
+                        //   if (kDebugMode) {
+                        //     print(
+                        //       'digitsOk: $digitsOk, upperCaseOk: $upperCaseOk, lowerCaseOk: $lowerCaseOk, specialCharsOk: $specialCharsOk, lengthOk: $lengthOk, passwordsMatch: $passwordsMatch',
+                        //     );
+                        //   }
                         //   return Container(
                         //     height: 100.0,
                         //     width: double.infinity,

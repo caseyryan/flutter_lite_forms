@@ -1,10 +1,10 @@
 import 'package:lite_state/lite_state.dart';
 
-LiteFromRebuildController get liteFromRebuildController {
-  return findController<LiteFromRebuildController>();
+LiteFormRebuildController get liteFormRebuildController {
+  return findController<LiteFormRebuildController>();
 }
 
-class LiteFromRebuildController extends LiteStateController<LiteFromRebuildController> {
+class LiteFormRebuildController extends LiteStateController<LiteFormRebuildController> {
   
   @override
   void reset() {

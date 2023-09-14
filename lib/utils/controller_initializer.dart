@@ -17,7 +17,7 @@ void initializeLiteForms({
     LiteFormController: () => LiteFormController(),
     /// this controller is used as a helper to rebuild some parts of the UI
     /// related to the inners parts of the form fields
-    LiteFromRebuildController: () => LiteFromRebuildController(),
+    LiteFormRebuildController: () => LiteFormRebuildController(),
   });
   if (config != null) {
     liteFormController.configureLiteFormUI(

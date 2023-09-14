@@ -128,7 +128,7 @@ class FormGroupField<T> {
         }
       }
     }
-    if (_isSelfValidating) {
+    if (_isSelfValidating && !isInitialValue) {
       _checkError().then((value) {
         return _parent?._validateNativeForm();
       });
