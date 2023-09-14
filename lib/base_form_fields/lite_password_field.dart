@@ -175,7 +175,7 @@ class LitePasswordField extends StatelessWidget {
           keyboardType: keyboardType,
           maxLines: 1,
           minLines: 1,
-          validator: (value) {
+          validator: (value) async {
             final firstFieldValue = liteFormController
                 .tryGetField(
                   formName: group.name,
