@@ -55,10 +55,11 @@ class LiteDatePicker extends StatefulWidget {
   final LiteDatePickerType pickerType;
   final String name;
   final bool use24HourFormat;
-  /// It is assumed that the initial value is DateTime? but you might 
-  /// also pass something else, for example a iso8601 String, and the 
-  /// form field must be ok with it as long as you also pass an [initialValueDeserializer] 
-  /// which will convert initial value into a DateTime object or else you will get an 
+
+  /// It is assumed that the initial value is DateTime? but you might
+  /// also pass something else, for example a iso8601 String, and the
+  /// form field must be ok with it as long as you also pass an [initialValueDeserializer]
+  /// which will convert initial value into a DateTime object or else you will get an
   /// exception
   final Object? initialValue;
   final DateTime? maxDate;
@@ -305,6 +306,10 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     bool use24HourFormat = true,
   }) async {
     var dateTime = initialDate ?? DateTime.now();
+    dateTime = dateTime.clamp(
+      minimumDate,
+      maximumDate,
+    );
     if (_isIos) {
       return await showCupertinoModalPopup(
         context: context,
@@ -378,13 +383,21 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
         lastDate: maximumDate,
       );
     }
-
-    /// used only for a material time / date time picker
-    DateTime? selectedTime = DateTime.now().clamp(
-      minimumDate,
-      maximumDate,
-    );
-
+    DateTime? dateOnly;
+    if (mode == CupertinoDatePickerMode.dateAndTime) {
+      dateOnly = await showDatePicker(
+        context: context,
+        initialDate: dateTime,
+        firstDate: minimumDate,
+        lastDate: maximumDate,
+      );
+      if (dateOnly == null || !mounted) {
+        return null;
+      }
+    }
+    if (!mounted) {
+      return null;
+    }
     final timeOfDay = await showTimePicker(
       context: context,
       initialEntryMode: widget.initialEntryMode,
@@ -403,31 +416,16 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     if (timeOfDay == null) {
       return null;
     }
-    selectedTime = selectedTime.copyWith(
+    if (dateOnly != null) {
+      return dateOnly.copyWith(
+        hour: timeOfDay.hour,
+        minute: timeOfDay.minute,
+      );
+    }
+    return dateTime.copyWith(
       hour: timeOfDay.hour,
       minute: timeOfDay.minute,
     );
-    if (mode == CupertinoDatePickerMode.time) {
-      return selectedTime;
-    }
-    if (mounted) {
-      final selectedDate = await showDatePicker(
-        context: context,
-        initialDate: dateTime,
-        firstDate: minimumDate,
-        lastDate: maximumDate,
-      );
-      if (selectedDate == null) {
-        return selectedTime;
-      }
-
-      return selectedDate.copyWith(
-        hour: selectedTime.hour,
-        minute: selectedTime.minute,
-        second: 0,
-      );
-    }
-    return null;
   }
 
   @override
@@ -440,9 +438,13 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
       validator: widget.validator,
       autovalidateMode: widget.autovalidateMode,
     );
-    DateTime? value =
+    final storedValue = liteFormController.tryGetValueForField(
+      formName: _group!.name,
+      fieldName: widget.name,
+    ) as DateTime?;
+    DateTime? value = storedValue ??
         widget.initialValueDeserializer?.call(widget.initialValue) as DateTime? ??
-            widget.initialValue as DateTime?;
+        widget.initialValue as DateTime?;
 
     final dateFormat = _dateFormat;
     if (value != null) {

@@ -13,11 +13,11 @@ import 'package:lite_state/lite_state.dart';
 typedef TranslationBuilder = String? Function(String? value);
 
 String? defaultTranslationBuilder(String? value) {
-  if (kDebugMode) {
-    if (value != null) {
-      print('LiteFormGroup.defaultTranslationBuilder("$value")');
-    }
-  }
+  // if (kDebugMode) {
+  //   if (value != null) {
+  //     print('LiteFormGroup.defaultTranslationBuilder("$value")');
+  //   }
+  // }
   return value;
 }
 

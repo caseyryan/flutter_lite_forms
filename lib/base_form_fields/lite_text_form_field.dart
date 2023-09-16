@@ -98,6 +98,7 @@ class LiteTextFormField extends StatefulWidget {
   final String name;
   final String? hintText;
   final TextEditingController? controller;
+  
 
   /// makes sense only if [textEntryType] is [LiteTextEntryType.onModalRoute]
   final TextEntryModalRouteSettings? modalRouteSettings;
@@ -282,6 +283,15 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
         hintText: _hintText,
       );
     }
+
+    // decoration = decoration.copyWith(
+      // icon: Icon(Icons.lock),
+      // suffixIcon: Container(
+      //   height: 40.0,
+      //   width: 40.0,
+      //   color: Colors.red,
+      // ),
+    // );
 
     return Padding(
       padding: EdgeInsets.only(

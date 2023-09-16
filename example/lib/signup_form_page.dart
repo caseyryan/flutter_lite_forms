@@ -23,6 +23,7 @@ class SignupFormPage extends StatelessWidget {
         /// this might come useful if you create a multipage onboarding
         /// and want to send the accumulated data to the backend in the end
         autoDispose: false,
+        allowUnfocusOnTapOutside: false,
         name: formName,
         child: CustomScrollView(
           slivers: [
@@ -69,6 +70,7 @@ class SignupFormPage extends StatelessWidget {
                       paddingBottom: 20.0,
                       initialValue: 'Hedgehog2*',
                       settings: PasswordSettings(
+                        passwordFieldCheckType: PasswordFieldCheckType.repeatPassword,
                         // validator: (value) async {
                         //   if (value?.isNotEmpty != true) {
                         //     return 'Password cannot be empty';
@@ -97,7 +99,6 @@ class SignupFormPage extends StatelessWidget {
                         // },
                       ),
                     ),
-                    const SizedBox(height: 20.0),
                     LiteDatePicker(
                       textAlign: TextAlign.center,
                       dateInputType: DateInputType.both,
@@ -125,6 +126,9 @@ class SignupFormPage extends StatelessWidget {
                         // return 'Date is incorrect';
                         return null;
                       },
+                    ),
+                    LiteSwitch(
+                      name: 'switch',
                     ),
                     MaterialButton(
                       onPressed: () async {

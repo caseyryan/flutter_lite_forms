@@ -14,7 +14,7 @@ enum PasswordFieldCheckType {
   validatorOnly,
 }
 
-class LitePasswordField extends StatelessWidget {
+class LitePasswordField extends StatefulWidget {
   const LitePasswordField({
     super.key,
     required this.name,
@@ -25,7 +25,6 @@ class LitePasswordField extends StatelessWidget {
       top: 6.0,
     ),
     this.hintText,
-    this.passwordFieldCheckType = PasswordFieldCheckType.repeatPassword,
     this.controller,
     this.restorationId,
     this.initialValue,
@@ -42,7 +41,6 @@ class LitePasswordField extends StatelessWidget {
     this.readOnly = false,
     this.showCursor,
     this.obscuringCharacter = '•',
-    this.obscureText = true,
     this.enableSuggestions = true,
     this.expands = false,
     this.maxLength,
@@ -63,6 +61,7 @@ class LitePasswordField extends StatelessWidget {
     this.scrollPhysics,
     this.autofillHints,
     this.autovalidateMode,
+    this.obscureText = true,
     this.enableIMEPersonalizedLearning = true,
     this.mouseCursor,
     this.contextMenuBuilder,
@@ -72,7 +71,6 @@ class LitePasswordField extends StatelessWidget {
     this.paddingRight = 0.0,
   });
 
-  final PasswordFieldCheckType passwordFieldCheckType;
   final String name;
   final String? repeatPlaceholder;
   final String? hintText;
@@ -97,9 +95,9 @@ class LitePasswordField extends StatelessWidget {
   final bool readOnly;
   final bool? showCursor;
   final String obscuringCharacter;
-  final bool obscureText;
   final bool enableSuggestions;
   final bool expands;
+  final bool obscureText;
   final int? maxLength;
   final ValueChanged<String>? onChanged;
   final TapRegionCallback? onTapOutside;
@@ -126,60 +124,106 @@ class LitePasswordField extends StatelessWidget {
   final double paddingLeft;
   final double paddingRight;
 
+  @override
+  State<LitePasswordField> createState() => _LitePasswordFieldState();
+}
+
+class _LitePasswordFieldState extends State<LitePasswordField> {
+  bool _isObscure = true;
+
+  @override
+  void initState() {
+    _isObscure = widget.obscureText;
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant LitePasswordField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.obscureText != widget.obscureText) {
+      setState(() {
+        _isObscure = widget.obscureText;
+      });
+    }
+  }
+
   bool get _isDoubleLine {
-    return passwordFieldCheckType == PasswordFieldCheckType.repeatPassword;
+    return widget.settings.passwordFieldCheckType ==
+        PasswordFieldCheckType.repeatPassword;
   }
 
   bool get _requiresCheckerView {
-    return settings.requirements != null;
+    return widget.settings.requirements != null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final repeatName = repeatPlaceholder ?? 'Confirm $name';
+    final repeatName = widget.repeatPlaceholder ?? 'Confirm ${widget.name}';
     final group = LiteFormGroup.of(context)!;
-    final allowErrorTexts = settings.validator != null;
-    var inputDecoration = decoration ??
+    final allowErrorTexts = widget.settings.validator != null;
+    var inputDecoration = widget.decoration ??
         liteFormController.config?.inputDecoration ??
         const InputDecoration();
+    if (widget.settings.hasShowPasswordButton) {
+      inputDecoration = inputDecoration.copyWith(
+        suffixIcon: widget.settings.showPasswordIconBuilder?.call(_isObscure) ??
+            Align(
+              widthFactor: 1.0,
+              heightFactor: 1.0,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isObscure = !_isObscure;
+                  });
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  child: Icon(
+                    _isObscure ? Icons.visibility : Icons.visibility_off,
+                  ),
+                ),
+              ),
+            ),
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         LiteTextFormField(
-          name: name,
+          name: widget.name,
           allowErrorTexts: allowErrorTexts,
           autocorrect: false,
-          autofillHints: autofillHints,
-          autofocus: autofocus,
-          autovalidateMode: autovalidateMode,
-          contextMenuBuilder: contextMenuBuilder,
-          buildCounter: buildCounter,
-          controller: controller,
-          cursorColor: cursorColor,
-          cursorHeight: cursorHeight,
-          cursorRadius: cursorRadius,
-          cursorWidth: cursorWidth,
+          autofillHints: widget.autofillHints,
+          autofocus: widget.autofocus,
+          autovalidateMode: widget.autovalidateMode,
+          contextMenuBuilder: widget.contextMenuBuilder,
+          buildCounter: widget.buildCounter,
+          controller: widget.controller,
+          cursorColor: widget.cursorColor,
+          cursorHeight: widget.cursorHeight,
+          cursorRadius: widget.cursorRadius,
+          cursorWidth: widget.cursorWidth,
           decoration: inputDecoration,
-          enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
-          enableInteractiveSelection: enableInteractiveSelection,
-          enableSuggestions: enableSuggestions,
-          enabled: enabled,
-          expands: expands,
-          focusNode: focusNode,
-          hintText: hintText,
-          initialValue: initialValue,
+          enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
+          enableInteractiveSelection: widget.enableInteractiveSelection,
+          enableSuggestions: widget.enableSuggestions,
+          enabled: widget.enabled,
+          expands: widget.expands,
+          focusNode: widget.focusNode,
+          hintText: widget.hintText,
+          initialValue: widget.initialValue,
           inputFormatters: null,
           initialValueDeserializer: null,
-          keyboardAppearance: keyboardAppearance,
-          keyboardType: keyboardType,
+          keyboardAppearance: widget.keyboardAppearance,
+          keyboardType: widget.keyboardType,
           maxLines: 1,
           minLines: 1,
           validator: (value) async {
             final firstFieldValue = liteFormController
                 .tryGetField(
                   formName: group.name,
-                  fieldName: name,
+                  fieldName: widget.name,
                 )
                 ?.value
                 ?.toString();
@@ -190,44 +234,45 @@ class LitePasswordField extends StatelessWidget {
                 )
                 ?.value
                 ?.toString();
-
+    
             bool? passwordsMatch = firstFieldValue == secondaryFieldValue;
-            return settings._validate(
+            return widget.settings._validate(
               value: value,
               passwordsMatch: passwordsMatch,
+              group: group,
             );
           },
-          maxLength: maxLength,
+          maxLength: widget.maxLength,
           maxLengthEnforcement: null,
-          mouseCursor: mouseCursor,
+          mouseCursor: widget.mouseCursor,
           onChanged: (value) {
             if (_isDoubleLine) {
               liteFormRebuildController.rebuild();
             }
-            onChanged?.call(value);
+            widget.onChanged?.call(value);
           },
-          obscureText: obscureText,
-          paddingTop: paddingTop,
-          paddingBottom: paddingBottom,
-          paddingLeft: paddingLeft,
-          paddingRight: paddingRight,
-          readOnly: readOnly,
-          onTapOutside: onTapOutside,
-          scrollPadding: scrollPadding,
-          scrollPhysics: scrollPhysics,
+          obscureText: _isObscure,
+          paddingTop: widget.paddingTop,
+          paddingBottom: widget.paddingBottom,
+          paddingLeft: widget.paddingLeft,
+          paddingRight: widget.paddingRight,
+          readOnly: widget.readOnly,
+          onTapOutside: widget.onTapOutside,
+          scrollPadding: widget.scrollPadding,
+          scrollPhysics: widget.scrollPhysics,
           scrollController: null,
-          smoothErrorPadding: smoothErrorPadding,
-          strutStyle: strutStyle,
-          showCursor: showCursor,
+          smoothErrorPadding: widget.smoothErrorPadding,
+          strutStyle: widget.strutStyle,
+          showCursor: widget.showCursor,
         ),
         if (_requiresCheckerView)
           LiteState<LiteFormRebuildController>(
             builder: (BuildContext c, LiteFormRebuildController controller) {
-              return settings._buildChecker(
+              return widget.settings._buildChecker(
                 paddingTop: 0.0,
-                paddingBottom: paddingBottom,
+                paddingBottom: widget.paddingBottom,
                 group: group,
-                name: name,
+                name: widget.name,
                 repeatName: repeatName,
                 decoration: inputDecoration.copyWith(
                   errorStyle: TextStyle(
@@ -241,57 +286,57 @@ class LitePasswordField extends StatelessWidget {
           LiteTextFormField(
             allowErrorTexts: allowErrorTexts,
             name: repeatName,
+    
             validator: (value) async {
               /// in this case no validation is required except for the password match
               liteFormRebuildController.rebuild();
               return null;
             },
             autocorrect: false,
-            autofillHints: autofillHints,
-            autofocus: autofocus,
-            autovalidateMode: autovalidateMode,
-            contextMenuBuilder: contextMenuBuilder,
-            buildCounter: buildCounter,
-            controller: controller,
-            cursorColor: cursorColor,
-            cursorHeight: cursorHeight,
-            cursorRadius: cursorRadius,
-            cursorWidth: cursorWidth,
+            autofillHints: widget.autofillHints,
+            autofocus: widget.autofocus,
+            autovalidateMode: widget.autovalidateMode,
+            contextMenuBuilder: widget.contextMenuBuilder,
+            buildCounter: widget.buildCounter,
+            controller: widget.controller,
+            cursorColor: widget.cursorColor,
+            cursorHeight: widget.cursorHeight,
+            cursorRadius: widget.cursorRadius,
+            cursorWidth: widget.cursorWidth,
             decoration: inputDecoration,
-            enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
-            enableInteractiveSelection: enableInteractiveSelection,
-            enableSuggestions: enableSuggestions,
-            enabled: enabled,
-            expands: expands,
-            focusNode: focusNode,
-            hintText: hintText,
-            // initialValue: initialValue,
+            enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
+            enableInteractiveSelection: widget.enableInteractiveSelection,
+            enableSuggestions: widget.enableSuggestions,
+            enabled: widget.enabled,
+            expands: widget.expands,
+            focusNode: widget.focusNode,
+            hintText: widget.hintText,
             inputFormatters: null,
             initialValueDeserializer: null,
-            keyboardAppearance: keyboardAppearance,
-            keyboardType: keyboardType,
+            keyboardAppearance: widget.keyboardAppearance,
+            keyboardType: widget.keyboardType,
             maxLines: 1,
             minLines: 1,
-            maxLength: maxLength,
+            maxLength: widget.maxLength,
             maxLengthEnforcement: null,
-            mouseCursor: mouseCursor,
+            mouseCursor: widget.mouseCursor,
             onChanged: (value) {
               liteFormRebuildController.rebuild();
               liteFormController.validateForm(formName: group.name);
             },
-            obscureText: obscureText,
+            obscureText: _isObscure,
             paddingTop: 0.0,
-            paddingBottom: paddingBottom,
-            paddingLeft: paddingLeft,
-            paddingRight: paddingRight,
-            readOnly: readOnly,
-            onTapOutside: onTapOutside,
-            scrollPadding: scrollPadding,
-            scrollPhysics: scrollPhysics,
+            paddingBottom: widget.paddingBottom,
+            paddingLeft: widget.paddingLeft,
+            paddingRight: widget.paddingRight,
+            readOnly: widget.readOnly,
+            onTapOutside: widget.onTapOutside,
+            scrollPadding: widget.scrollPadding,
+            scrollPhysics: widget.scrollPhysics,
             scrollController: null,
-            smoothErrorPadding: smoothErrorPadding,
-            strutStyle: strutStyle,
-            showCursor: showCursor,
+            smoothErrorPadding: widget.smoothErrorPadding,
+            strutStyle: widget.strutStyle,
+            showCursor: widget.showCursor,
           ),
       ],
     );
@@ -309,10 +354,36 @@ typedef PasswordCheckBuilder = Widget Function(
   bool? passwordsMatch,
 );
 
+typedef ShowPasswordIconBuilder = Widget Function(bool isVisible);
+
 class PasswordSettings {
+  PasswordSettings({
+    this.validator,
+    this.requirements,
+    this.checkerBuilder,
+    this.hasShowPasswordButton = true,
+    this.minLength = 3,
+    this.showPasswordIconBuilder,
+    this.passwordFieldCheckType = PasswordFieldCheckType.repeatPassword,
+  }) : assert(
+          (validator == null || requirements == null) &&
+              (validator != null || requirements != null),
+          'You must provide either a validator or a requirements config',
+        );
+
   final LiteFormFieldValidator<String>? validator;
   final int minLength;
   final PasswordRequirements? requirements;
+  final PasswordFieldCheckType passwordFieldCheckType;
+
+  /// if you need to display a button that hides / shows the password
+  final bool hasShowPasswordButton;
+
+  /// if you need to build a custom icon for showing and hiding a password
+  ///
+  /// NOTICE: if you implement your own icon, you will have to write a custom logic
+  /// to pass [obscureText] parameter to the LitePasswordField as well
+  final ShowPasswordIconBuilder? showPasswordIconBuilder;
 
   /// If you don't like the default look and feel of the
   /// password requirements check, you can implement your own
@@ -348,6 +419,7 @@ class PasswordSettings {
       value: firstFieldValue,
       rebuild: false,
       passwordsMatch: passwordsMatch,
+      group: group,
     );
     if (firstFieldValue?.isNotEmpty != true && secondaryFieldValue?.isNotEmpty != true) {
       passwordsMatch = null;
@@ -360,12 +432,6 @@ class PasswordSettings {
     final specialCharsOk =
         requirements!.minSpecialChars < 1 ? null : requirements!._specialCharsOk;
 
-    // bool? digitsOk,
-    // bool? upperCaseOk,
-    // bool? lowerCaseOk,
-    // bool? specialCharsOk,
-    // bool? lengthOk,
-    // bool? passwordsMatch,
     return checkerBuilder?.call(
           digitsOk,
           upperCaseOk,
@@ -395,27 +461,29 @@ class PasswordSettings {
         );
   }
 
-  PasswordSettings({
-    this.validator,
-    this.requirements,
-    this.checkerBuilder,
-    this.minLength = 3,
-  }) : assert(
-          (validator == null || requirements == null) &&
-              (validator != null || requirements != null),
-          'You must provide either a validator or a requirements config',
-        );
-
   Future<String?> _validate({
     required String? value,
     required bool passwordsMatch,
+    required LiteFormGroup? group,
   }) async {
     if (validator != null) {
-      return validator!(value);
+      if (passwordFieldCheckType == PasswordFieldCheckType.repeatPassword) {
+        if (!passwordsMatch) {
+          const errorText = 'Passwords do not match';
+          if (group != null) {
+            return group.translationBuilder.call(errorText);
+          }
+          return errorText;
+        }
+      }
+      final result = await validator!(value);
+
+      return result;
     }
     return requirements!._validate(
       value: value,
       passwordsMatch: passwordsMatch,
+      group: group,
     );
   }
 }
@@ -453,6 +521,7 @@ class PasswordRequirements {
   String? _validate({
     required String? value,
     required bool passwordsMatch,
+    required LiteFormGroup? group,
     bool rebuild = true,
   }) {
     if (value?.isNotEmpty != true) {
