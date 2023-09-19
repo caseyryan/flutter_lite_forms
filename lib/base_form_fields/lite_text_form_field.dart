@@ -283,16 +283,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
         hintText: _hintText,
       );
     }
-
-    // decoration = decoration.copyWith(
-      // icon: Icon(Icons.lock),
-      // suffixIcon: Container(
-      //   height: 40.0,
-      //   width: 40.0,
-      //   color: Colors.red,
-      // ),
-    // );
-
+    
     return Padding(
       padding: EdgeInsets.only(
         top: widget.paddingTop,

@@ -129,6 +129,17 @@ class SignupFormPage extends StatelessWidget {
                     ),
                     LiteSwitch(
                       name: 'switch',
+                      paddingTop: 20.0,
+                      initialValue: 'true',
+                      initialValueDeserializer: (value) {
+                        if (value is String) {
+                          return value == 'true';
+                        }
+                        return value;
+                      },
+                      serializer: (value) {
+                        return value == true ? 'Yes' : 'No';
+                      },
                     ),
                     MaterialButton(
                       onPressed: () async {
