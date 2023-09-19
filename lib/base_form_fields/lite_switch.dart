@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
@@ -12,10 +14,16 @@ enum LiteSwitchType {
   material,
 }
 
+enum SwitchPosition {
+  left,
+  right,
+}
+
 class LiteSwitch extends StatefulWidget {
   const LiteSwitch({
     super.key,
     required this.name,
+    this.switchPosition = SwitchPosition.left,
     this.onChanged,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
@@ -27,8 +35,38 @@ class LiteSwitch extends StatefulWidget {
     this.initialValue,
     this.autovalidateMode,
     this.type = LiteSwitchType.cupertino,
-  });
+    this.activeColor,
+    this.activeThumbImage,
+    this.activeTrackColor,
+    this.autofocus = false,
+    this.dragStartBehavior = DragStartBehavior.start,
+    this.focusColor,
+    this.focusNode,
+    this.hoverColor,
+    this.inactiveThumbColor,
+    this.inactiveTrackColor,
+    this.materialTapTargetSize,
+    this.mouseCursor,
+    this.onActiveThumbImageError,
+    this.onFocusChange,
+    this.overlayColor,
+    this.splashRadius,
+    this.thumbColor,
+    this.thumbIcon,
+    this.trackColor,
+    this.child,
+    this.text,
+    this.onInactiveThumbImageError,
+  }) : assert(
+          (child == null || text == null),
+          'You cannot pass both `text` and `child` at the same time',
+        );
 
+  /// The position of the switch relative to a [child] or a [text]
+  final SwitchPosition switchPosition;
+  final Widget? child;
+  final String? text;
+  final ImageErrorListener? onInactiveThumbImageError;
   final String name;
   final double paddingTop;
   final double paddingBottom;
@@ -36,6 +74,25 @@ class LiteSwitch extends StatefulWidget {
   final double paddingRight;
   final ValueChanged<bool>? onChanged;
   final LiteSwitchType type;
+  final Color? activeColor;
+  final Color? activeTrackColor;
+  final Color? inactiveThumbColor;
+  final Color? inactiveTrackColor;
+  final ImageProvider? activeThumbImage;
+  final ImageErrorListener? onActiveThumbImageError;
+  final MaterialStateProperty<Color?>? thumbColor;
+  final MaterialStateProperty<Color?>? trackColor;
+  final MaterialStateProperty<Icon?>? thumbIcon;
+  final MaterialTapTargetSize? materialTapTargetSize;
+  final DragStartBehavior dragStartBehavior;
+  final MouseCursor? mouseCursor;
+  final Color? focusColor;
+  final Color? hoverColor;
+  final MaterialStateProperty<Color?>? overlayColor;
+  final double? splashRadius;
+  final FocusNode? focusNode;
+  final ValueChanged<bool>? onFocusChange;
+  final bool autofocus;
 
   /// Allows you to prepare the data for some general usage like sending it
   /// to an api endpoint. E.g. you have a Date Picker which returns a DateTime object
@@ -94,25 +151,68 @@ class _LiteSwitchState extends State<LiteSwitch> {
   Widget _buildToggle({
     required String formName,
   }) {
-    bool? value = _tryGetValue(
-      fieldName: widget.name,
-      formName: formName,
-    );
+    bool value = _tryGetValue(
+          fieldName: widget.name,
+          formName: formName,
+        ) ==
+        true;
     if (widget.type == LiteSwitchType.material) {
-      
+      return Switch(
+        value: value,
+        activeColor: widget.activeColor,
+        activeThumbImage: widget.activeThumbImage,
+        activeTrackColor: widget.activeTrackColor,
+        autofocus: widget.autofocus,
+        dragStartBehavior: widget.dragStartBehavior,
+        focusColor: widget.focusColor,
+        focusNode: widget.focusNode,
+        hoverColor: widget.hoverColor,
+        inactiveThumbColor: widget.inactiveThumbColor,
+        inactiveThumbImage: widget.activeThumbImage,
+        inactiveTrackColor: widget.inactiveTrackColor,
+        materialTapTargetSize: widget.materialTapTargetSize,
+        mouseCursor: widget.mouseCursor,
+        onActiveThumbImageError: widget.onActiveThumbImageError,
+        onFocusChange: widget.onFocusChange,
+        onInactiveThumbImageError: widget.onInactiveThumbImageError,
+        overlayColor: widget.overlayColor,
+        splashRadius: widget.splashRadius,
+        thumbColor: widget.thumbColor,
+        thumbIcon: widget.thumbIcon,
+        trackColor: widget.trackColor,
+        onChanged: (value) {
+          _onChanged(value, formName);
+        },
+      );
     }
     return CupertinoSwitch(
-      value: value == true,
+      value: value,
+      dragStartBehavior: widget.dragStartBehavior,
+      activeColor: widget.activeColor,
+      thumbColor: value ? widget.activeColor : widget.inactiveThumbColor,
+      trackColor: value ? widget.activeTrackColor : widget.inactiveTrackColor,
       onChanged: (value) {
-        liteFormController.onValueChanged(
-          formName: formName,
-          fieldName: widget.name,
-          value: value,
-        );
-        widget.onChanged?.call(value);
-        liteFormRebuildController.rebuild();
+        _onChanged(value, formName);
       },
     );
+  }
+
+  void _onChanged(
+    bool value,
+    String formName,
+  ) {
+    liteFormController.onValueChanged(
+      formName: formName,
+      fieldName: widget.name,
+      value: value,
+    );
+    widget.onChanged?.call(value);
+    liteFormRebuildController.rebuild();
+  }
+
+  Widget _buildChild() {
+    Widget child = const SizedBox.shrink();
+    return Expanded(child: child);
   }
 
   @override
@@ -149,12 +249,34 @@ class _LiteSwitchState extends State<LiteSwitch> {
       ),
       child: LiteState<LiteFormRebuildController>(
         builder: (BuildContext c, LiteFormRebuildController controller) {
-          return Row(
-            children: [
+          final hasChild = widget.child != null || widget.text != null;
+          List<Widget>? children;
+
+          if (hasChild) {
+            if (widget.switchPosition == SwitchPosition.right) {
+              children = [
+                _buildChild(),
+                _buildToggle(
+                  formName: group.name,
+                ),
+              ];
+            } else {
+              children = [
+                _buildToggle(
+                  formName: group.name,
+                ),
+                _buildChild(),
+              ];
+            }
+          } else {
+            children = [
               _buildToggle(
                 formName: group.name,
               ),
-            ],
+            ];
+          }
+          return Row(
+            children: children,
           );
         },
       ),

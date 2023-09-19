@@ -68,7 +68,7 @@ class SignupFormPage extends StatelessWidget {
                       name: 'password',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       paddingBottom: 20.0,
-                      initialValue: 'Hedgehog2*',
+                      initialValue: 'Qwert123*',
                       settings: PasswordSettings(
                         passwordFieldCheckType: PasswordFieldCheckType.repeatPassword,
                         // validator: (value) async {
@@ -129,8 +129,11 @@ class SignupFormPage extends StatelessWidget {
                     ),
                     LiteSwitch(
                       name: 'switch',
+                      switchPosition: SwitchPosition.right,
+                      text: 'Test',
                       paddingTop: 20.0,
                       initialValue: 'true',
+                      type: LiteSwitchType.material,
                       initialValueDeserializer: (value) {
                         if (value is String) {
                           return value == 'true';
