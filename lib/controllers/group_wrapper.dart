@@ -81,7 +81,16 @@ class _FormGroupWrapper {
   }
 
   bool _validateNativeForm() {
-    return _formState?.validate() ?? true;
+    /// native form might be valid but custom fields 
+    /// (that are not based on Flutter's form fields) might still 
+    /// contain errors
+    final result = _formState?.validate();
+    for (var field in _fields.values) {
+      if (field._error?.isNotEmpty == true) {
+        return false;
+      }
+    }
+    return result ?? true;
   }
 
   void clearDependencies() {

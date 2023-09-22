@@ -1,13 +1,12 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/intl_local/lib/intl.dart' as local_intl;
 import 'package:lite_forms/lite_forms.dart';
 import 'package:lite_forms/utils/string_extensions.dart';
 import 'package:lite_forms/utils/value_validator.dart';
+
+import 'error_line.dart';
 
 enum LiteDatePickerType {
   cupertino,
@@ -46,6 +45,11 @@ class LiteDatePicker extends StatefulWidget {
     this.textAlign = TextAlign.start,
     this.pickerType = LiteDatePickerType.adaptive,
     this.initialEntryMode = TimePickerEntryMode.dial,
+    this.smoothErrorPadding = const EdgeInsets.only(
+      top: 6.0,
+    ),
+    this.useSmoothError = true,
+    this.allowErrorTexts = true,
   });
 
   /// The look and feel of the picker
@@ -87,6 +91,22 @@ class LiteDatePicker extends StatefulWidget {
   /// [pickerType] is [LiteDatePickerType.material]
   final TimePickerEntryMode initialEntryMode;
 
+  /// makes sense only of [useSmoothError] is true
+  final EdgeInsets? smoothErrorPadding;
+
+  /// if true, this will use a smoothly animated error
+  /// that uses AnimateSize to display, unlike the standard
+  /// Flutter's input error
+  final bool useSmoothError;
+
+  /// Pass false here if you don't want to display errors on invalid fields at all
+  ///
+  /// Notice! In this case the form will silently get
+  /// invalid and your users might not
+  /// understand what happened. Use it in case you want to implement your own
+  /// error processing
+  final bool allowErrorTexts;
+
   /// Allows you to prepare the data for some general usage like sending it
   /// to an api endpoint. E.g. you have a Date Picker which returns a DateTime object
   /// but you need to send it to a backend in a iso8601 string format.
@@ -110,7 +130,7 @@ class LiteDatePicker extends StatefulWidget {
 }
 
 class _LiteDatePickerState extends State<LiteDatePicker> {
-  LiteFormGroup? _group;
+  late LiteFormGroup _group;
   bool _hasSetInitialValue = false;
 
   @override
@@ -122,16 +142,12 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
   }
 
   LiteDatePickerType get _type {
-    if (kIsWeb) {
-      return LiteDatePickerType.material;
-    } else {
-      if (widget.pickerType == LiteDatePickerType.adaptive) {
-        if (Platform.isIOS) {
-          return LiteDatePickerType.cupertino;
-        }
-      } else if (widget.pickerType == LiteDatePickerType.cupertino) {
+    if (widget.pickerType == LiteDatePickerType.adaptive) {
+      if (ExtendedPlatform.isIOS) {
         return LiteDatePickerType.cupertino;
       }
+    } else if (widget.pickerType == LiteDatePickerType.cupertino) {
+      return LiteDatePickerType.cupertino;
     }
     return LiteDatePickerType.material;
   }
@@ -140,13 +156,17 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     return _type == LiteDatePickerType.cupertino;
   }
 
+  bool get _useErrorDecoration {
+    return !widget.useSmoothError && widget.allowErrorTexts;
+  }
+
   Future<DateTime?> _onShowPickerPressed({
     required BuildContext context,
     DateTime? currentValue,
   }) async {
     final theme = Theme.of(context);
     currentValue ??= (liteFormController.tryGetValueForField(
-          formName: _group!.name,
+          formName: _group.name,
           fieldName: widget.name,
         ) as DateTime? ??
         widget.initialValue as dynamic);
@@ -430,8 +450,8 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    _group = LiteFormGroup.of(context);
-    final field = liteFormController.registerFormField<DateTime>(
+    _group = LiteFormGroup.of(context)!;
+    final field = liteFormController.registerFormFieldIfNone<DateTime>(
       fieldName: widget.name,
       formName: _group!.name,
       serializer: widget.serializer,
@@ -497,23 +517,45 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
               left: widget.paddingLeft,
               right: widget.paddingRight,
             ),
-            child: TextFormField(
-              restorationId: widget.restorationId,
-              validator: widget.validator != null
-                  ? (value) {
-                      return _group!.translationBuilder(field.error);
-                    }
-                  : null,
-              autovalidateMode: null,
-              controller: textEditingController,
-              decoration: decoration,
-              strutStyle: widget.strutStyle,
-              style: widget.style,
-              textAlign: widget.textAlign,
-              textAlignVertical: widget.textAlignVertical,
-              textCapitalization: widget.textCapitalization,
-              textDirection: widget.textDirection,
-              textInputAction: widget.textInputAction,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  restorationId: widget.restorationId,
+                  validator: widget.validator != null
+                      ? (value) {
+                          return _group!.translationBuilder(field.error);
+                        }
+                      : null,
+                  autovalidateMode: null,
+                  controller: textEditingController,
+                  decoration: _useErrorDecoration
+                      ? decoration
+                      : decoration.copyWith(
+                          errorStyle: const TextStyle(
+                            fontSize: .01,
+                            color: Colors.transparent,
+                          ),
+                        ),
+                  strutStyle: widget.strutStyle,
+                  style: widget.style,
+                  textAlign: widget.textAlign,
+                  textAlignVertical: widget.textAlignVertical,
+                  textCapitalization: widget.textCapitalization,
+                  textDirection: widget.textDirection,
+                  textInputAction: widget.textInputAction,
+                ),
+                if (widget.useSmoothError)
+                  LiteFormErrorLine(
+                    fieldName: widget.name,
+                    formName: _group.name,
+                    errorStyle: decoration.errorStyle,
+                    paddingBottom: widget.smoothErrorPadding?.bottom,
+                    paddingTop: widget.smoothErrorPadding?.top,
+                    paddingLeft: widget.smoothErrorPadding?.left,
+                    paddingRight: widget.smoothErrorPadding?.right,
+                  ),
+              ],
             ),
           ),
         ),

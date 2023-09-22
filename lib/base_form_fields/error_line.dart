@@ -13,7 +13,7 @@ class LiteFormErrorLine extends StatefulWidget {
     this.paddingRight,
     this.paddingLeft,
     this.isExpanded = true,
-    this.decoration,
+    this.errorStyle,
     this.textAlign = TextAlign.left,
   }) : super(key: key);
 
@@ -25,7 +25,7 @@ class LiteFormErrorLine extends StatefulWidget {
   final double? paddingRight;
   final TextAlign textAlign;
   final bool isExpanded;
-  final InputDecoration? decoration;
+  final TextStyle? errorStyle;
 
   @override
   State<LiteFormErrorLine> createState() => _LiteFormErrorLineState();
@@ -62,7 +62,7 @@ class _LiteFormErrorLineState extends State<LiteFormErrorLine> {
                 height: !hasText ? 0.0 : null,
                 child: Text(
                   errorText ?? '',
-                  style: widget.decoration?.errorStyle,
+                  style: widget.errorStyle,
                   textAlign: widget.textAlign,
                 ),
               ),

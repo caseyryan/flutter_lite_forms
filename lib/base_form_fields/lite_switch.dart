@@ -1,30 +1,54 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:lite_forms/base_form_fields/error_line.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
-import 'package:lite_forms/utils/value_serializer.dart';
+import 'package:lite_forms/lite_forms.dart';
 import 'package:lite_forms/utils/value_validator.dart';
 import 'package:lite_state/lite_state.dart';
 
-import 'lite_form_group.dart';
+typedef CustomLiteToggleBuilder = Widget Function(
+  BuildContext context,
+  bool isSelected,
+);
+
+Widget simpleSquareToggleBuilder(
+  BuildContext context,
+  bool isSelected,
+) {
+  return Icon(
+    isSelected ? Icons.check_box_outlined : Icons.check_box_outline_blank,
+    color: Theme.of(context).iconTheme.color,
+  );
+}
 
 enum LiteSwitchType {
   cupertino,
   material,
+  adaptive,
 }
 
-enum SwitchPosition {
+enum LiteSwitchPosition {
   left,
   right,
+}
+
+enum LiteSwitchReactionArea {
+  full,
+  toggleOnly,
 }
 
 class LiteSwitch extends StatefulWidget {
   const LiteSwitch({
     super.key,
     required this.name,
-    this.switchPosition = SwitchPosition.left,
+    this.switchPosition = LiteSwitchPosition.left,
+    this.reactionArea = LiteSwitchReactionArea.full,
     this.onChanged,
+    this.onTapLink,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
@@ -34,7 +58,8 @@ class LiteSwitch extends StatefulWidget {
     this.validator,
     this.initialValue,
     this.autovalidateMode,
-    this.type = LiteSwitchType.cupertino,
+    this.type = LiteSwitchType.adaptive,
+    this.customLiteToggleBuilder,
     this.activeColor,
     this.activeThumbImage,
     this.activeTrackColor,
@@ -54,18 +79,43 @@ class LiteSwitch extends StatefulWidget {
     this.thumbColor,
     this.thumbIcon,
     this.trackColor,
+    this.childPadding = const EdgeInsets.symmetric(
+      vertical: 8.0,
+    ),
     this.child,
     this.text,
+    this.useMarkdown = false,
+    this.useSmoothError = true,
+    this.markdownStyleSheet,
+    this.style,
     this.onInactiveThumbImageError,
+    this.smoothErrorPadding = const EdgeInsets.only(
+      top: 8.0,
+    ),
+    this.errorStyle,
   }) : assert(
           (child == null || text == null),
           'You cannot pass both `text` and `child` at the same time',
         );
 
   /// The position of the switch relative to a [child] or a [text]
-  final SwitchPosition switchPosition;
+  final LiteSwitchPosition switchPosition;
   final Widget? child;
   final String? text;
+  final TextStyle? errorStyle;
+
+  /// If you need to use markdown in the text description, pass true here.
+  final bool useMarkdown;
+
+  /// Called when the user taps a link.
+  final MarkdownTapLinkCallback? onTapLink;
+
+  /// You can use a custom markdown style sheet. It makes sense
+  /// only if [useMarkdown] == true
+  final MarkdownStyleSheet? markdownStyleSheet;
+
+  /// A style for text. Makes sense only if [text] != null
+  final TextStyle? style;
   final ImageErrorListener? onInactiveThumbImageError;
   final String name;
   final double paddingTop;
@@ -73,7 +123,30 @@ class LiteSwitch extends StatefulWidget {
   final double paddingLeft;
   final double paddingRight;
   final ValueChanged<bool>? onChanged;
+
+  /// makes sense only of [useSmoothError] is true
+  final EdgeInsets? smoothErrorPadding;
+
+  /// if true, this will use a smoothly animated error
+  /// that uses AnimateSize to display, unlike the standard
+  /// Flutter's input error
+  final bool useSmoothError;
+
+  /// The look and feel of the switch.
+  ///
+  /// [LiteSwitchType.adaptive] by default. It means it will use
+  /// cupertino style on iOS and Material on Android
   final LiteSwitchType type;
+
+  /// If you don't want the toggle to look like Cupertino or Material
+  /// you may provide you own toggle builder here
+  final CustomLiteToggleBuilder? customLiteToggleBuilder;
+
+  /// Determines the tap area which will activate / deactivate the switch
+  /// [LiteSwitchReactionArea.full] by default. It means you can tap even on a
+  /// text to control the switch. [LiteSwitchReactionArea.toggleOnly] means that
+  /// only the toggle itself will be reactive
+  final LiteSwitchReactionArea reactionArea;
   final Color? activeColor;
   final Color? activeTrackColor;
   final Color? inactiveThumbColor;
@@ -93,6 +166,7 @@ class LiteSwitch extends StatefulWidget {
   final FocusNode? focusNode;
   final ValueChanged<bool>? onFocusChange;
   final bool autofocus;
+  final EdgeInsets childPadding;
 
   /// Allows you to prepare the data for some general usage like sending it
   /// to an api endpoint. E.g. you have a Date Picker which returns a DateTime object
@@ -126,6 +200,7 @@ class LiteSwitch extends StatefulWidget {
 
 class _LiteSwitchState extends State<LiteSwitch> {
   bool _hasSetInitialValue = false;
+  late LiteFormGroup _group;
 
   @override
   void initState() {
@@ -156,7 +231,33 @@ class _LiteSwitchState extends State<LiteSwitch> {
           formName: formName,
         ) ==
         true;
+    if (widget.customLiteToggleBuilder != null) {
+      return GestureDetector(
+        onTap: () {
+          _onChanged(!value);
+        },
+        child: Container(
+          color: Colors.transparent,
+          child: IgnorePointer(
+            child: widget.customLiteToggleBuilder!(
+              context,
+              value,
+            ),
+          ),
+        ),
+      );
+    }
+
+    bool isMaterial = false;
     if (widget.type == LiteSwitchType.material) {
+      isMaterial = true;
+    } else if (widget.type == LiteSwitchType.adaptive) {
+      if (!ExtendedPlatform.isIOS) {
+        isMaterial = true;
+      }
+    }
+
+    if (isMaterial) {
       return Switch(
         value: value,
         activeColor: widget.activeColor,
@@ -181,7 +282,7 @@ class _LiteSwitchState extends State<LiteSwitch> {
         thumbIcon: widget.thumbIcon,
         trackColor: widget.trackColor,
         onChanged: (value) {
-          _onChanged(value, formName);
+          _onChanged(value);
         },
       );
     }
@@ -192,17 +293,16 @@ class _LiteSwitchState extends State<LiteSwitch> {
       thumbColor: value ? widget.activeColor : widget.inactiveThumbColor,
       trackColor: value ? widget.activeTrackColor : widget.inactiveTrackColor,
       onChanged: (value) {
-        _onChanged(value, formName);
+        _onChanged(value);
       },
     );
   }
 
   void _onChanged(
     bool value,
-    String formName,
   ) {
     liteFormController.onValueChanged(
-      formName: formName,
+      formName: _group.name,
       fieldName: widget.name,
       value: value,
     );
@@ -212,15 +312,64 @@ class _LiteSwitchState extends State<LiteSwitch> {
 
   Widget _buildChild() {
     Widget child = const SizedBox.shrink();
+    if (widget.text != null) {
+      if (widget.useMarkdown) {
+        child = MarkdownBody(
+          selectable: false,
+          onTapLink: widget.onTapLink ??
+              (text, href, title) {
+                if (kDebugMode) {
+                  print(
+                      'Link tap: $href. Provide [widget.onTapLink] callback to process it');
+                }
+              },
+          styleSheet: widget.markdownStyleSheet ??
+              MarkdownStyleSheet(
+                p: widget.style,
+              ),
+          softLineBreak: true,
+          data: widget.text!,
+          shrinkWrap: true,
+          fitContent: true,
+        );
+      } else {
+        child = Text(
+          widget.text!,
+          style: widget.style,
+        );
+      }
+    } else {
+      child = widget.child!;
+    }
+    child = Container(
+      color: Colors.transparent,
+      child: Padding(
+        padding: widget.childPadding,
+        child: child,
+      ),
+    );
+    if (widget.reactionArea == LiteSwitchReactionArea.full) {
+      child = GestureDetector(
+        onTap: () {
+          bool value = _tryGetValue(
+                fieldName: widget.name,
+                formName: _group.name,
+              ) ==
+              true;
+          _onChanged(!value);
+        },
+        child: child,
+      );
+    }
     return Expanded(child: child);
   }
 
   @override
   Widget build(BuildContext context) {
-    final group = LiteFormGroup.of(context);
-    liteFormController.registerFormField<bool>(
+    _group = LiteFormGroup.of(context)!;
+    liteFormController.registerFormFieldIfNone<bool>(
       fieldName: widget.name,
-      formName: group!.name,
+      formName: _group.name,
       serializer: widget.serializer,
       validator: widget.validator,
       autovalidateMode: widget.autovalidateMode,
@@ -230,11 +379,11 @@ class _LiteSwitchState extends State<LiteSwitch> {
       _hasSetInitialValue = true;
       bool? value = _tryGetValue(
         fieldName: widget.name,
-        formName: group.name,
+        formName: _group.name,
       );
       liteFormController.onValueChanged(
         fieldName: widget.name,
-        formName: group.name,
+        formName: _group.name,
         value: value,
         isInitialValue: true,
       );
@@ -253,17 +402,17 @@ class _LiteSwitchState extends State<LiteSwitch> {
           List<Widget>? children;
 
           if (hasChild) {
-            if (widget.switchPosition == SwitchPosition.right) {
+            if (widget.switchPosition == LiteSwitchPosition.right) {
               children = [
                 _buildChild(),
                 _buildToggle(
-                  formName: group.name,
+                  formName: _group.name,
                 ),
               ];
             } else {
               children = [
                 _buildToggle(
-                  formName: group.name,
+                  formName: _group.name,
                 ),
                 _buildChild(),
               ];
@@ -271,12 +420,32 @@ class _LiteSwitchState extends State<LiteSwitch> {
           } else {
             children = [
               _buildToggle(
-                formName: group.name,
+                formName: _group.name,
               ),
             ];
           }
-          return Row(
-            children: children,
+
+          final errorStyle = widget.errorStyle ??
+              liteFormController.config?.inputDecoration?.errorStyle ??
+              TextStyle(color: Theme.of(context).colorScheme.error);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: children,
+              ),
+              if (widget.useSmoothError)
+                LiteFormErrorLine(
+                  fieldName: widget.name,
+                  formName: _group.name,
+                  errorStyle: errorStyle,
+                  paddingBottom: widget.smoothErrorPadding?.bottom,
+                  paddingTop: widget.smoothErrorPadding?.top,
+                  paddingLeft: widget.smoothErrorPadding?.left,
+                  paddingRight: widget.smoothErrorPadding?.right,
+                ),
+            ],
           );
         },
       ),

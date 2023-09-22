@@ -21,6 +21,23 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
+    const defaultBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(
+          30.0,
+        ),
+        topRight: Radius.circular(
+          10.0,
+        ),
+        bottomRight: Radius.circular(
+          30.0,
+        ),
+        bottomLeft: Radius.circular(
+          10.0,
+        ),
+      ),
+    );
+
     /// Must be called in the beginning.
     /// Basically that's all you need
     /// to start using Lite Forms
@@ -34,14 +51,24 @@ class _MyAppState extends State<MyApp> {
         defaultTextEntryModalRouteSettings: TextEntryModalRouteSettings(
           backgroundOpacity: .95,
         ),
-        inputDecoration: const InputDecoration(
-          filled: false,
-          errorStyle: TextStyle(
-            fontSize: 16.0,
-            color: Colors.pink,
-          ),
-          border: OutlineInputBorder(),
-        ),
+        inputDecoration: InputDecoration(
+            filled: false,
+            errorStyle: const TextStyle(
+              fontSize: 16.0,
+              color: Colors.orange,
+            ),
+            border: defaultBorder,
+            enabledBorder: defaultBorder.copyWith(
+              borderSide: const BorderSide(
+                width: .1,
+              ),
+            ),
+            focusedBorder: defaultBorder.copyWith(
+              borderSide: const BorderSide(
+                width: 3,
+                color: Colors.blue,
+              ),
+            )),
       ),
     );
     super.initState();

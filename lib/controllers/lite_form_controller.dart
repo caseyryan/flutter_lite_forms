@@ -153,7 +153,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
 
   /// Registers a form field for a specified form. If the
   /// form field is already registered, it does nothing
-  FormGroupField<T> registerFormField<T>({
+  FormGroupField<T> registerFormFieldIfNone<T>({
     required String formName,
     required String fieldName,
     required LiteFormValueConvertor serializer,

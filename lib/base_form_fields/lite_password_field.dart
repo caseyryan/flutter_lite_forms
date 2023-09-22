@@ -20,7 +20,7 @@ class LitePasswordField extends StatefulWidget {
     required this.name,
     required this.settings,
     this.repeatPlaceholder,
-    this.useSmoothError = false,
+    this.useSmoothError = true,
     this.smoothErrorPadding = const EdgeInsets.only(
       top: 6.0,
     ),

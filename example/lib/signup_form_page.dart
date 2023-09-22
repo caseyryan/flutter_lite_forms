@@ -34,10 +34,22 @@ class SignupFormPage extends StatelessWidget {
               sliver: SliverList(
                 delegate: SliverChildListDelegate(
                   [
-                    const SizedBox(height: 20.0),
+                    LiteSearchField(
+                      paddingTop: 20.0,
+                      onSearch: (value) {
+                        if (kDebugMode) {
+                          print('Searching for: $value');
+                        }
+                      },
+                      settings: LiteSearchFieldSettings(
+                        searchTriggerType: SearchTriggerType.manual,
+                        iconPosition: LiteSearchFieldIconPosition.left,
+                      ),
+                    ),
                     LiteTextFormField(
+                      paddingTop: 20.0,
                       maxLines: 1,
-                      textEntryType: LiteTextEntryType.onModalRoute,
+                      textEntryType: LiteTextEntryType.normal,
                       useSmoothError: true,
                       name: 'login',
                       validator: (value) async {
@@ -123,17 +135,32 @@ class SignupFormPage extends StatelessWidget {
                         return value;
                       },
                       validator: (value) async {
-                        // return 'Date is incorrect';
+                        return 'Date is incorrect';
                         return null;
                       },
                     ),
                     LiteSwitch(
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       name: 'switch',
-                      switchPosition: SwitchPosition.right,
-                      text: 'Test',
+                      // customLiteToggleBuilder: simpleSquareToggleBuilder,
+                      reactionArea: LiteSwitchReactionArea.full,
+                      switchPosition: LiteSwitchPosition.left,
+                      useMarkdown: true,
+                      childPadding: EdgeInsets.only(
+                        left: 8.0,
+                        top: 10.0,
+                        bottom: 10.0,
+                      ),
+                      text: 'Read and accept our [Privacy Policy](https://github.com/caseyryan/flutter_lite_forms)',
                       paddingTop: 20.0,
-                      initialValue: 'true',
-                      type: LiteSwitchType.material,
+                      initialValue: false,
+                      type: LiteSwitchType.adaptive,
+                      validator: (value) {
+                        if (value == false) {
+                          return 'You must accept the Privacy Policy';
+                        }
+                        return null;
+                      },
                       initialValueDeserializer: (value) {
                         if (value is String) {
                           return value == 'true';

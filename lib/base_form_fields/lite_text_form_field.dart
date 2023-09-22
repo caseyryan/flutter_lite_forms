@@ -30,7 +30,7 @@ class LiteTextFormField extends StatefulWidget {
     super.key,
     required this.name,
     this.textEntryType = LiteTextEntryType.normal,
-    this.useSmoothError = false,
+    this.useSmoothError = true,
     this.allowErrorTexts = true,
     this.smoothErrorPadding = const EdgeInsets.only(
       top: 6.0,
@@ -241,7 +241,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
   Widget build(BuildContext context) {
     final group = LiteFormGroup.of(context);
     _formName = group!.name;
-    _field = liteFormController.registerFormField(
+    _field = liteFormController.registerFormFieldIfNone(
       fieldName: widget.name,
       formName: _formName,
       serializer: widget.serializer,
@@ -367,7 +367,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
             LiteFormErrorLine(
               fieldName: widget.name,
               formName: group.name,
-              decoration: decoration,
+              errorStyle: decoration.errorStyle,
               paddingBottom: widget.smoothErrorPadding?.bottom,
               paddingTop: widget.smoothErrorPadding?.top,
               paddingLeft: widget.smoothErrorPadding?.left,
