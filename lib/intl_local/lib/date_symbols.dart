@@ -121,7 +121,6 @@ class DateSymbols {
       required this.QUARTERS,
       required this.AMPMS,
       this.ZERODIGIT,
-      // TODO(alanknight): These formats are taken from Closure,
       // where there's only a fixed set of available formats.
       // Here we have the patterns separately. These should
       // either be used, or removed.

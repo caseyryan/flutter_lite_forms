@@ -135,7 +135,7 @@ class SignupFormPage extends StatelessWidget {
                         return value;
                       },
                       validator: (value) async {
-                        return 'Date is incorrect';
+                        // return 'Date is incorrect';
                         return null;
                       },
                     ),
