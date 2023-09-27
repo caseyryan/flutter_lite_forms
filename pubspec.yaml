@@ -1,5 +1,5 @@
 name: lite_forms
-description: A new Flutter package project.
+description: This packages dramatically simplifies working with forms still letting you use standard flutter decorations.
 version: 0.0.1
 homepage: https://github.com/caseyryan/flutter_lite_forms
 
