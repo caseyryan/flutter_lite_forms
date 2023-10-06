@@ -89,33 +89,17 @@ class SignupFormPage extends StatelessWidget {
                         //   }
                         //   return null;
                         // },
-                        requirements: PasswordRequirements.defaultRequirements(),
-                        // checkerBuilder: (
-                        //   digitsOk,
-                        //   upperCaseOk,
-                        //   lowerCaseOk,
-                        //   specialCharsOk,
-                        //   lengthOk,
-                        //   passwordsMatch,
-                        // ) {
-                        //   if (kDebugMode) {
-                        //     print(
-                        //       'digitsOk: $digitsOk, upperCaseOk: $upperCaseOk, lowerCaseOk: $lowerCaseOk, specialCharsOk: $specialCharsOk, lengthOk: $lengthOk, passwordsMatch: $passwordsMatch',
-                        //     );
-                        //   }
-                        //   return Container(
-                        //     height: 100.0,
-                        //     width: double.infinity,
-                        //     color: Colors.blue,
-                        //   );
-                        // },
+                        // requirements: PasswordRequirements.defaultRequirements(),
+                        requirements: PasswordRequirements(
+                          minLowerCaseLetters: 0,
+                          minDigits: 0,
+                        ),
                       ),
                     ),
                     LiteDatePicker(
                       textAlign: TextAlign.center,
                       dateInputType: DateInputType.both,
                       name: 'dateOfBirth',
-
                       /// notice that you can pass DateTime object here or
                       /// a String representation of a date. Both cases
                       /// will be processed by initialValueDeserializer below

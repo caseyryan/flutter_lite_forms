@@ -228,26 +228,29 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
   local_intl.DateFormat get _dateFormat {
     if (widget.dateInputType == DateInputType.date) {
       return widget.format ??
-          liteFormController.config?.defaultDatePickerFormat ??
-          local_intl.DateFormat('dd MMMM, yyyy');
+          local_intl.DateFormat(liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy');
     }
 
     if (widget.dateInputType == DateInputType.time) {
       return widget.format ??
-          liteFormController.config?.defaultTimePickerFormat ??
-          local_intl.DateFormat(_timeFormat);
+          local_intl.DateFormat(liteFormController.config?.defaultTimeFormat ?? _timeFormat);
     }
 
     if (widget.dateInputType == DateInputType.both) {
-      return widget.format ??
-          liteFormController.config?.defaultDateTimePickerFormat ??
-          local_intl.DateFormat('dd MMMM, yyyy | $_timeFormat');
+      if (widget.format != null) {
+        return widget.format!;
+      }
+      final timeFormatPattern = liteFormController.config?.defaultTimeFormat ?? _timeFormat;
+      final dateFormatPattern =  liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy';
+
+      return local_intl.DateFormat('$dateFormatPattern | $timeFormatPattern');
     }
 
     return local_intl.DateFormat('dd MMMM, yyyy');
   }
 
   String get _timeFormat {
+    
     if (widget.use24HourFormat) {
       return 'HH:mm';
     }
