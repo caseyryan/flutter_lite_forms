@@ -39,7 +39,7 @@ class _FormGroupWrapper {
   FormGroupField<T> tryRegisterField<T>({
     required String name,
     required LiteFormValueConvertor serializer,
-    required LiteFormFieldValidator<T>? validator,
+    required List<LiteFormFieldValidator<Object?>>? validators,
     required AutovalidateMode? autovalidateMode,
   }) {
     if (!_fields.containsKey(name)) {
@@ -49,7 +49,7 @@ class _FormGroupWrapper {
     }
     final field = _fields[name]! as FormGroupField<T>;
     field._serializer = serializer;
-    field._validator = validator;
+    field._validators = validators;
     field._autovalidateMode = autovalidateMode;
     field._parent = this;
     return _fields[name] as FormGroupField<T>;
@@ -81,8 +81,8 @@ class _FormGroupWrapper {
   }
 
   bool _validateNativeForm() {
-    /// native form might be valid but custom fields 
-    /// (that are not based on Flutter's form fields) might still 
+    /// native form might be valid but custom fields
+    /// (that are not based on Flutter's form fields) might still
     /// contain errors
     final result = _formState?.validate();
     for (var field in _fields.values) {
@@ -104,7 +104,7 @@ class _FormGroupWrapper {
 class FormGroupField<T> {
   final String name;
   LiteFormValueConvertor? _serializer;
-  LiteFormFieldValidator<T>? _validator;
+  List<LiteFormFieldValidator<Object?>>? _validators;
   AutovalidateMode? _autovalidateMode;
   _FormGroupWrapper? _parent;
 
@@ -195,7 +195,14 @@ class FormGroupField<T> {
     _numValidations++;
     dynamic fieldAsDynamic = this as dynamic;
     final lastError = _error;
-    final error = await fieldAsDynamic._validator?.call(_value);
+    String? error;
+    List? validators = fieldAsDynamic._validators as List? ?? const [];
+    for (var validator in validators) {
+      error = await validator.call(_value);
+      if (error != null) {
+        break;
+      }
+    }
     _setError(error?.toString());
     _numValidations--;
     if (error != lastError) {

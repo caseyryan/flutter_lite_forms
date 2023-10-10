@@ -13,6 +13,7 @@ class SignupFormPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const formName = 'signupForm';
+
     return Scaffold(
       appBar: AppBar(),
       body: LiteFormGroup(
@@ -42,7 +43,7 @@ class SignupFormPage extends StatelessWidget {
                         }
                       },
                       settings: LiteSearchFieldSettings(
-                        searchTriggerType: SearchTriggerType.manual,
+                        searchTriggerType: SearchTriggerType.automatic,
                         iconPosition: LiteSearchFieldIconPosition.left,
                       ),
                     ),
@@ -52,12 +53,14 @@ class SignupFormPage extends StatelessWidget {
                       textEntryType: LiteTextEntryType.normal,
                       useSmoothError: true,
                       name: 'login',
-                      validator: (value) async {
-                        if (value?.isNotEmpty != true) {
-                          return 'Login cannot be empty';
-                        }
-                        return null;
-                      },
+                      validators: [
+                        (value) async {
+                          if (value?.toString().isNotEmpty != true) {
+                            return 'Login cannot be empty';
+                          }
+                          return null;
+                        },
+                      ],
                       onChanged: (value) {
                         if (kDebugMode) {
                           print('VALUE: $value');
@@ -76,6 +79,48 @@ class SignupFormPage extends StatelessWidget {
                       autovalidateMode: AutovalidateMode.always,
                     ),
                     const SizedBox(height: 20.0),
+                    // LiteDropSelector(
+                    //   name: 'classes',
+                    //   // initialValue: 'Male',
+                    //   items: [
+                    //     'ActivateIntent',
+                    //     'Align',
+                    //     // 'Alignment',
+                    //     // 'AlignmentDirectional',
+                    //     // 'AlignmentGeometry',
+                    //     // 'AlignmentGeometryTween',
+                    //     // 'AlignmentTween',
+                    //     // 'AlignTransition',
+                    //     // 'AlwaysScrollableScrollPhysics',
+                    //     // 'AlwaysStoppedAnimation',
+                    //     // 'AndroidView',
+                    //     // 'AndroidViewSurface',
+                    //     // 'Animatable',
+                    //     // 'AnimatedAlign',
+                    //     // 'AnimatedBuilder',
+                    //     // 'AnimatedContainer',
+                    //     // 'AnimatedCrossFade',
+                    //     // 'AnimatedDefaultTextStyle',
+                    //     // 'AnimatedFractionallySizedBox',
+                    //     // 'AnimatedGrid',
+                    //     // 'AnimatedGridState',
+                    //   ],
+                    //   validators: [
+                    //     (value) {
+                    //       if (value == null) {
+                    //         return 'Gender must be selected';
+                    //       }
+                    //       return null;
+                    //     }
+                    //   ],
+                    //   serializer: (value) {
+                    //     return value.title;
+                    //   },
+                    //   initialValueDeserializer: (value) {
+                    //     return value;
+                    //   },
+                    // ),
+                    const SizedBox(height: 20.0),
                     LitePasswordField(
                       name: 'password',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -91,38 +136,40 @@ class SignupFormPage extends StatelessWidget {
                         // },
                         // requirements: PasswordRequirements.defaultRequirements(),
                         requirements: PasswordRequirements(
-                          minLowerCaseLetters: 0,
+                          minLowerCaseLetters: 1,
                           minDigits: 0,
                         ),
                       ),
                     ),
                     LiteDatePicker(
-                      textAlign: TextAlign.center,
-                      dateInputType: DateInputType.both,
-                      name: 'dateOfBirth',
-                      /// notice that you can pass DateTime object here or
-                      /// a String representation of a date. Both cases
-                      /// will be processed by initialValueDeserializer below
-                      /// and the LiteDatePicker will get a valid DateTime
-                      /// object as an input
-                      // initialValue: DateTime.now(),
-                      initialValue: DateTime.now().toIso8601String(),
-                      pickerType: LiteDatePickerType.material,
-                      autovalidateMode: AutovalidateMode.disabled,
-                      initialValueDeserializer: (value) {
-                        if (value is DateTime) {
+                        textAlign: TextAlign.center,
+                        dateInputType: DateInputType.both,
+                        name: 'dateOfBirth',
+
+                        /// notice that you can pass DateTime object here or
+                        /// a String representation of a date. Both cases
+                        /// will be processed by initialValueDeserializer below
+                        /// and the LiteDatePicker will get a valid DateTime
+                        /// object as an input
+                        // initialValue: DateTime.now(),
+                        initialValue: DateTime.now().toIso8601String(),
+                        pickerType: LiteDatePickerType.material,
+                        autovalidateMode: AutovalidateMode.disabled,
+                        initialValueDeserializer: (value) {
+                          if (value is DateTime) {
+                            return value;
+                          }
+                          if (value is String) {
+                            return DateTime.tryParse(value);
+                          }
                           return value;
-                        }
-                        if (value is String) {
-                          return DateTime.tryParse(value);
-                        }
-                        return value;
-                      },
-                      validator: (value) async {
-                        // return 'Date is incorrect';
-                        return null;
-                      },
-                    ),
+                        },
+                        validators: [
+                          (value) async {
+                            // return 'Date is incorrect';
+                            return null;
+                          },
+                        ]),
                     LiteSwitch(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       name: 'switch',
@@ -135,16 +182,19 @@ class SignupFormPage extends StatelessWidget {
                         top: 10.0,
                         bottom: 10.0,
                       ),
-                      text: 'Read and accept our [Privacy Policy](https://github.com/caseyryan/flutter_lite_forms)',
+                      text:
+                          'Read and accept our [Privacy Policy](https://github.com/caseyryan/flutter_lite_forms)',
                       paddingTop: 20.0,
                       initialValue: false,
                       type: LiteSwitchType.adaptive,
-                      validator: (value) {
-                        if (value == false) {
-                          return 'You must accept the Privacy Policy';
+                      validators: [
+                        (value) {
+                          if (value == false) {
+                            return 'You must accept the Privacy Policy';
+                          }
+                          return null;
                         }
-                        return null;
-                      },
+                      ],
                       initialValueDeserializer: (value) {
                         if (value is String) {
                           return value == 'true';

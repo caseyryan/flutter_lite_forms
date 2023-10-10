@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/intl_local/lib/intl.dart' as local_intl;
 import 'package:lite_forms/lite_forms.dart';
-import 'package:lite_forms/utils/string_extensions.dart';
 import 'package:lite_forms/utils/value_validator.dart';
 
 import 'error_line.dart';
+import 'mixins/form_field_mixin.dart';
 
 enum LiteDatePickerType {
   cupertino,
@@ -20,7 +20,9 @@ class LiteDatePicker extends StatefulWidget {
     required this.name,
     this.serializer = nonConvertingValueConvertor,
     this.initialValueDeserializer,
-    this.validator,
+    this.validators,
+    this.errorStyle,
+    this.onChanged,
     this.initialValue,
     this.maxDate,
     this.minDate,
@@ -82,10 +84,12 @@ class LiteDatePicker extends StatefulWidget {
   final TextCapitalization textCapitalization;
   final TextInputAction? textInputAction;
   final TextStyle? style;
+  final TextStyle? errorStyle;
   final StrutStyle? strutStyle;
   final TextDirection? textDirection;
   final TextAlign textAlign;
   final TextAlignVertical? textAlignVertical;
+  final ValueChanged<DateTime?>? onChanged;
 
   /// initial mode for a material picker. Makes sense only if
   /// [pickerType] is [LiteDatePickerType.material]
@@ -123,21 +127,19 @@ class LiteDatePicker extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueConvertor? initialValueDeserializer;
-  final LiteFormFieldValidator<DateTime>? validator;
+  final List<LiteFormFieldValidator<Object?>>? validators;
 
   @override
   State<LiteDatePicker> createState() => _LiteDatePickerState();
 }
 
-class _LiteDatePickerState extends State<LiteDatePicker> {
-  late LiteFormGroup _group;
-  bool _hasSetInitialValue = false;
+class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
 
   @override
   void didUpdateWidget(covariant LiteDatePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.dateInputType != oldWidget.dateInputType) {
-      _hasSetInitialValue = false;
+      resetInitialValueFlag();
     }
   }
 
@@ -165,8 +167,9 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
     DateTime? currentValue,
   }) async {
     final theme = Theme.of(context);
+    
     currentValue ??= (liteFormController.tryGetValueForField(
-          formName: _group.name,
+          formName: group.name,
           fieldName: widget.name,
         ) as DateTime? ??
         widget.initialValue as dynamic);
@@ -228,20 +231,24 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
   local_intl.DateFormat get _dateFormat {
     if (widget.dateInputType == DateInputType.date) {
       return widget.format ??
-          local_intl.DateFormat(liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy');
+          local_intl.DateFormat(
+              liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy');
     }
 
     if (widget.dateInputType == DateInputType.time) {
       return widget.format ??
-          local_intl.DateFormat(liteFormController.config?.defaultTimeFormat ?? _timeFormat);
+          local_intl.DateFormat(
+              liteFormController.config?.defaultTimeFormat ?? _timeFormat);
     }
 
     if (widget.dateInputType == DateInputType.both) {
       if (widget.format != null) {
         return widget.format!;
       }
-      final timeFormatPattern = liteFormController.config?.defaultTimeFormat ?? _timeFormat;
-      final dateFormatPattern =  liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy';
+      final timeFormatPattern =
+          liteFormController.config?.defaultTimeFormat ?? _timeFormat;
+      final dateFormatPattern =
+          liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy';
 
       return local_intl.DateFormat('$dateFormatPattern | $timeFormatPattern');
     }
@@ -250,7 +257,6 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
   }
 
   String get _timeFormat {
-    
     if (widget.use24HourFormat) {
       return 'HH:mm';
     }
@@ -453,50 +459,30 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    _group = LiteFormGroup.of(context)!;
-    final field = liteFormController.registerFormFieldIfNone<DateTime>(
+    initializeFormField<DateTime>(
       fieldName: widget.name,
-      formName: _group.name,
-      serializer: widget.serializer,
-      validator: widget.validator,
       autovalidateMode: widget.autovalidateMode,
+      serializer: widget.serializer,
+      initialValue: widget.initialValue,
+      initialValueDeserializer: widget.initialValueDeserializer,
+      validators: widget.validators,
+      hintText: widget.hintText,
+      decoration: widget.decoration,
+      errorStyle: widget.errorStyle,
     );
-    final storedValue = liteFormController.tryGetValueForField(
-      formName: _group.name,
-      fieldName: widget.name,
-    ) as DateTime?;
-    DateTime? value = storedValue ??
-        widget.initialValueDeserializer?.call(widget.initialValue) as DateTime? ??
-        widget.initialValue as DateTime?;
-
+    
     final dateFormat = _dateFormat;
     if (value != null) {
-      if (!_hasSetInitialValue) {
-        _hasSetInitialValue = true;
+      setInitialValue(() {
         liteFormController.onValueChanged(
-          formName: _group.name,
+          formName: group.name,
           fieldName: widget.name,
           value: value,
           view: dateFormat.format(value),
           isInitialValue: true,
         );
-      }
+      });
     }
-    String? hintText = _group.translationBuilder(widget.hintText);
-    if (hintText?.isNotEmpty != true) {
-      if (liteFormController.config?.useAutogeneratedHints == true) {
-        hintText = widget.name.splitByCamelCase();
-      }
-    }
-    var decoration = widget.decoration ??
-        liteFormController.config?.inputDecoration ??
-        const InputDecoration();
-    if (hintText?.isNotEmpty == true) {
-      decoration = decoration.copyWith(
-        hintText: hintText,
-      );
-    }
-    final textEditingController = field.getOrCreateTextEditingController();
 
     return GestureDetector(
       onTap: () async {
@@ -504,11 +490,12 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
           context: context,
         );
         liteFormController.onValueChanged(
-          formName: _group.name,
+          formName: group.name,
           fieldName: widget.name,
           value: dateTime,
           view: dateTime != null ? dateFormat.format(dateTime) : null,
         );
+        widget.onChanged?.call(dateTime);
       },
       child: Container(
         color: Colors.transparent,
@@ -525,9 +512,9 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
               children: [
                 TextFormField(
                   restorationId: widget.restorationId,
-                  validator: widget.validator != null
+                  validator: widget.validators != null
                       ? (value) {
-                          return _group.translationBuilder(field.error);
+                          return group.translationBuilder(field.error);
                         }
                       : null,
                   autovalidateMode: null,
@@ -551,7 +538,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> {
                 if (widget.useSmoothError)
                   LiteFormErrorLine(
                     fieldName: widget.name,
-                    formName: _group.name,
+                    formName: group.name,
                     errorStyle: decoration.errorStyle,
                     paddingBottom: widget.smoothErrorPadding?.bottom,
                     paddingTop: widget.smoothErrorPadding?.top,

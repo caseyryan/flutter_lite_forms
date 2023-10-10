@@ -4,12 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
-import 'package:lite_forms/utils/string_extensions.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
 import 'package:lite_forms/utils/value_validator.dart';
 
 import 'error_line.dart';
-import 'lite_form_group.dart';
+import 'mixins/form_field_mixin.dart';
 
 enum LiteTextEntryType {
   normal,
@@ -38,7 +37,7 @@ class LiteTextFormField extends StatefulWidget {
     this.hintText,
     this.serializer = nonConvertingValueConvertor,
     this.initialValueDeserializer,
-    this.validator,
+    this.validators,
     this.controller,
     this.restorationId,
     this.initialValue,
@@ -48,6 +47,7 @@ class LiteTextFormField extends StatefulWidget {
     this.textCapitalization = TextCapitalization.none,
     this.textInputAction,
     this.style,
+    this.errorStyle,
     this.strutStyle,
     this.textDirection,
     this.textAlign = TextAlign.start,
@@ -98,7 +98,6 @@ class LiteTextFormField extends StatefulWidget {
   final String name;
   final String? hintText;
   final TextEditingController? controller;
-  
 
   /// makes sense only if [textEntryType] is [LiteTextEntryType.onModalRoute]
   final TextEntryModalRouteSettings? modalRouteSettings;
@@ -140,7 +139,7 @@ class LiteTextFormField extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueConvertor? initialValueDeserializer;
-  final LiteFormFieldValidator<String>? validator;
+  final List<LiteFormFieldValidator<Object?>>? validators;
   final String? restorationId;
   final Object? initialValue;
   final FocusNode? focusNode;
@@ -149,6 +148,7 @@ class LiteTextFormField extends StatefulWidget {
   final TextCapitalization textCapitalization;
   final TextInputAction? textInputAction;
   final TextStyle? style;
+  final TextStyle? errorStyle;
   final StrutStyle? strutStyle;
   final TextDirection? textDirection;
   final TextAlign textAlign;
@@ -198,12 +198,7 @@ class LiteTextFormField extends StatefulWidget {
   State<LiteTextFormField> createState() => _LiteTextFormFieldState();
 }
 
-class _LiteTextFormFieldState extends State<LiteTextFormField> {
-  bool _hasSetInitialValue = false;
-  late FormGroupField<String> _field;
-  late String _formName;
-  late String? _hintText;
-
+class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMixin {
   VoidCallback? _getTapMethod() {
     if (widget.textEntryType == LiteTextEntryType.onModalRoute) {
       return _openTextEntryRoute;
@@ -216,18 +211,19 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
       final result = await Navigator.of(context).push(
         _TextEntryRoute(
           modalRouteSettings: widget.modalRouteSettings,
-          hintText: _hintText,
-          selection: _field.textEditingController?.selection,
-          text: _field.textEditingController?.text ?? '',
+          hintText: hintText,
+          selection: field.textEditingController?.selection,
+          text: field.textEditingController?.text ?? '',
           maxLines: widget.maxLines,
         ),
       );
       if (result is String) {
         liteFormController.onValueChanged(
-          formName: _formName,
+          formName: formName,
           fieldName: widget.name,
           value: result,
           isInitialValue: true,
+          view: null,
         );
       }
     }
@@ -239,51 +235,28 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
 
   @override
   Widget build(BuildContext context) {
-    final group = LiteFormGroup.of(context);
-    _formName = group!.name;
-    _field = liteFormController.registerFormFieldIfNone(
+    initializeFormField<String>(
       fieldName: widget.name,
-      formName: _formName,
-      serializer: widget.serializer,
-      validator: widget.validator,
       autovalidateMode: widget.autovalidateMode,
-    );
-    final textEditingController = _field.getOrCreateTextEditingController(
-      controller: widget.controller,
+      serializer: widget.serializer,
+      initialValueDeserializer: widget.initialValueDeserializer,
+      validators: widget.validators,
+      initialValue: widget.initialValue,
+      hintText: widget.hintText,
+      decoration: widget.decoration,
+      errorStyle: widget.errorStyle,
     );
 
-    /// If a form was stored before, then the initial value passed from the
-    /// constructor will have no effect and the previous value will be used instead
-    final value = _field.value ??
-        widget.initialValueDeserializer?.call(widget.initialValue)?.toString() ??
-        widget.initialValue?.toString();
-
-    if (!_hasSetInitialValue) {
-      _hasSetInitialValue = true;
+    setInitialValue(() {
       liteFormController.onValueChanged(
         fieldName: widget.name,
         formName: group.name,
         value: value,
         isInitialValue: true,
+        view: null,
       );
-    }
+    });
 
-    _hintText = group.translationBuilder.call(widget.hintText);
-    if (_hintText?.isNotEmpty != true) {
-      if (liteFormController.config?.useAutogeneratedHints == true) {
-        _hintText = widget.name.splitByCamelCase();
-      }
-    }
-
-    var decoration = widget.decoration ??
-        liteFormController.config?.inputDecoration ??
-        const InputDecoration();
-    if (_hintText?.isNotEmpty == true) {
-      decoration = decoration.copyWith(
-        hintText: _hintText,
-      );
-    }
-    
     return Padding(
       padding: EdgeInsets.only(
         top: widget.paddingTop,
@@ -296,9 +269,9 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
           TextFormField(
             restorationId: widget.restorationId,
             scrollController: widget.scrollController,
-            validator: widget.validator != null
+            validator: widget.validators != null
                 ? (value) {
-                    return group.translationBuilder(_field.error);
+                    return group.translationBuilder(field.error);
                   }
                 : null,
             autocorrect: widget.autocorrect,
@@ -341,6 +314,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> {
                 formName: group.name,
                 fieldName: widget.name,
                 value: value,
+                view: null,
               );
               widget.onChanged?.call(value);
             },

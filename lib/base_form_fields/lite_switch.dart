@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:lite_forms/base_form_fields/error_line.dart';
+import 'package:lite_forms/base_form_fields/mixins/form_field_mixin.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
@@ -55,7 +56,7 @@ class LiteSwitch extends StatefulWidget {
     this.paddingRight = 0.0,
     this.serializer = nonConvertingValueConvertor,
     this.initialValueDeserializer,
-    this.validator,
+    this.validators,
     this.initialValue,
     this.autovalidateMode,
     this.type = LiteSwitchType.adaptive,
@@ -184,7 +185,7 @@ class LiteSwitch extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueConvertor? initialValueDeserializer;
-  final LiteFormFieldValidator<bool>? validator;
+  final List<LiteFormFieldValidator<Object?>>? validators;
 
   /// even though the type here is specified as Object?
   /// it is assumed that the default value type is [bool]
@@ -198,10 +199,7 @@ class LiteSwitch extends StatefulWidget {
   State<LiteSwitch> createState() => _LiteSwitchState();
 }
 
-class _LiteSwitchState extends State<LiteSwitch> {
-  bool _hasSetInitialValue = false;
-  late LiteFormGroup _group;
-
+class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
   @override
   void initState() {
     super.initState();
@@ -302,9 +300,10 @@ class _LiteSwitchState extends State<LiteSwitch> {
     bool value,
   ) {
     liteFormController.onValueChanged(
-      formName: _group.name,
+      formName: group.name,
       fieldName: widget.name,
       value: value,
+      view: null,
     );
     widget.onChanged?.call(value);
     liteFormRebuildController.rebuild();
@@ -353,7 +352,7 @@ class _LiteSwitchState extends State<LiteSwitch> {
         onTap: () {
           bool value = _tryGetValue(
                 fieldName: widget.name,
-                formName: _group.name,
+                formName: group.name,
               ) ==
               true;
           _onChanged(!value);
@@ -366,28 +365,31 @@ class _LiteSwitchState extends State<LiteSwitch> {
 
   @override
   Widget build(BuildContext context) {
-    _group = LiteFormGroup.of(context)!;
-    liteFormController.registerFormFieldIfNone<bool>(
+    initializeFormField<bool>(
       fieldName: widget.name,
-      formName: _group.name,
-      serializer: widget.serializer,
-      validator: widget.validator,
       autovalidateMode: widget.autovalidateMode,
+      serializer: widget.serializer,
+      initialValueDeserializer: widget.initialValueDeserializer,
+      validators: widget.validators,
+      initialValue: widget.initialValue,
+      hintText: null,
+      decoration: null,
+      errorStyle: widget.errorStyle,
     );
 
-    if (!_hasSetInitialValue) {
-      _hasSetInitialValue = true;
+    setInitialValue(() {
       bool? value = _tryGetValue(
         fieldName: widget.name,
-        formName: _group.name,
+        formName: group.name,
       );
       liteFormController.onValueChanged(
         fieldName: widget.name,
-        formName: _group.name,
+        formName: group.name,
         value: value,
         isInitialValue: true,
+        view: null,
       );
-    }
+    });
 
     return Padding(
       padding: EdgeInsets.only(
@@ -406,13 +408,13 @@ class _LiteSwitchState extends State<LiteSwitch> {
               children = [
                 _buildChild(),
                 _buildToggle(
-                  formName: _group.name,
+                  formName: group.name,
                 ),
               ];
             } else {
               children = [
                 _buildToggle(
-                  formName: _group.name,
+                  formName: group.name,
                 ),
                 _buildChild(),
               ];
@@ -420,14 +422,10 @@ class _LiteSwitchState extends State<LiteSwitch> {
           } else {
             children = [
               _buildToggle(
-                formName: _group.name,
+                formName: group.name,
               ),
             ];
           }
-
-          final errorStyle = widget.errorStyle ??
-              liteFormController.config?.inputDecoration?.errorStyle ??
-              TextStyle(color: Theme.of(context).colorScheme.error);
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,7 +436,7 @@ class _LiteSwitchState extends State<LiteSwitch> {
               if (widget.useSmoothError)
                 LiteFormErrorLine(
                   fieldName: widget.name,
-                  formName: _group.name,
+                  formName: group.name,
                   errorStyle: errorStyle,
                   paddingBottom: widget.smoothErrorPadding?.bottom,
                   paddingTop: widget.smoothErrorPadding?.top,

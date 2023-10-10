@@ -134,7 +134,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     required String formName,
     required String fieldName,
     required Object? value,
-    String? view,
+    required String? view,
     bool isInitialValue = false,
   }) {
     _FormGroupWrapper? group = _formGroups[formName];
@@ -157,7 +157,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     required String formName,
     required String fieldName,
     required LiteFormValueConvertor serializer,
-    required LiteFormFieldValidator<T>? validator,
+    required List<LiteFormFieldValidator<Object?>>? validators,
     required AutovalidateMode? autovalidateMode,
   }) {
     createFormIfNull(formName: formName);
@@ -165,7 +165,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     return groupWrapper.tryRegisterField(
       name: fieldName,
       serializer: serializer,
-      validator: validator,
+      validators: validators,
       autovalidateMode: autovalidateMode,
     );
   }

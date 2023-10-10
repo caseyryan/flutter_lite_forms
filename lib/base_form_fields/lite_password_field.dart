@@ -219,29 +219,31 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
           keyboardType: widget.keyboardType,
           maxLines: 1,
           minLines: 1,
-          validator: (value) async {
-            final firstFieldValue = liteFormController
-                .tryGetField(
-                  formName: group.name,
-                  fieldName: widget.name,
-                )
-                ?.value
-                ?.toString();
-            final secondaryFieldValue = liteFormController
-                .tryGetField(
-                  formName: group.name,
-                  fieldName: repeatName,
-                )
-                ?.value
-                ?.toString();
-    
-            bool? passwordsMatch = firstFieldValue == secondaryFieldValue;
-            return widget.settings._validate(
-              value: value,
-              passwordsMatch: passwordsMatch,
-              group: group,
-            );
-          },
+          validators: [
+            (value) async {
+              final firstFieldValue = liteFormController
+                  .tryGetField(
+                    formName: group.name,
+                    fieldName: widget.name,
+                  )
+                  ?.value
+                  ?.toString();
+              final secondaryFieldValue = liteFormController
+                  .tryGetField(
+                    formName: group.name,
+                    fieldName: repeatName,
+                  )
+                  ?.value
+                  ?.toString();
+
+              bool? passwordsMatch = firstFieldValue == secondaryFieldValue;
+              return widget.settings._validate(
+                value: value as String?,
+                passwordsMatch: passwordsMatch,
+                group: group,
+              );
+            },
+          ],
           maxLength: widget.maxLength,
           maxLengthEnforcement: null,
           mouseCursor: widget.mouseCursor,
@@ -286,12 +288,13 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
           LiteTextFormField(
             allowErrorTexts: allowErrorTexts,
             name: repeatName,
-    
-            validator: (value) async {
-              /// in this case no validation is required except for the password match
-              liteFormRebuildController.rebuild();
-              return null;
-            },
+            validators: [
+              (value) async {
+                /// in this case no validation is required except for the password match
+                liteFormRebuildController.rebuild();
+                return null;
+              },
+            ],
             autocorrect: false,
             autofillHints: widget.autofillHints,
             autofocus: widget.autofocus,
@@ -542,7 +545,7 @@ class PasswordRequirements {
         _lengthOk &
         passwordsMatch;
     if (!success) {
-      return 'Invalid form';
+      return 'Invalid password';
     }
     return null;
   }

@@ -1,5 +1,5 @@
 /// used to write custom value serializers / deserializers
-typedef LiteFormValueConvertor = Object? Function(Object? value);
+typedef LiteFormValueConvertor = Object? Function(dynamic value);
 
 /// The default for all fields. This means that the values is 
 /// supposed to be accepted as is. If you need to convert the 
