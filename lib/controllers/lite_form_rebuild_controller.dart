@@ -10,6 +10,11 @@ class LiteFormRebuildController extends LiteStateController<LiteFormRebuildContr
   void reset() {
     
   }
+
+  Future rebuildAfterMillis(int millis) async {
+    await delay(millis);
+    rebuild();
+  }
   @override
   void onLocalStorageInitialized() {
     

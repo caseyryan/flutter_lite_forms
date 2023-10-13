@@ -36,13 +36,22 @@ class _FormGroupWrapper {
     return _fields.values.any((e) => e._isBeingValidated);
   }
 
+  bool isFieldInitiallySet(String fieldName) {
+    final FormGroupField? field = _fields[fieldName];
+    return field?.isInitiallySet == true;
+  }
+
   FormGroupField<T> tryRegisterField<T>({
     required String name,
     required LiteFormValueConvertor serializer,
     required List<LiteFormFieldValidator<Object?>>? validators,
     required AutovalidateMode? autovalidateMode,
+    required InputDecoration? decoration,
   }) {
-    if (!_fields.containsKey(name)) {
+    if (kDebugMode) {
+      print('TRY REGISTER FIELD: $name');
+    }
+    if (!isFieldInitiallySet(name)) {
       _fields[name] = FormGroupField<T>(
         name: name,
       );
@@ -52,17 +61,46 @@ class _FormGroupWrapper {
     field._validators = validators;
     field._autovalidateMode = autovalidateMode;
     field._parent = this;
+    field._decoration = decoration;
+    field._updatedAt = DateTime.now();
     return _fields[name] as FormGroupField<T>;
+  }
+
+  void unregisterField({
+    required String fieldName,
+  }) {
+    _fields.remove(fieldName);
+  }
+
+  void unregisterFieldIfOutdated({
+    required FormGroupField field,
+  }) {
+    if (field._isOutdated() == true) {
+      unregisterField(fieldName: field.name);
+    }
+  }
+
+  void unregisterAllOutdatedFields() {
+    final tempFields = [..._fields.values];
+    for (var field in tempFields) {
+      unregisterFieldIfOutdated(field: field);
+    }
   }
 
   FormGroupField? tryFindField(String fieldName) {
     return _fields[fieldName];
   }
 
-  Map<String, dynamic> getFormData() {
+  Map<String, dynamic> getFormData(
+    bool applySerializers,
+  ) {
     final map = <String, dynamic>{};
     for (var kv in _fields.entries) {
-      map[kv.key] = kv.value.serializedValue;
+      if (applySerializers) {
+        map[kv.key] = kv.value.serializedValue;
+      } else {
+        map[kv.key] = kv.value;
+      }
     }
     return map;
   }
@@ -106,7 +144,21 @@ class FormGroupField<T> {
   LiteFormValueConvertor? _serializer;
   List<LiteFormFieldValidator<Object?>>? _validators;
   AutovalidateMode? _autovalidateMode;
+  InputDecoration? _decoration;
   _FormGroupWrapper? _parent;
+
+  /// This allows us to unregister the fields that were not
+  /// registered during this build stage. E.e. you removed
+  /// a field by some condition. This filed might be automatically removed from
+  /// form
+  DateTime? _updatedAt;
+
+  bool _isOutdated() {
+    if (_updatedAt == null) {
+      return false;
+    }
+    return DateTime.now().difference(_updatedAt!).inMilliseconds > 60;
+  }
 
   TextEditingController? _textEditingController;
   TextEditingController? get textEditingController => _textEditingController;
@@ -134,8 +186,16 @@ class FormGroupField<T> {
     _textEditingController = null;
   }
 
+  bool _isInitiallySet = false;
+
+  bool get isInitiallySet {
+    return _isInitiallySet;
+  }
+
   Object? _value;
-  Object? get value => _value;
+  Object? get value {
+    return _value;
+  }
 
   /// [view] is a String that will be displayed
   /// to a user. This must be null for text inputs
@@ -150,6 +210,7 @@ class FormGroupField<T> {
     _value = value;
     if (value != null) {
       if (isInitialValue) {
+        _isInitiallySet = true;
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           try {
             textEditingController?.text = view ?? _value.toString();

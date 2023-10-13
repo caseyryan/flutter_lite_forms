@@ -241,21 +241,29 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
       serializer: widget.serializer,
       initialValueDeserializer: widget.initialValueDeserializer,
       validators: widget.validators,
-      initialValue: widget.initialValue,
       hintText: widget.hintText,
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
     );
 
-    setInitialValue(() {
-      liteFormController.onValueChanged(
-        fieldName: widget.name,
-        formName: group.name,
-        value: value,
-        isInitialValue: true,
-        view: null,
-      );
-    });
+    tryDeserializeInitialValueIfNecessary<String>(
+      rawInitialValue: widget.initialValue,
+      initialValueDeserializer: widget.initialValueDeserializer,
+    );
+
+    setInitialValue(
+      fieldName: widget.name,
+      formName: group.name,
+      setter: () {
+        liteFormController.onValueChanged(
+          fieldName: widget.name,
+          formName: group.name,
+          value: initialValue,
+          isInitialValue: true,
+          view: null,
+        );
+      },
+    );
 
     return Padding(
       padding: EdgeInsets.only(
@@ -330,7 +338,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
             smartQuotesType: widget.smartQuotesType,
             showCursor: widget.showCursor,
             strutStyle: widget.strutStyle,
-            style: widget.style,
+            style: liteFormController.config?.defaultTextStyle ?? widget.style,
             textAlign: widget.textAlign,
             textAlignVertical: widget.textAlignVertical,
             textCapitalization: widget.textCapitalization,

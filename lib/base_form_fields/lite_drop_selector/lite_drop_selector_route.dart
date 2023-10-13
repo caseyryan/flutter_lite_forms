@@ -1,5 +1,11 @@
 part of 'lite_drop_selector.dart';
 
+typedef MenuItemBuilder = Widget Function(
+  int index,
+  LiteDropSelectorItem item,
+  bool isLast,
+);
+
 Future showDropSelector({
   required List<LiteDropSelectorItem> buttonDatas,
   required Offset tapPosition,
@@ -8,12 +14,21 @@ Future showDropSelector({
   required LiteDropSelectorActionType dropSelectorActionType,
   required InputDecoration? decoration,
   required Size buttonSize,
+  required LiteDropSelectorSheetSettings settings,
+  required TextStyle? style,
+  required String parentFieldName,
+  required String parentFormName,
+  MenuItemBuilder? menuItemBuilder,
 }) async {
   FocusScope.of(context).unfocus();
   return await Navigator.of(context).push(
     LiteDropSelectorRoute(
       LiteDropSelectorRouteArgs(
         items: buttonDatas,
+        style: style,
+        parentFieldName: parentFieldName,
+        parentFormName: parentFormName,
+        dropSelectorSettings: settings,
         buttonLeftBottomCorner: Offset(
           tapPosition.dx,
           tapPosition.dy,
@@ -22,9 +37,26 @@ Future showDropSelector({
         buttonSize: buttonSize,
         dropSelectorViewType: dropSelectorType,
         dropSelectorActionType: dropSelectorActionType,
+        menuItemBuilder: menuItemBuilder,
       ),
     ),
   );
+}
+
+class MenuSearchConfiguration {
+  const MenuSearchConfiguration({
+    this.searchFieldVisibility = SearchFieldVisibility.adaptive,
+    this.innerFieldSettings = const LiteSearchFieldSettings(),
+    this.searchFieldDecoration,
+    this.padding,
+    this.autofocusSearchField = false,
+  });
+
+  final SearchFieldVisibility searchFieldVisibility;
+  final LiteSearchFieldSettings innerFieldSettings;
+  final InputDecoration? searchFieldDecoration;
+  final EdgeInsets? padding;
+  final bool autofocusSearchField;
 }
 
 class LiteDropSelectorSheetSettings {
@@ -34,23 +66,38 @@ class LiteDropSelectorSheetSettings {
     this.bottomLeftRadius = 22.0,
     this.bottomRightRadius = 22.0,
     this.headerStyle,
+    this.buttonHeight,
+    this.menuSearchConfiguration = const MenuSearchConfiguration(),
     this.header,
-    this.paddingTop = 16.0,
-    this.paddingLeft = 16.0,
-    this.paddingRight = 16.0,
-    this.paddingBottom = 16.0,
+    this.veilColor,
+    this.maxVeilOpacity = .04,
+    this.withScrollBar = true,
+    this.padding = const EdgeInsets.all(
+      16.0,
+    ),
   });
 
+  final MenuSearchConfiguration menuSearchConfiguration;
   final double topLeftRadius;
   final double topRightRadius;
   final double bottomLeftRadius;
   final double bottomRightRadius;
+  final Color? veilColor;
+  final double maxVeilOpacity;
+
+  /// [buttonHeight] a height for a button i na list.
+  /// Defaults to the current height of the drop selector
+  final double? buttonHeight;
   final TextStyle? headerStyle;
   final String? header;
-  final double paddingTop;
-  final double paddingLeft;
-  final double paddingRight;
-  final double paddingBottom;
+  final bool withScrollBar;
+  final EdgeInsets padding;
+}
+
+enum SearchFieldVisibility {
+  none,
+  adaptive,
+  always,
 }
 
 class LiteDropSelectorRouteArgs {
@@ -61,9 +108,15 @@ class LiteDropSelectorRouteArgs {
     required this.dropSelectorViewType,
     required this.dropSelectorActionType,
     required this.decoration,
-    this.dropSelectorSettings = const LiteDropSelectorSheetSettings(),
+    required this.dropSelectorSettings,
+    required this.style,
+    required this.parentFieldName,
+    required this.parentFormName,
+    this.menuItemBuilder,
   });
 
+  final String parentFieldName;
+  final String parentFormName;
   final InputDecoration? decoration;
   final List<LiteDropSelectorItem> items;
   final Offset buttonLeftBottomCorner;
@@ -71,6 +124,8 @@ class LiteDropSelectorRouteArgs {
   final LiteDropSelectorViewType dropSelectorViewType;
   final LiteDropSelectorActionType dropSelectorActionType;
   final LiteDropSelectorSheetSettings dropSelectorSettings;
+  final TextStyle? style;
+  MenuItemBuilder? menuItemBuilder;
 }
 
 class LiteDropSelectorRoute extends ModalRoute {
@@ -123,28 +178,58 @@ class AdaptiveMenuView extends StatefulWidget {
   State<AdaptiveMenuView> createState() => _AdaptiveMenuViewState();
 }
 
+class _TempSelection {
+  final String title;
+  _TempSelection({
+    required this.title,
+  });
+}
+
 class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin {
   final _sizeKey = GlobalKey();
   double _menuWidth = 0.0;
-  double _menuHeight = 0.0;
   Size? _size;
   final _draggableScrollableController = DraggableScrollableController();
+  final ScrollController _scrollController = ScrollController();
+  String? _searchValue;
+  bool _isTopDirected = false;
+  double _initialScreenHeight = 0.0;
+  double _keyboardHeight = 0.0;
+
+  /// for cancellation case
+  List<_TempSelection> _initialSelection = [];
 
   @override
   void didFirstLayoutFinished(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    _initialScreenHeight = size.height;
     setState(() {
       _menuWidth = _sizeKey.currentContext!.size!.width.clamp(0.0, size.width);
+      if (!_isSimple || _hasSearchField) {
+        _menuWidth = max(
+          _menuWidth,
+          250.0 - _totalHorizontalPadding,
+        );
+      }
       for (var d in widget.args.items) {
         d._menuWidth = _menuWidth;
       }
-      _menuHeight = _sizeKey.currentContext!.size!.height.clamp(0.0, size.height);
     });
+  }
+
+  @override
+  void initState() {
+    _initialSelection = widget.args.items
+        .where((e) => e.isSelected)
+        .map((e) => _TempSelection(title: e.title))
+        .toList();
+    super.initState();
   }
 
   @override
   void dispose() {
     _draggableScrollableController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -167,17 +252,18 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
   void _onButtonPressed(
     LiteDropSelectorItem value,
   ) {
+    FocusScope.of(context).unfocus();
     if (value.isSelected) {
       if (value.isSingleAction) {
-        value.onPressed?.call(value);
+        value.onPressed?.call([value]);
         return;
       }
     }
 
     if (value.type != null) {
       if (_isSimple) {
-        Navigator.of(context).pop(value);
-        value.onPressed?.call(value);
+        Navigator.of(context).pop([value]);
+        value.onPressed?.call([value]);
       }
     } else {
       if (_isMultiselect) {
@@ -193,11 +279,11 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
         }
       }
       if (_isSimple) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop([value]);
       } else {
         setState(() {});
       }
-      value.onPressed?.call(value);
+      value.onPressed?.call([value]);
     }
   }
 
@@ -209,30 +295,197 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
     return widget.args.items.length * _singleButtonHeight;
   }
 
+  bool get _hasSearchField {
+    if (_settings.menuSearchConfiguration.searchFieldVisibility ==
+        SearchFieldVisibility.adaptive) {
+      if (widget.args.items.length <= 8) {
+        return false;
+      }
+    } else if (_settings.menuSearchConfiguration.searchFieldVisibility ==
+        SearchFieldVisibility.none) {
+      return false;
+    }
+    return true;
+  }
+
+  Widget _buildButtonRow() {
+    if (_isSimple) {
+      return const SizedBox.shrink();
+    }
+    return SizedBox(
+      width: _menuWidth,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: _settings.padding.bottom,
+        ),
+        child: Row(
+          children: [
+            CupertinoButton(
+              key: const Key('drop_selector_cancel_button'),
+              onPressed: _onCancel,
+              child: const Text('Cancel'),
+            ),
+            const Spacer(),
+            CupertinoButton(
+              key: const Key('drop_selector_done_button'),
+              onPressed: () {
+                final selectedItems = widget.args.items
+                    .where(
+                      (e) => e.isSelected,
+                    )
+                    .toList();
+                Navigator.of(context).pop(
+                  selectedItems,
+                );
+              },
+              child: const Text('Done'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _insertButtons(
+    List<Widget> children,
+  ) {
+    if (_isTopDirected) {
+      children.add(
+        _buildButtonRow(),
+      );
+    } else {
+      children.insert(
+        0,
+        _buildButtonRow(),
+      );
+    }
+  }
+
+  void _tryInsertSearchField(
+    List<Widget> children,
+  ) {
+    if (!_hasSearchField) {
+      return;
+    }
+    if (_isTopDirected) {
+      children.add(
+        SizedBox(
+          width: _menuWidth,
+          child: LiteSearchField(
+            decoration: _settings.menuSearchConfiguration.searchFieldDecoration,
+            settings: _settings.menuSearchConfiguration.innerFieldSettings,
+            onSearch: _onSearch,
+            autofocus: _settings.menuSearchConfiguration.autofocusSearchField,
+            style: widget.args.style,
+            paddingTop:
+                _settings.menuSearchConfiguration.padding?.top ?? _settings.padding.top,
+            paddingBottom: _settings.menuSearchConfiguration.padding?.bottom ?? 0.0,
+            paddingLeft:
+                _settings.menuSearchConfiguration.padding?.left ?? _settings.padding.left,
+            paddingRight: _settings.menuSearchConfiguration.padding?.right ??
+                _settings.padding.right,
+          ),
+        ),
+      );
+    } else {
+      children.insert(
+        0,
+        SizedBox(
+          width: _menuWidth,
+          child: LiteSearchField(
+            autofocus: _settings.menuSearchConfiguration.autofocusSearchField,
+            onSearch: _onSearch,
+            paddingTop: _settings.menuSearchConfiguration.padding?.top ?? 0.0,
+            paddingBottom: _settings.menuSearchConfiguration.padding?.bottom ??
+                _settings.padding.bottom,
+            paddingLeft:
+                _settings.menuSearchConfiguration.padding?.left ?? _settings.padding.left,
+            paddingRight: _settings.menuSearchConfiguration.padding?.right ??
+                _settings.padding.right,
+          ),
+        ),
+      );
+    }
+  }
+
+  void _onSearch(String? value) {
+    setState(() {
+      _searchValue = value;
+    });
+  }
+
   Widget _buildMenuContent() {
     final items = _filteredItems;
-    return Padding(
-      padding: EdgeInsets.only(
-        top: _isBottomSheet ? _settings.paddingTop : 0.0,
-        bottom: _isBottomSheet ? _settings.paddingBottom : 0.0,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: items.mapIndexed(
-            (int index, e) {
-              // final isLast = index == items.length - 1;
-              return LiteDropSelectorButton(
-                data: e,
-                paddingLeft: _settings.paddingLeft,
-                paddingRight: _settings.paddingRight,
-                onPressed: _onButtonPressed,
-                key: ValueKey(e),
-                buttonHeight: _singleButtonHeight,
-              );
-            },
-          ).toList(),
+    final List<Widget> children = [
+      Flexible(
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: items.mapIndexed(
+              (int index, e) {
+                final isLast = index == items.length - 1;
+                Widget button;
+                if (widget.args.menuItemBuilder != null) {
+                  button = widget.args.menuItemBuilder!(
+                    index,
+                    e,
+                    isLast,
+                  );
+                } else {
+                  button = Padding(
+                    padding: EdgeInsets.only(
+                      bottom: isLast ? 0.0 : _settings.padding.bottom,
+                    ),
+                    child: LiteDropSelectorButton(
+                      data: e,
+                      parentFieldName: widget.args.parentFieldName,
+                      parentFormName: widget.args.parentFormName,
+                      sheetSettings: _settings,
+                      decoration: widget.args.decoration,
+                      style: widget.args.style,
+                      paddingLeft: _settings.padding.left,
+                      paddingRight: _settings.padding.right,
+                      key: ValueKey(e),
+                      buttonHeight: _singleButtonHeight,
+                    ),
+                  );
+                }
+
+                return GestureDetector(
+                  onTap: () {
+                    _onButtonPressed(e);
+                  },
+                  child: button,
+                );
+              },
+            ).toList(),
+          ),
+        ),
+      )
+    ];
+    if (_menuWidth > 0.0) {
+      _tryInsertSearchField(children);
+      _insertButtons(children);
+    }
+    return AnimatedSize(
+      duration: kThemeAnimationDuration,
+      curve: Curves.easeInOutExpo,
+      alignment: _isTopDirected ? Alignment.bottomLeft : Alignment.topLeft,
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: _isBottomSheet ? _settings.padding.top : 0.0,
+          bottom: _isBottomSheet ? _settings.padding.bottom : 0.0,
+        ),
+        child: Scrollbar(
+          thickness: _settings.withScrollBar ? null : 0.0,
+          controller: _scrollController,
+          interactive: kIsWeb,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: children,
+          ),
         ),
       ),
     );
@@ -263,6 +516,13 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
   }
 
   List<LiteDropSelectorItem> get _filteredItems {
+    if (_searchValue?.isNotEmpty == true) {
+      return widget.args.items
+          .where(
+            (e) => e.isMatchingSearch(_searchValue!),
+          )
+          .toList();
+    }
     return widget.args.items;
   }
 
@@ -281,17 +541,26 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
         .clamp(0.0, 1.0);
   }
 
-  InputDecoration? get _decoration {
-    return widget.args.decoration;
-  }
+  // InputDecoration? get _decoration {
+  //   return widget.args.decoration;
+  // }
 
   double get _totalVerticalPadding {
-    return _settings.paddingTop + _settings.paddingBottom;
+    return _settings.padding.top + _settings.padding.bottom;
+  }
+
+  double get _totalHorizontalPadding {
+    return _settings.padding.right + _settings.padding.left;
   }
 
   bool get _isBottomSheet {
-    // return false;
-    return isNarrowScreen;
+    if (widget.args.dropSelectorViewType == LiteDropSelectorViewType.adaptive) {
+      return isNarrowScreen;
+    }
+    if (widget.args.dropSelectorViewType == LiteDropSelectorViewType.menu) {
+      return false;
+    }
+    return true;
   }
 
   Widget _buildMenu() {
@@ -308,8 +577,8 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
             ScrollController scrollController,
           ) {
             return Padding(
-              padding: const EdgeInsets.only(
-                top: 20.0,
+              padding: EdgeInsets.only(
+                top: _settings.padding.top,
               ),
               child: Transform.translate(
                 offset: Offset(
@@ -358,25 +627,27 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
       );
     }
 
-    bool isTopDirected = widget.args.buttonLeftBottomCorner.dy > (_screenHeight * .5);
+    _isTopDirected = widget.args.buttonLeftBottomCorner.dy > (_screenHeight * .5);
 
     double availableHeight = 0.0;
-    if (isTopDirected) {
-      availableHeight =
-          widget.args.buttonLeftBottomCorner.dy - widget.args.buttonSize.height;
+    if (_isTopDirected) {
+      availableHeight = widget.args.buttonLeftBottomCorner.dy;
     } else {
-      availableHeight = _screenHeight - widget.args.buttonLeftBottomCorner.dy;
+      availableHeight =
+          _screenHeight - widget.args.buttonLeftBottomCorner.dy - _bottomInset;
     }
-    double top = widget.args.buttonLeftBottomCorner.dy;
+    double? top = widget.args.buttonLeftBottomCorner.dy;
+    double? bottom;
     double left = widget.args.buttonLeftBottomCorner.dx;
     bool isLeftAlignment = widget.args.buttonLeftBottomCorner.dx > (_screenWidth * .5);
     if (isLeftAlignment) {
       left -= (_menuWidth - widget.args.buttonSize.width);
     }
     double initialOffset = -10.0;
-    if (isTopDirected) {
-      top = widget.args.buttonLeftBottomCorner.dy;
-      top -= _menuHeight + widget.args.buttonSize.height;
+    if (_isTopDirected) {
+      bottom = _screenHeight - widget.args.buttonLeftBottomCorner.dy;
+      bottom -= widget.args.buttonSize.height;
+      top = null;
       initialOffset = 10.0;
     }
     if (left < 0.0) {
@@ -385,9 +656,27 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
     if (left + _menuWidth > _screenWidth) {
       left -= ((left + _menuWidth) - _screenWidth);
     }
+    if (bottom != null) {
+      bottom -= _keyboardHeight;
+      if (bottom < _settings.padding.bottom) {
+        bottom = _settings.padding.bottom;
+      }
+    } else if (top != null) {
+      final calculatedMenuBottom = availableHeight + top;
+      final overlap = _keyboardHeight - (_initialScreenHeight - calculatedMenuBottom);
+      if (overlap > 0) {
+        top -= overlap + _settings.padding.top;
+      }
+      final topPadding = _topInset + _settings.padding.top;
+      if (top < topPadding) {
+        availableHeight += top - topPadding;
+        top = topPadding;
+      }
+    }
 
     return Positioned(
       top: top,
+      bottom: bottom,
       left: left,
       child: Transform.translate(
         offset: Offset(
@@ -426,8 +715,9 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20.0,
+                padding: EdgeInsets.only(
+                  top: _settings.padding.top,
+                  bottom: _settings.padding.bottom,
                 ),
                 child: _buildMenuContent(),
               ),
@@ -435,6 +725,32 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
           ),
         ),
       ),
+    );
+  }
+
+  Color _getVeilColor(double animationValue) {
+    if (_settings.veilColor != null) {
+      return _settings.veilColor!.withOpacity(
+        _settings.maxVeilOpacity * widget.animation.value,
+      );
+    }
+    return Colors.black.withOpacity(
+      _settings.maxVeilOpacity * widget.animation.value,
+    );
+  }
+
+  void _reselectToInitial() {
+    for (var item in widget.args.items) {
+      item.isSelected = _initialSelection.any(
+        (e) => e.title == item.title,
+      );
+    }
+  }
+
+  void _onCancel() {
+    _reselectToInitial();
+    Navigator.of(context).pop(
+      widget.args.items.where((i) => i.isSelected).toList(),
     );
   }
 
@@ -446,26 +762,36 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
       builder: (c, w) {
         return Scaffold(
           extendBodyBehindAppBar: true,
-          // appBar: AppBar(),
+          resizeToAvoidBottomInset: true,
           backgroundColor: Colors.transparent,
-          body: Stack(
-            children: [
-              GestureDetector(
-                onTap: Navigator.of(context).pop,
-                child: Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: Colors.black.withOpacity(
-                    .04 * widget.animation.value,
-                  ),
-                ),
-              ),
-              LiteState<LiteFormRebuildController>(
-                builder: (BuildContext c, LiteFormRebuildController controller) {
-                  return _buildMenu();
+          body: KeyboardVisibilityBuilder(
+            builder: (c, isKeyboardVisible) {
+              return LayoutBuilder(
+                builder: (c, BoxConstraints constraints) {
+                  _keyboardHeight = _initialScreenHeight - constraints.maxHeight;
+                  liteFormRebuildController.rebuild();
+                  return Stack(
+                    children: [
+                      GestureDetector(
+                        onTap: _onCancel,
+                        child: Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          color: _getVeilColor(
+                            widget.animation.value,
+                          ),
+                        ),
+                      ),
+                      LiteState<LiteFormRebuildController>(
+                        builder: (BuildContext c, LiteFormRebuildController controller) {
+                          return _buildMenu();
+                        },
+                      ),
+                    ],
+                  );
                 },
-              ),
-            ],
+              );
+            },
           ),
         );
       },

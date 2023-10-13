@@ -35,12 +35,14 @@ class LiteFormGroup extends InheritedWidget {
     Key? key,
     required this.name,
     this.autoDispose = true,
+    this.autoRemoveUnregisteredFields = true,
     this.allowUnfocusOnTapOutside,
     this.translationBuilder = defaultTranslationBuilder,
     required Widget child,
   }) : super(
           child: _LiteGroupWrapper(
             name: name,
+            autoRemoveUnregisteredFields: autoRemoveUnregisteredFields,
             allowUnfocusOnTapOutside: allowUnfocusOnTapOutside,
             onDispose: () {
               liteFormController.onFormDisposed(
@@ -82,6 +84,10 @@ class LiteFormGroup extends InheritedWidget {
   /// clearLiteForm method
   final bool autoDispose;
 
+  /// [autoRemoveUnregisteredFields] If some condition removes a form field
+  /// from your form
+  final bool autoRemoveUnregisteredFields;
+
   /// if true it will automatically unfocus any active focus node
   /// on tap outside. null by default, which equivalent to true
   /// You can also set this globally via a config
@@ -100,12 +106,14 @@ class _LiteGroupWrapper extends StatefulWidget {
     required this.onDispose,
     required this.name,
     required this.allowUnfocusOnTapOutside,
+    required this.autoRemoveUnregisteredFields,
   });
 
   final String name;
   final Widget child;
   final VoidCallback onDispose;
   final bool? allowUnfocusOnTapOutside;
+  final bool autoRemoveUnregisteredFields;
 
   @override
   State<_LiteGroupWrapper> createState() => __LiteGroupWrapperState();
@@ -122,6 +130,16 @@ class __LiteGroupWrapperState extends State<_LiteGroupWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.autoRemoveUnregisteredFields) {
+      /// TODO: придумать как грамотно разрешистрировать 
+      /// устаревшие поля. Здесь это удаляет их раньше валидации
+      // WidgetsBinding.instance.ensureVisualUpdate();
+      // WidgetsBinding.instance.addPostFrameCallback((c) {
+      //   liteFormController.removeUnregisteredFields(
+      //     formName: widget.name,
+      //   );
+      // });
+    }
     liteFormController.checkAlwaysValidatingFields(
       formName: widget.name,
     );

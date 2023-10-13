@@ -134,14 +134,12 @@ class LiteDatePicker extends StatefulWidget {
 }
 
 class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
-
-  @override
-  void didUpdateWidget(covariant LiteDatePicker oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.dateInputType != oldWidget.dateInputType) {
-      resetInitialValueFlag();
-    }
-  }
+  // @override
+  // void didUpdateWidget(covariant LiteDatePicker oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   if (widget.dateInputType != oldWidget.dateInputType) {
+  //   }
+  // }
 
   LiteDatePickerType get _type {
     if (widget.pickerType == LiteDatePickerType.adaptive) {
@@ -167,7 +165,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
     DateTime? currentValue,
   }) async {
     final theme = Theme.of(context);
-    
+
     currentValue ??= (liteFormController.tryGetValueForField(
           formName: group.name,
           fieldName: widget.name,
@@ -463,25 +461,33 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
       fieldName: widget.name,
       autovalidateMode: widget.autovalidateMode,
       serializer: widget.serializer,
-      initialValue: widget.initialValue,
+      // initialValue: widget.initialValue,
       initialValueDeserializer: widget.initialValueDeserializer,
       validators: widget.validators,
       hintText: widget.hintText,
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
     );
-    
+
     final dateFormat = _dateFormat;
-    if (value != null) {
-      setInitialValue(() {
-        liteFormController.onValueChanged(
-          formName: group.name,
-          fieldName: widget.name,
-          value: value,
-          view: dateFormat.format(value),
-          isInitialValue: true,
-        );
-      });
+    tryDeserializeInitialValueIfNecessary<DateTime>(
+      initialValueDeserializer: widget.initialValueDeserializer,
+      rawInitialValue: widget.initialValue,
+    );
+    if (initialValue != null) {
+      setInitialValue(
+        fieldName: widget.name,
+        formName: group.name,
+        setter: () {
+          liteFormController.onValueChanged(
+            formName: group.name,
+            fieldName: widget.name,
+            value: initialValue,
+            view: dateFormat.format(initialValue),
+            isInitialValue: true,
+          );
+        },
+      );
     }
 
     return GestureDetector(
@@ -528,7 +534,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                           ),
                         ),
                   strutStyle: widget.strutStyle,
-                  style: widget.style,
+                  style: liteFormController.config?.defaultTextStyle ?? widget.style,
                   textAlign: widget.textAlign,
                   textAlignVertical: widget.textAlignVertical,
                   textCapitalization: widget.textCapitalization,

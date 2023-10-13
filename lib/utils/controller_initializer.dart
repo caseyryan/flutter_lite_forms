@@ -48,6 +48,8 @@ class LiteFormsConfiguration {
   /// Has no effect on web
   final bool? allowUnfocusOnTapOutside;
 
+  final TextStyle? defaultTextStyle;
+
   LiteFormsConfiguration({
     this.inputDecoration,
     this.autovalidateMode,
@@ -55,6 +57,7 @@ class LiteFormsConfiguration {
     /// [defaultDateFormat] is a string pattern acceptable by [DateFormat]
     /// for example 'yyyy-MM-dd'
     this.defaultDateFormat,
+    this.defaultTextStyle,
     this.defaultTextEntryModalRouteSettings,
 
     /// [defaultTimeFormat] is a string pattern acceptable by [DateFormat]

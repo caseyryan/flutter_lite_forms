@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/utils/controller_initializer.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
@@ -17,6 +18,19 @@ void clearLiteForm(String formName) {
   liteFormController.clearForm(formName);
 }
 
+/// Returns current value for any form field.
+/// If the form is not disposed and the value was set
+/// you can get it here
+T? getFormFieldValue<T>({
+  required String formName,
+  required String fieldName,
+}) {
+  return liteFormController.tryGetValueForField(
+    formName: formName,
+    fieldName: fieldName,
+  ) as T?;
+}
+
 /// Allows to check if a form is in the process of being validated
 bool isFormBeingValidated(String formName) {
   return liteFormController._isFormBeingValidated(formName);
@@ -31,9 +45,18 @@ Future<bool> validateLiteForm(String formName) async {
   );
 }
 
-Map<String, dynamic> getFormData(String formName) {
+/// Returns current data for a form
+/// [formName] the name of the form you want to get the data for
+///
+/// [applySerializers] by default it calls a serializer on every field
+/// before putting it to the form. Pass false if you need to get raw form data
+Map<String, dynamic> getFormData({
+  required String formName,
+  bool applySerializers = true,
+}) {
   return liteFormController.getFormData(
-    formName,
+    formName: formName,
+    applySerializers: applySerializers,
   );
 }
 
@@ -78,6 +101,25 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     }
   }
 
+  /// This is required to be able to keep form up to date
+  /// For example you might have remove some fields
+  /// from a form because of some user's actions
+  /// then we don't have to validate them any more
+  /// A real use case: User selects a `MALE` gender but
+  /// you had `Pregnancy status` drop selector and you want to
+  /// remove it for a male. There is not need to validate it but
+  /// the form has this field already registered
+  ///
+  /// This method will remove this sort of inputs and unregister them
+  void removeUnregisteredFields({
+    required String formName,
+  }) {
+    final form = _formGroups[formName];
+    if (form != null) {
+      form.unregisterAllOutdatedFields();
+    }
+  }
+
   Object? tryGetValueForField({
     required String formName,
     required String fieldName,
@@ -104,8 +146,11 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     return result;
   }
 
-  Map<String, dynamic> getFormData(String formName) {
-    return _formGroups[formName]?.getFormData() ?? {};
+  Map<String, dynamic> getFormData({
+    required String formName,
+    required bool applySerializers,
+  }) {
+    return _formGroups[formName]?.getFormData(applySerializers) ?? {};
   }
 
   void onFormDisposed({
@@ -151,6 +196,13 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     return _formGroups[formName]?.isBeingValidated == true;
   }
 
+  bool isFieldInitiallySet({
+    required String formName,
+    required String fieldName,
+  }) {
+    return _formGroups[formName]?.isFieldInitiallySet(fieldName) == true;
+  }
+
   /// Registers a form field for a specified form. If the
   /// form field is already registered, it does nothing
   FormGroupField<T> registerFormFieldIfNone<T>({
@@ -159,6 +211,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     required LiteFormValueConvertor serializer,
     required List<LiteFormFieldValidator<Object?>>? validators,
     required AutovalidateMode? autovalidateMode,
+    required InputDecoration? decoration,
   }) {
     createFormIfNull(formName: formName);
     final groupWrapper = _formGroups[formName]!;
@@ -166,6 +219,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
       name: fieldName,
       serializer: serializer,
       validators: validators,
+      decoration: decoration,
       autovalidateMode: autovalidateMode,
     );
   }

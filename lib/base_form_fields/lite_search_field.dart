@@ -49,6 +49,7 @@ class LiteSearchField extends StatefulWidget {
     this.initialValue,
     this.hintText = 'Search...',
     this.autofocus = false,
+    this.style,
     this.settings = const LiteSearchFieldSettings(),
   });
 
@@ -63,6 +64,7 @@ class LiteSearchField extends StatefulWidget {
   final String? initialValue;
   final String? hintText;
   final ValueChanged<String> onSearch;
+  final TextStyle? style;
 
   @override
   State<LiteSearchField> createState() => _LiteSearchFieldState();
@@ -70,6 +72,7 @@ class LiteSearchField extends StatefulWidget {
 
 class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin {
   String? _hintText;
+  String _searchValue = '';
 
   @override
   void initState() {
@@ -98,7 +101,45 @@ class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin 
   }
 
   void _onSearch(String? value) {
-    widget.onSearch(value ?? '');
+    _searchValue = value ?? '';
+    widget.onSearch(_searchValue);
+  }
+
+  Widget _buildClearIcon() {
+    if (_searchValue.isNotEmpty) {
+      return GestureDetector(
+        onTap: () {
+          textEditingController.clear();
+          _onSearch('');
+        },
+        child: Container(
+          color: Colors.transparent,
+          child: widget.settings.searchIcon ??
+              const Icon(
+                Icons.clear,
+              ),
+        ),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  bool get _isManualSearch {
+    return widget.settings.searchTriggerType == SearchTriggerType.manual;
+  }
+
+  Widget _buildIcon() {
+    if (!_isManualSearch) {
+      if (_searchValue.isNotEmpty) {
+        return const Icon(
+          Icons.clear_rounded,
+        );
+      }
+    }
+    return widget.settings.searchIcon ??
+        const Icon(
+          Icons.search,
+        );
   }
 
   @override
@@ -116,19 +157,21 @@ class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin 
       heightFactor: 1.0,
       child: GestureDetector(
         onTap: () {
-          if (widget.settings.searchTriggerType == SearchTriggerType.manual) {
+          if (_isManualSearch) {
             onChanged(
               textEditingController.text,
               triggerImmediately: true,
             );
+          } else {
+            if (_searchValue.isNotEmpty) {
+              textEditingController.clear();
+              _onSearch('');
+            }
           }
         },
         child: Container(
           color: Colors.transparent,
-          child: widget.settings.searchIcon ??
-              const Icon(
-                Icons.search,
-              ),
+          child: _buildIcon(),
         ),
       ),
     );
@@ -150,6 +193,7 @@ class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin 
         right: widget.paddingRight,
       ),
       child: TextFormField(
+        style: widget.style,
         focusNode: widget.focusNode,
         autofocus: widget.autofocus,
         onFieldSubmitted: (value) {

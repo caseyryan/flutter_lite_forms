@@ -324,7 +324,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
               },
           styleSheet: widget.markdownStyleSheet ??
               MarkdownStyleSheet(
-                p: widget.style,
+                p: liteFormController.config?.defaultTextStyle ?? widget.style,
               ),
           softLineBreak: true,
           data: widget.text!,
@@ -334,7 +334,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
       } else {
         child = Text(
           widget.text!,
-          style: widget.style,
+          style: liteFormController.config?.defaultTextStyle ?? widget.style,
         );
       }
     } else {
@@ -371,25 +371,33 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
       serializer: widget.serializer,
       initialValueDeserializer: widget.initialValueDeserializer,
       validators: widget.validators,
-      initialValue: widget.initialValue,
+      // initialValue: widget.initialValue,
       hintText: null,
       decoration: null,
       errorStyle: widget.errorStyle,
     );
+    tryDeserializeInitialValueIfNecessary<bool>(
+      initialValueDeserializer: widget.initialValueDeserializer,
+      rawInitialValue: widget.initialValue,
+    );
 
-    setInitialValue(() {
-      bool? value = _tryGetValue(
-        fieldName: widget.name,
-        formName: group.name,
-      );
-      liteFormController.onValueChanged(
-        fieldName: widget.name,
-        formName: group.name,
-        value: value,
-        isInitialValue: true,
-        view: null,
-      );
-    });
+    setInitialValue(
+      formName: widget.name,
+      fieldName: group.name,
+      setter: () {
+        bool? value = _tryGetValue(
+          fieldName: widget.name,
+          formName: group.name,
+        );
+        liteFormController.onValueChanged(
+          fieldName: widget.name,
+          formName: group.name,
+          value: value,
+          isInitialValue: true,
+          view: null,
+        );
+      },
+    );
 
     return Padding(
       padding: EdgeInsets.only(

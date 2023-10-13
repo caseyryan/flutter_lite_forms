@@ -33,7 +33,9 @@ class ProfilePage extends StatelessWidget {
                       onPressed: () async {
                         /// Here we print the data of from the previous form
                         /// It is possible because it had an autoDispose value set to false.
-                        final data = liteFormController.getFormData('signupForm');
+                        final data = getFormData(
+                          formName: 'signupForm',
+                        );
                         if (kDebugMode) {
                           print(data);
                         }

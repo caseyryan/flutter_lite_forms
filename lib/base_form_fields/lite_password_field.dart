@@ -517,7 +517,7 @@ class PasswordRequirements {
       _upperCaseLettersRegex = RegExp('[$upperCaseLettersPattern]+');
     }
     if (specialCharsPattern.isNotEmpty && minSpecialChars > 0) {
-      _specialCharsLettersRegex = RegExp('$specialCharsPattern+');
+      _specialCharsRegex = RegExp('$specialCharsPattern+');
     }
   }
 
@@ -585,13 +585,13 @@ class PasswordRequirements {
     if (minSpecialChars < 1) {
       return true;
     }
-    return _specialCharsLettersRegex!.allMatches(value).length >= minSpecialChars;
+    return _specialCharsRegex!.allMatches(value).length >= minSpecialChars;
   }
 
   RegExp? _digitsRegex;
   RegExp? _upperCaseLettersRegex;
   RegExp? _lowerCaseLettersRegex;
-  RegExp? _specialCharsLettersRegex;
+  RegExp? _specialCharsRegex;
 
   bool _digitsOk = false;
   bool _upperCaseOk = false;
