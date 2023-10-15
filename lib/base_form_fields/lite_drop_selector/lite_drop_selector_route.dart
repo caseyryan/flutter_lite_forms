@@ -16,8 +16,7 @@ Future showDropSelector({
   required Size buttonSize,
   required LiteDropSelectorSheetSettings settings,
   required TextStyle? style,
-  required String parentFieldName,
-  required String parentFormName,
+  required LiteFormGroup group,
   MenuItemBuilder? menuItemBuilder,
 }) async {
   FocusScope.of(context).unfocus();
@@ -26,8 +25,7 @@ Future showDropSelector({
       LiteDropSelectorRouteArgs(
         items: buttonDatas,
         style: style,
-        parentFieldName: parentFieldName,
-        parentFormName: parentFormName,
+        group: group,
         dropSelectorSettings: settings,
         buttonLeftBottomCorner: Offset(
           tapPosition.dx,
@@ -110,13 +108,11 @@ class LiteDropSelectorRouteArgs {
     required this.decoration,
     required this.dropSelectorSettings,
     required this.style,
-    required this.parentFieldName,
-    required this.parentFormName,
+    required this.group,
     this.menuItemBuilder,
   });
 
-  final String parentFieldName;
-  final String parentFormName;
+  final LiteFormGroup group;
   final InputDecoration? decoration;
   final List<LiteDropSelectorItem> items;
   final Offset buttonLeftBottomCorner;
@@ -312,6 +308,7 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
     if (_isSimple) {
       return const SizedBox.shrink();
     }
+    // final group = widget.
     return SizedBox(
       width: _menuWidth,
       child: Padding(
@@ -323,7 +320,7 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
             CupertinoButton(
               key: const Key('drop_selector_cancel_button'),
               onPressed: _onCancel,
-              child: const Text('Cancel'),
+              child: Text(widget.args.group.translationBuilder.call('Cancel')!),
             ),
             const Spacer(),
             CupertinoButton(
@@ -418,49 +415,58 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
     final items = _filteredItems;
     final List<Widget> children = [
       Flexible(
-        child: SingleChildScrollView(
+        child: Scrollbar(
+          thickness: _settings.withScrollBar ? null : 0.0,
           controller: _scrollController,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: items.mapIndexed(
-              (int index, e) {
-                final isLast = index == items.length - 1;
-                Widget button;
-                if (widget.args.menuItemBuilder != null) {
-                  button = widget.args.menuItemBuilder!(
-                    index,
-                    e,
-                    isLast,
-                  );
-                } else {
-                  button = Padding(
-                    padding: EdgeInsets.only(
-                      bottom: isLast ? 0.0 : _settings.padding.bottom,
-                    ),
-                    child: LiteDropSelectorButton(
-                      data: e,
-                      parentFieldName: widget.args.parentFieldName,
-                      parentFormName: widget.args.parentFormName,
-                      sheetSettings: _settings,
-                      decoration: widget.args.decoration,
-                      style: widget.args.style,
-                      paddingLeft: _settings.padding.left,
-                      paddingRight: _settings.padding.right,
-                      key: ValueKey(e),
-                      buttonHeight: _singleButtonHeight,
-                    ),
-                  );
-                }
+          interactive: kIsWeb,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: items.mapIndexed(
+                (int index, item) {
+                  final isLast = index == items.length - 1;
+                  Widget button;
+                  if (widget.args.menuItemBuilder != null) {
+                    button = widget.args.menuItemBuilder!(
+                      index,
+                      item,
+                      isLast,
+                    );
+                  } else {
+                    button = Padding(
+                      padding: EdgeInsets.only(
+                        bottom: isLast ? 0.0 : _settings.padding.bottom,
+                      ),
+                      child: LiteDropSelectorButton(
+                        data: item,
+                        sheetSettings: _settings,
+                        decoration: widget.args.decoration,
+                        style: widget.args.style,
+                        paddingLeft: _settings.padding.left,
+                        paddingRight: _settings.padding.right,
+                        key: ValueKey(item),
+                        buttonHeight: _singleButtonHeight,
+                      ),
+                    );
+                  }
 
-                return GestureDetector(
-                  onTap: () {
-                    _onButtonPressed(e);
-                  },
-                  child: button,
-                );
-              },
-            ).toList(),
+                  return GestureDetector(
+                    onTap: () {
+                      _onButtonPressed(item);
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        
+                        button,
+                      ],
+                    ),
+                  );
+                },
+              ).toList(),
+            ),
           ),
         ),
       )
@@ -478,14 +484,9 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
           top: _isBottomSheet ? _settings.padding.top : 0.0,
           bottom: _isBottomSheet ? _settings.padding.bottom : 0.0,
         ),
-        child: Scrollbar(
-          thickness: _settings.withScrollBar ? null : 0.0,
-          controller: _scrollController,
-          interactive: kIsWeb,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: children,
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: children,
         ),
       ),
     );

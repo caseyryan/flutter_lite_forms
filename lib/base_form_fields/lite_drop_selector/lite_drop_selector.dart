@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:lite_forms/base_form_fields/error_line.dart';
+import 'package:lite_forms/base_form_fields/lite_form_group.dart';
 import 'package:lite_forms/base_form_fields/lite_search_field.dart';
 import 'package:lite_forms/base_form_fields/mixins/form_field_mixin.dart';
 import 'package:lite_forms/base_form_fields/mixins/post_frame_mixin.dart';
@@ -18,95 +19,23 @@ import 'package:lite_forms/utils/value_serializer.dart';
 import 'package:lite_forms/utils/value_validator.dart';
 import 'package:lite_state/lite_state.dart';
 
-import 'Lite_drop_selector_multiple_sheet.dart';
 import 'lite_drop_selector_button.dart';
+import 'lite_drop_selector_enum.dart';
+import 'lite_drop_selector_multi_sheet.dart';
 
+part '_lite_drop_selector_item.dart';
 part 'lite_drop_selector_route.dart';
 
-enum LiteDropSelectorViewType {
-  /// [bottomsheet] means the the selector will appear from the
-  /// bottom of the screen
-  bottomsheet,
 
-  /// [menu] the selector will appear right from the tap area
-  menu,
 
-  /// [adaptive] means it will become a floating menu on wide screens
-  /// and [bottomsheet] on narrow ones
-  adaptive,
-}
 
-enum LiteDropSelectorActionType {
-  singleSelect,
-  multiselect,
-  simple,
-}
-
-class LiteDropSelectorItem<T> with SearchQueryMixin {
-  final String title;
-  final T payload;
-
-  LiteDropSelectorItem({
-    required this.title,
-    required this.payload,
-    this.onPressed,
-    this.type,
-    bool isSelected = false,
-    this.isSeparator = false,
-    this.isSingleAction = false,
-  }) : _isSelected = isSelected {
-    final list = [title];
-    if (payload is String) {
-      list.add(payload as String);
-    }
-    prepareSearch(list);
-  }
-
-  bool _isSelected;
-
-  // ignore: unnecessary_getters_setters
-  bool get isSelected {
-    return _isSelected;
-  }
-
-  set isSelected(bool value) {
-    _isSelected = value;
-  }
-
-  Color? normalIconColor;
-  Color? selectedIconColor;
-
-  ValueChanged<List<LiteDropSelectorItem>>? onPressed;
-
-  /// [type] the type of each button can be set independently of
-  /// the whole menu
-  LiteDropSelectorViewType? type;
-  ValueChanged<List<LiteDropSelectorItem>>? onMultiSelection;
-  String? svgPath;
-  IconData? iconData;
-
-  /// [isSeparator] means the button won't have a view.
-  /// Instead, a white space
-  /// will be added
-  bool isSeparator;
-  double? iconSize;
-  bool isSingleAction;
-
-  double? _menuWidth;
-  double? get menuWidth => _menuWidth;
-
-  @override
-  bool operator ==(covariant LiteDropSelectorItem other) {
-    return other.title == title;
-  }
-
-  @override
-  int get hashCode {
-    return title.hashCode;
-  }
-}
-
-typedef DropSelectorItemBuilder = Widget Function(LiteDropSelectorItem item);
+typedef DropSelectorItemBuilder = Widget Function(
+  LiteDropSelectorItem item,
+);
+typedef LiteDropSelectorViewBuilder = Widget Function(
+  BuildContext context,
+  List<LiteDropSelectorItem> selectedItems,
+);
 
 class LiteDropSelector extends StatefulWidget {
   LiteDropSelector({
@@ -114,8 +43,8 @@ class LiteDropSelector extends StatefulWidget {
     required this.items,
     super.key,
     this.menuItemBuilder,
+    this.selectorViewBuilder,
     this.settings = const LiteDropSelectorSheetSettings(),
-    this.itemBuilder,
     this.dropSelectorType = LiteDropSelectorViewType.adaptive,
     this.dropSelectorActionType = LiteDropSelectorActionType.simple,
     this.initialValueDeserializer,
@@ -152,6 +81,11 @@ class LiteDropSelector extends StatefulWidget {
 
   final String name;
 
+  /// [selectorViewBuilder] allows you to build a custom view for
+  /// this drop selector. You might want to display something else instead
+  /// of a view with a hint and/or chips
+  final LiteDropSelectorViewBuilder? selectorViewBuilder;
+
   /// [settings] for a sheet where all menu items are displayed
   final LiteDropSelectorSheetSettings settings;
 
@@ -170,10 +104,6 @@ class LiteDropSelector extends StatefulWidget {
   /// [menuItemBuilder] if you want menu items to have a custom
   /// look and feel, just pass a builder for them
   final MenuItemBuilder? menuItemBuilder;
-
-  /// [itemBuilder] pass a builder function here if you want
-  /// to build custom views for your list items
-  final DropSelectorItemBuilder? itemBuilder;
 
   /// [items] It can be a list of Strings or a list of [LiteDropSelectorItem]'s
   final List<Object?> items;
@@ -302,7 +232,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
               ))
           .toList();
     } else {
-      _items = widget.items as List<LiteDropSelectorItem>;
+      _items = widget.items.cast<LiteDropSelectorItem>().toList();
     }
 
     initializeFormField(
@@ -321,21 +251,12 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       initialValueDeserializer: widget.initialValueDeserializer,
     );
 
-    for (var item in _items) {
-      item.isSelected = (initialValue as List).contains(item);
-    }
-
     /// The `isSelected` flag is important here because
     /// the field allows for a multi selection
     /// and all selected fields must be highlighted
-    // final List<LiteDropSelectorItem> initialItems = getFormFieldValue(
-    //       formName: formName,
-    //       fieldName: widget.name,
-    //     ) ??
-    //     preparedInitialValue;
-    // for (var item in _items) {
-    //   item.isSelected = initialItems.contains(item);
-    // }
+    for (var item in _items) {
+      item.isSelected = (initialValue as List).contains(item);
+    }
 
     setInitialValue(
       fieldName: widget.name,
@@ -374,8 +295,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
           final list = await showDropSelector(
             buttonDatas: _items,
             style: widget.style,
-            parentFieldName: widget.name,
-            parentFormName: group.name,
+            group: group,
             decoration: decoration,
             tapPosition: buttonLeftTopCorner,
             context: context,
@@ -414,39 +334,50 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextFormField(
-                  key: _globalKey,
-                  restorationId: widget.restorationId,
-                  validator: widget.validators != null
-                      ? (value) {
-                          return group.translationBuilder(field.error);
-                        }
-                      : null,
-                  autovalidateMode: null,
-                  controller: textEditingController,
-                  decoration: _useErrorDecoration
-                      ? decoration
-                      : decoration.copyWith(
-                          errorStyle: const TextStyle(
-                            fontSize: .01,
-                            color: Colors.transparent,
-                          ),
-                        ),
-                  strutStyle: widget.strutStyle,
-                  style: liteFormController.config?.defaultTextStyle ?? widget.style,
-                  textAlign: widget.textAlign,
-                  textAlignVertical: widget.textAlignVertical,
-                  textCapitalization: widget.textCapitalization,
-                  textDirection: widget.textDirection,
-                ),
-                // if (_selectedOptions.length > 1)
-                LiteState<LiteFormRebuildController>(
-                  builder: (BuildContext c, LiteFormRebuildController controller) {
-                    return LiteDropSelectorMultipleSheet(
-                      items: _selectedOptions,
-                    );
-                  },
-                ),
+                if (widget.selectorViewBuilder != null)
+                  widget.selectorViewBuilder!(
+                    context,
+                    _selectedOptions,
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextFormField(
+                        key: _globalKey,
+                        restorationId: widget.restorationId,
+                        validator: widget.validators != null
+                            ? (value) {
+                                return group.translationBuilder(field.error);
+                              }
+                            : null,
+                        autovalidateMode: null,
+                        controller: textEditingController,
+                        decoration: _useErrorDecoration
+                            ? decoration
+                            : decoration.copyWith(
+                                errorStyle: const TextStyle(
+                                  fontSize: .01,
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                        strutStyle: widget.strutStyle,
+                        style:
+                            liteFormController.config?.defaultTextStyle ?? widget.style,
+                        textAlign: widget.textAlign,
+                        textAlignVertical: widget.textAlignVertical,
+                        textCapitalization: widget.textCapitalization,
+                        textDirection: widget.textDirection,
+                      ),
+                      LiteState<LiteFormRebuildController>(
+                        builder: (BuildContext c, LiteFormRebuildController controller) {
+                          return LiteDropSelectorMultipleSheet(
+                            items: _selectedOptions,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 if (widget.useSmoothError)
                   LiteFormErrorLine(
                     fieldName: widget.name,

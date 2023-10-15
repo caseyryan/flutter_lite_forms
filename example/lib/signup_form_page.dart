@@ -4,6 +4,7 @@
 import 'package:example/profile_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lite_forms/base_form_fields/lite_drop_selector/lite_drop_selector_enum.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
 
@@ -94,40 +95,84 @@ class SignupFormPage extends StatelessWidget {
                       //   );
                       // },
                       // dropSelectorType: LiteDropSelectorViewType.adaptive,
+                      // menuItemBuilder: (index, item, isSelected) {
+                      //   return Container(
+                      //     width: 200.0,
+                      //     height: 60.0,
+                      //     color: Colors.red.withOpacity(index / 10.0),
+                      //   );
+                      // },
                       dropSelectorType: LiteDropSelectorViewType.menu,
-                      dropSelectorActionType: LiteDropSelectorActionType.multiselect,
+                      // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
+                      // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
+                      dropSelectorActionType: LiteDropSelectorActionType.simple,
                       settings: LiteDropSelectorSheetSettings(
                         // veilColor: Colors.red,
+                        bottomLeftRadius: 10.0,
                         padding: EdgeInsets.all(8.0),
                         menuSearchConfiguration: MenuSearchConfiguration(
                           searchFieldVisibility: SearchFieldVisibility.adaptive,
                         ),
                         // buttonHeight: 40.0
                       ),
-
                       items: [
-                        'ActivateIntent',
-                        'Align',
-                        'Alignment',
-                        'AlignmentDirectional',
-                        'AlignmentGeometry',
-                        'AlignmentGeometryTween',
-                        'AlignmentTween',
-                        'AlignTransition',
-                        'AlwaysScrollableScrollPhysics',
-                        // 'AlwaysStoppedAnimation',
-                        // 'AndroidView',
-                        // 'AndroidViewSurface',
-                        // 'Animatable',
-                        // 'AnimatedAlign',
-                        // 'AnimatedBuilder',
-                        // 'AnimatedContainer',
-                        // 'AnimatedCrossFade',
-                        // 'AnimatedDefaultTextStyle',
-                        // 'AnimatedFractionallySizedBox',
-                        // 'AnimatedGrid',
-                        // 'AnimatedGridState',
+                        LiteDropSelectorItem(
+                          title: 'Airplane Mode',
+                          payload: 'airplane mode',
+                          iconBuilder: (context, item, isSelected) {
+                            if (isSelected) {
+                              return Icon(
+                                Icons.airplanemode_active,
+                                color: Colors.green,
+                              );
+                            }
+                            return Icon(
+                              Icons.airplanemode_inactive,
+                              color: Colors.red,
+                            );
+                          },
+                        ),
+                        LiteDropSelectorItem(
+                          title: 'Notifications',
+                          payload: 'notifications',
+                          iconBuilder: (context, item, isSelected) {
+                            if (isSelected) {
+                              return Icon(
+                                Icons.notifications_active,
+                                color: Colors.lightGreen,
+                              );
+                            }
+                            return Icon(
+                              Icons.notifications_off,
+                              color: Colors.orange,
+                            );
+                          },
+                        ),
                       ],
+
+                      // items: [
+                      //   'ActivateIntent',
+                      //   'Align',
+                      //   'Alignment',
+                      //   'AlignmentDirectional',
+                      //   'AlignmentGeometry',
+                      //   'AlignmentGeometryTween',
+                      //   'AlignmentTween',
+                      //   'AlignTransition',
+                      //   'AlwaysScrollableScrollPhysics',
+                      //   'AlwaysStoppedAnimation',
+                      //   'AndroidView',
+                      //   'AndroidViewSurface',
+                      //   'Animatable',
+                      //   'AnimatedAlign',
+                      //   'AnimatedBuilder',
+                      //   'AnimatedContainer',
+                      //   'AnimatedCrossFade',
+                      //   'AnimatedDefaultTextStyle',
+                      //   'AnimatedFractionallySizedBox',
+                      //   'AnimatedGrid',
+                      //   'AnimatedGridState',
+                      // ],
                       validators: [
                         (value) {
                           if (value == null) {

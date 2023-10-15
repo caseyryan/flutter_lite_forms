@@ -2,7 +2,6 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/lite_drop_selector/lite_drop_selector.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
-import 'package:lite_forms/smooth_icons/smooth_icondata_icon.dart';
 
 class LiteDropSelectorButton extends StatefulWidget {
   const LiteDropSelectorButton({
@@ -12,17 +11,12 @@ class LiteDropSelectorButton extends StatefulWidget {
     required this.decoration,
     required this.style,
     required this.sheetSettings,
-    required this.parentFieldName,
-    required this.parentFormName,
-
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
     this.paddingRight = 0.0,
   }) : super(key: key);
 
-  final String parentFieldName;
-  final String parentFormName;
   final LiteDropSelectorItem data;
   final double buttonHeight;
   final double paddingTop;
@@ -51,12 +45,21 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
   }
 
   Widget _buildIcon() {
-    if (widget.data.iconData != null) {
-      return SmoothIconDataIcon(
-        iconData: widget.data.iconData!,
-        color: iconColor,
-        backgroundColor: iconBackgroundColor,
-        size: widget.data.iconSize ?? 24.0,
+    if (widget.data.iconBuilder != null) {
+      return Padding(
+        padding:  EdgeInsets.only(
+          right: widget.paddingRight,
+        ),
+        child: SizedBox(
+          height: widget.buttonHeight,
+          child: Center(
+            child: widget.data.iconBuilder!(
+              context,
+              widget.data,
+              widget.data.isSelected,
+            ),
+          ),
+        ),
       );
     }
 
