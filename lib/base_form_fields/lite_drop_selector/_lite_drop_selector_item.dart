@@ -13,6 +13,8 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
     this.onPressed,
     this.iconBuilder,
     this.type,
+    this.selectedBorderColor,
+    this.selectedBorderWidth,
     bool isSelected = false,
     this.isSeparator = false,
     this.isSingleAction = false,
@@ -23,7 +25,8 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
     }
     prepareSearch(list);
   }
-
+  final Color? selectedBorderColor;
+  final double? selectedBorderWidth;
   final String title;
   final T payload;
   bool _isSelected;

@@ -59,14 +59,14 @@ class MenuSearchConfiguration {
 
 class LiteDropSelectorSheetSettings {
   const LiteDropSelectorSheetSettings({
-    this.topLeftRadius = 22.0,
-    this.topRightRadius = 22.0,
-    this.bottomLeftRadius = 22.0,
-    this.bottomRightRadius = 22.0,
-    this.headerStyle,
+    this.topLeftRadius,
+    this.topRightRadius,
+    this.bottomLeftRadius,
+    this.bottomRightRadius,
+    // this.headerStyle,
     this.buttonHeight,
     this.menuSearchConfiguration = const MenuSearchConfiguration(),
-    this.header,
+    // this.header,
     this.veilColor,
     this.maxVeilOpacity = .04,
     this.withScrollBar = true,
@@ -76,18 +76,18 @@ class LiteDropSelectorSheetSettings {
   });
 
   final MenuSearchConfiguration menuSearchConfiguration;
-  final double topLeftRadius;
-  final double topRightRadius;
-  final double bottomLeftRadius;
-  final double bottomRightRadius;
+  final double? topLeftRadius;
+  final double? topRightRadius;
+  final double? bottomLeftRadius;
+  final double? bottomRightRadius;
   final Color? veilColor;
   final double maxVeilOpacity;
 
   /// [buttonHeight] a height for a button i na list.
   /// Defaults to the current height of the drop selector
   final double? buttonHeight;
-  final TextStyle? headerStyle;
-  final String? header;
+  // final TextStyle? headerStyle;
+  // final String? header;
   final bool withScrollBar;
   final EdgeInsets padding;
 }
@@ -308,7 +308,6 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
     if (_isSimple) {
       return const SizedBox.shrink();
     }
-    // final group = widget.
     return SizedBox(
       width: _menuWidth,
       child: Padding(
@@ -459,7 +458,6 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        
                         button,
                       ],
                     ),
@@ -547,6 +545,9 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
   // }
 
   double get _totalVerticalPadding {
+    if (_isBottomSheet) {
+      return _settings.padding.top + _settings.padding.bottom + kDefaultFormSmoothRadius;
+    }
     return _settings.padding.top + _settings.padding.bottom;
   }
 
@@ -562,6 +563,29 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
       return false;
     }
     return true;
+  }
+
+  ShapeBorder? get _shape {
+    return SmoothRectangleBorder(
+      borderRadius: SmoothBorderRadius.only(
+        topLeft: SmoothRadius(
+          cornerRadius: _settings.topLeftRadius ?? kDefaultFormSmoothRadius,
+          cornerSmoothing: 1.0,
+        ),
+        topRight: SmoothRadius(
+          cornerRadius: _settings.topRightRadius ?? kDefaultFormSmoothRadius,
+          cornerSmoothing: 1.0,
+        ),
+        bottomLeft: SmoothRadius(
+          cornerRadius: _settings.bottomLeftRadius ?? kDefaultFormSmoothRadius,
+          cornerSmoothing: 1.0,
+        ),
+        bottomRight: SmoothRadius(
+          cornerRadius: _settings.bottomRightRadius ?? kDefaultFormSmoothRadius,
+          cornerSmoothing: 1.0,
+        ),
+      ),
+    );
   }
 
   Widget _buildMenu() {
@@ -595,29 +619,17 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
                       maxWidth: _screenWidth,
                     ),
                     child: Material(
-                      shadowColor: Colors.black.withOpacity(.3),
+                      shadowColor:
+                          formConfig?.shadowColor ?? Colors.black.withOpacity(.3),
                       elevation: 10.0,
-                      shape: SmoothRectangleBorder(
-                        borderRadius: SmoothBorderRadius.only(
-                          topLeft: SmoothRadius(
-                            cornerRadius: _settings.topLeftRadius,
-                            cornerSmoothing: 1.0,
-                          ),
-                          topRight: SmoothRadius(
-                            cornerRadius: _settings.topRightRadius,
-                            cornerSmoothing: 1.0,
-                          ),
-                          bottomLeft: SmoothRadius(
-                            cornerRadius: _settings.bottomLeftRadius,
-                            cornerSmoothing: 1.0,
-                          ),
-                          bottomRight: SmoothRadius(
-                            cornerRadius: _settings.bottomRightRadius,
-                            cornerSmoothing: 1.0,
-                          ),
+                      color: Theme.of(context).cardColor,
+                      shape: _shape,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: kDefaultPadding,
                         ),
+                        child: _buildMenuContent(),
                       ),
-                      child: _buildMenuContent(),
                     ),
                   ),
                 ),
@@ -693,28 +705,10 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
               maxWidth: _screenWidth,
             ),
             child: Material(
-              shadowColor: Colors.black.withOpacity(.3),
+              shadowColor: formConfig?.shadowColor ?? Colors.black.withOpacity(.3),
               elevation: 10.0,
-              shape: SmoothRectangleBorder(
-                borderRadius: SmoothBorderRadius.only(
-                  topLeft: SmoothRadius(
-                    cornerRadius: _settings.topLeftRadius,
-                    cornerSmoothing: 1.0,
-                  ),
-                  topRight: SmoothRadius(
-                    cornerRadius: _settings.topRightRadius,
-                    cornerSmoothing: 1.0,
-                  ),
-                  bottomLeft: SmoothRadius(
-                    cornerRadius: _settings.bottomLeftRadius,
-                    cornerSmoothing: 1.0,
-                  ),
-                  bottomRight: SmoothRadius(
-                    cornerRadius: _settings.bottomRightRadius,
-                    cornerSmoothing: 1.0,
-                  ),
-                ),
-              ),
+              color: Theme.of(context).cardColor,
+              shape: _shape,
               child: Padding(
                 padding: EdgeInsets.only(
                   top: _settings.padding.top,

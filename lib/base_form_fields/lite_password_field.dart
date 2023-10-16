@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
-import 'package:lite_forms/utils/value_validator.dart';
 import 'package:lite_state/lite_state.dart';
 
 enum PasswordFieldCheckType {
@@ -158,8 +157,8 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
 
   @override
   Widget build(BuildContext context) {
-    final repeatName = widget.repeatPlaceholder ?? 'Confirm ${widget.name}';
     final group = LiteFormGroup.of(context)!;
+    final repeatName = widget.repeatPlaceholder ?? '${group.translationBuilder('Confirm')} ${widget.name}';
     final allowErrorTexts = widget.settings.validator != null;
     var inputDecoration = widget.decoration ??
         liteFormController.config?.inputDecoration ??

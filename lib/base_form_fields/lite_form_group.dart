@@ -130,8 +130,12 @@ class __LiteGroupWrapperState extends State<_LiteGroupWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    Theme.of(context).brightness;
+    liteFormController.updateBrightness(
+      Theme.of(context).brightness,
+    );
     if (widget.autoRemoveUnregisteredFields) {
-      /// TODO: придумать как грамотно разрешистрировать 
+      /// TODO: придумать как грамотно разрегистрировать
       /// устаревшие поля. Здесь это удаляет их раньше валидации
       // WidgetsBinding.instance.ensureVisualUpdate();
       // WidgetsBinding.instance.addPostFrameCallback((c) {

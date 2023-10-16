@@ -1,6 +1,7 @@
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/lite_drop_selector/lite_drop_selector.dart';
+import 'package:lite_forms/constants.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 
 class LiteDropSelectorButton extends StatefulWidget {
@@ -32,22 +33,10 @@ class LiteDropSelectorButton extends StatefulWidget {
 }
 
 class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
-  Color get iconColor {
-    return Colors.red;
-    // if (widget.data.isSelected) {
-    //   return themeColors.primaryColor;
-    // }
-    // return widget.data.iconColor ?? themeColors.primaryColor;
-  }
-
-  Color get iconBackgroundColor {
-    return Colors.white;
-  }
-
   Widget _buildIcon() {
     if (widget.data.iconBuilder != null) {
       return Padding(
-        padding:  EdgeInsets.only(
+        padding: EdgeInsets.only(
           right: widget.paddingRight,
         ),
         child: SizedBox(
@@ -74,12 +63,20 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
     return primaryColor;
   }
 
+  double get _selectedBorderWidth {
+    if (widget.decoration != null) {
+      return widget.decoration?.focusedBorder?.borderSide.width ??
+          kDefaultSelectedBorderWidth;
+    }
+    return kDefaultSelectedBorderWidth;
+  }
+
   BoxDecoration? _buildDecoration() {
     return BoxDecoration(
       border: Border.fromBorderSide(
         BorderSide(
           color: widget.data.isSelected ? _selectedBorderColor : Colors.transparent,
-          width: 1.0,
+          width: widget.data.selectedBorderWidth ?? _selectedBorderWidth,
         ),
       ),
       color: widget.data.isSelected
@@ -89,6 +86,14 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
     );
   }
 
+  BorderRadius? get _defaultRadius {
+    if (widget.decoration?.border is OutlineInputBorder) {
+      final outlineBorder = widget.decoration!.border! as OutlineInputBorder;
+      return outlineBorder.borderRadius;
+    }
+    return null;
+  }
+
   Color get _textColor {
     return _textStyle?.color ??
         Theme.of(context).textTheme.titleMedium?.color ??
@@ -96,27 +101,39 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
   }
 
   TextStyle? get _textStyle {
-    return liteFormController.config?.defaultTextStyle ??
-        widget.style ??
+    return widget.style ??
+        formConfig?.defaultTextStyle ??
         Theme.of(context).textTheme.titleMedium;
   }
 
   BorderRadius? get _borderRadius {
     return SmoothBorderRadius.only(
       topLeft: SmoothRadius(
-        cornerRadius: widget.sheetSettings.topLeftRadius,
+        cornerRadius: widget.sheetSettings.topLeftRadius ??
+            formConfig?.dropSelectorSheetSettings.topLeftRadius ??
+            _defaultRadius?.topLeft.x ??
+            kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,
       ),
       topRight: SmoothRadius(
-        cornerRadius: widget.sheetSettings.topRightRadius,
+        cornerRadius: widget.sheetSettings.topRightRadius ??
+            formConfig?.dropSelectorSheetSettings.topRightRadius ??
+            _defaultRadius?.topRight.x ??
+            kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,
       ),
       bottomLeft: SmoothRadius(
-        cornerRadius: widget.sheetSettings.bottomLeftRadius,
+        cornerRadius: widget.sheetSettings.bottomLeftRadius ??
+            formConfig?.dropSelectorSheetSettings.bottomLeftRadius ??
+            _defaultRadius?.bottomLeft.x ??
+            kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,
       ),
       bottomRight: SmoothRadius(
-        cornerRadius: widget.sheetSettings.bottomRightRadius,
+        cornerRadius: widget.sheetSettings.bottomRightRadius ??
+            formConfig?.dropSelectorSheetSettings.bottomRightRadius ??
+            _defaultRadius?.bottomRight.x ??
+            kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,
       ),
     );

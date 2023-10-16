@@ -2,73 +2,33 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:lite_forms/utils/controller_initializer.dart';
+import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
+import 'package:lite_forms/utils/lite_forms_configuration.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
 import 'package:lite_forms/utils/value_validator.dart';
 import 'package:lite_state/lite_state.dart';
 
+part '_global_functions.dart';
 part 'group_wrapper.dart';
 
-/// call this function if you want to clear the values for
-/// a form. Usually forms are cleared automatically when
-/// their containing widget is disposed but this
-/// behavior changes if you pass [autoDispose]: false
-/// to LiteFormGroup
-void clearLiteForm(String formName) {
-  liteFormController.clearForm(formName);
-}
 
-/// Returns current value for any form field.
-/// If the form is not disposed and the value was set
-/// you can get it here
-T? getFormFieldValue<T>({
-  required String formName,
-  required String fieldName,
-}) {
-  return liteFormController.tryGetValueForField(
-    formName: formName,
-    fieldName: fieldName,
-  ) as T?;
-}
 
-/// Allows to check if a form is in the process of being validated
-bool isFormBeingValidated(String formName) {
-  return liteFormController._isFormBeingValidated(formName);
-}
-
-/// This method is made asynchronous because
-/// validators in LiteForms can be asynchronous unlike
-/// many in other form packages
-Future<bool> validateLiteForm(String formName) async {
-  return await liteFormController.validateForm(
-    formName: formName,
-  );
-}
-
-/// Returns current data for a form
-/// [formName] the name of the form you want to get the data for
-///
-/// [applySerializers] by default it calls a serializer on every field
-/// before putting it to the form. Pass false if you need to get raw form data
-Map<String, dynamic> getFormData({
-  required String formName,
-  bool applySerializers = true,
-}) {
-  return liteFormController.getFormData(
-    formName: formName,
-    applySerializers: applySerializers,
-  );
-}
-
-LiteFormController get liteFormController {
-  return findController<LiteFormController>();
-}
 
 class LiteFormController extends LiteStateController<LiteFormController> {
   final Map<String, _FormGroupWrapper> _formGroups = {};
 
   LiteFormsConfiguration? _config;
   LiteFormsConfiguration? get config => _config;
+
+  Brightness _brightness = Brightness.light;
+  void updateBrightness(Brightness value) {
+    if (_brightness == value) {
+      return;
+    }
+    _brightness = value;
+    rebuild();
+    liteFormRebuildController.rebuild();
+  }
 
   void configureLiteFormUI({
     LiteFormsConfiguration? config,

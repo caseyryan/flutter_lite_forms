@@ -84,37 +84,23 @@ class SignupFormPage extends StatelessWidget {
                     LiteDropSelector(
                       name: 'classes',
                       initialValue: [
-                        'ActivateIntent',
-                        // 'Alignment',
+                        // 'Airplane Mode',
+                        'Notifications',
                       ],
-                      // menuItemBuilder: (index, item, isLast) {
-                      //   return Container(
-                      //     height: 40.0,
-                      //     width: 300.0,
-                      //     color: Colors.red,
-                      //   );
-                      // },
-                      // dropSelectorType: LiteDropSelectorViewType.adaptive,
-                      // menuItemBuilder: (index, item, isSelected) {
-                      //   return Container(
-                      //     width: 200.0,
-                      //     height: 60.0,
-                      //     color: Colors.red.withOpacity(index / 10.0),
-                      //   );
-                      // },
-                      dropSelectorType: LiteDropSelectorViewType.menu,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      // dropSelectorType: LiteDropSelectorViewType.menu,
+                      dropSelectorType: LiteDropSelectorViewType.bottomsheet,
                       // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
                       // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
                       dropSelectorActionType: LiteDropSelectorActionType.simple,
-                      settings: LiteDropSelectorSheetSettings(
-                        // veilColor: Colors.red,
-                        bottomLeftRadius: 10.0,
-                        padding: EdgeInsets.all(8.0),
-                        menuSearchConfiguration: MenuSearchConfiguration(
-                          searchFieldVisibility: SearchFieldVisibility.adaptive,
-                        ),
-                        // buttonHeight: 40.0
-                      ),
+                      // settings: LiteDropSelectorSheetSettings(
+                      //   // veilColor: Colors.red,
+                      //   // bottomLeftRadius: 10.0,
+                      //   padding: EdgeInsets.all(8.0),
+                      //   menuSearchConfiguration: MenuSearchConfiguration(
+                      //     searchFieldVisibility: SearchFieldVisibility.adaptive,
+                      //   ),
+                      // ),
                       items: [
                         LiteDropSelectorItem(
                           title: 'Airplane Mode',
@@ -174,9 +160,12 @@ class SignupFormPage extends StatelessWidget {
                       //   'AnimatedGridState',
                       // ],
                       validators: [
-                        (value) {
-                          if (value == null) {
-                            return 'Gender must be selected';
+                        (Object? value) async {
+                          // await Future.delayed(const Duration(seconds: 1));
+                          if (value is List<LiteDropSelectorItem>) {
+                            if (value.any((e) => e.title.contains('Airplane'))) {
+                              return 'No planes allowed here';
+                            } 
                           }
                           return null;
                         }

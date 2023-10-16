@@ -1,4 +1,4 @@
-// ignore_for_file: empty_catches
+// ignore_for_file: empty_catches, unused_field
 /*
 (c) Copyright 2020 Serov Konstantin.
 

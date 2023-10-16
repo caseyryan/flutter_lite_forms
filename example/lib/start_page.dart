@@ -26,7 +26,6 @@ class StartPage extends StatelessWidget {
               ),
               const SizedBox(height: 50.0),
               MaterialButton(
-                color: Colors.blue[50],
                 onPressed: () async {
                   Navigator.of(context).push(
                     MaterialPageRoute(
