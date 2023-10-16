@@ -6,7 +6,6 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:lite_forms/base_form_fields/error_line.dart';
 import 'package:lite_forms/base_form_fields/lite_form_group.dart';
 import 'package:lite_forms/base_form_fields/lite_search_field.dart';
@@ -16,6 +15,7 @@ import 'package:lite_forms/base_form_fields/mixins/search_query_mixin.dart';
 import 'package:lite_forms/constants.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
+import 'package:lite_forms/utils/swipe_detector.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
 import 'package:lite_forms/utils/value_validator.dart';
 import 'package:lite_state/lite_state.dart';
@@ -26,9 +26,6 @@ import 'lite_drop_selector_multi_sheet.dart';
 
 part '_lite_drop_selector_item.dart';
 part 'lite_drop_selector_route.dart';
-
-
-
 
 typedef DropSelectorItemBuilder = Widget Function(
   LiteDropSelectorItem item,
@@ -255,8 +252,10 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
     /// The `isSelected` flag is important here because
     /// the field allows for a multi selection
     /// and all selected fields must be highlighted
-    for (var item in _items) {
-      item.isSelected = (initialValue as List).contains(item);
+    if (initialValue != null && initialValue is List) {
+      for (var item in _items) {
+        item.isSelected = (initialValue as List).contains(item);
+      }
     }
 
     setInitialValue(
@@ -293,6 +292,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
             );
           }
           final buttonLeftTopCorner = renderBox.localToGlobal(Offset.zero);
+
           final list = await showDropSelector(
             buttonDatas: _items,
             style: widget.style,

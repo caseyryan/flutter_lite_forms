@@ -112,7 +112,7 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
       ),
       darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.dark,
+      // themeMode: ThemeMode.dark,
       home: const StartPage(),
     );
   }

@@ -20,24 +20,24 @@ Future showDropSelector({
   MenuItemBuilder? menuItemBuilder,
 }) async {
   FocusScope.of(context).unfocus();
-  return await Navigator.of(context).push(
-    LiteDropSelectorRoute(
-      LiteDropSelectorRouteArgs(
-        items: buttonDatas,
-        style: style,
-        group: group,
-        dropSelectorSettings: settings,
-        buttonLeftBottomCorner: Offset(
-          tapPosition.dx,
-          tapPosition.dy,
-        ),
-        decoration: decoration,
-        buttonSize: buttonSize,
-        dropSelectorViewType: dropSelectorType,
-        dropSelectorActionType: dropSelectorActionType,
-        menuItemBuilder: menuItemBuilder,
-      ),
+  final args = LiteDropSelectorRouteArgs(
+    items: buttonDatas,
+    style: style,
+    group: group,
+    dropSelectorSettings: settings,
+    buttonLeftTopCorner: Offset(
+      tapPosition.dx,
+      tapPosition.dy,
     ),
+    decoration: decoration,
+    buttonSize: buttonSize,
+    dropSelectorViewType: dropSelectorType,
+    dropSelectorActionType: dropSelectorActionType,
+    menuItemBuilder: menuItemBuilder,
+  );
+
+  return await Navigator.of(context).push(
+    LiteDropSelectorRoute(args),
   );
 }
 
@@ -63,10 +63,8 @@ class LiteDropSelectorSheetSettings {
     this.topRightRadius,
     this.bottomLeftRadius,
     this.bottomRightRadius,
-    // this.headerStyle,
     this.buttonHeight,
     this.menuSearchConfiguration = const MenuSearchConfiguration(),
-    // this.header,
     this.veilColor,
     this.maxVeilOpacity = .04,
     this.withScrollBar = true,
@@ -86,10 +84,33 @@ class LiteDropSelectorSheetSettings {
   /// [buttonHeight] a height for a button i na list.
   /// Defaults to the current height of the drop selector
   final double? buttonHeight;
-  // final TextStyle? headerStyle;
-  // final String? header;
   final bool withScrollBar;
   final EdgeInsets padding;
+
+  LiteDropSelectorSheetSettings copyWith({
+    MenuSearchConfiguration? menuSearchConfiguration,
+    double? topLeftRadius,
+    double? topRightRadius,
+    double? bottomLeftRadius,
+    double? bottomRightRadius,
+    Color? veilColor,
+    double? maxVeilOpacity,
+    double? buttonHeight,
+    bool? withScrollBar,
+    EdgeInsets? padding,
+  }) {
+    return LiteDropSelectorSheetSettings(
+      bottomLeftRadius: bottomLeftRadius ?? this.bottomLeftRadius,
+      bottomRightRadius: bottomRightRadius ?? this.bottomRightRadius,
+      topLeftRadius: topLeftRadius ?? this.topLeftRadius,
+      topRightRadius: topRightRadius ?? this.topRightRadius,
+      veilColor: veilColor ?? this.veilColor,
+      maxVeilOpacity: maxVeilOpacity ?? this.maxVeilOpacity,
+      buttonHeight: buttonHeight ?? this.buttonHeight,
+      withScrollBar: withScrollBar ?? this.withScrollBar,
+      padding: padding ?? this.padding,
+    );
+  }
 }
 
 enum SearchFieldVisibility {
@@ -101,7 +122,7 @@ enum SearchFieldVisibility {
 class LiteDropSelectorRouteArgs {
   LiteDropSelectorRouteArgs({
     required this.items,
-    required this.buttonLeftBottomCorner,
+    required this.buttonLeftTopCorner,
     required this.buttonSize,
     required this.dropSelectorViewType,
     required this.dropSelectorActionType,
@@ -115,7 +136,7 @@ class LiteDropSelectorRouteArgs {
   final LiteFormGroup group;
   final InputDecoration? decoration;
   final List<LiteDropSelectorItem> items;
-  final Offset buttonLeftBottomCorner;
+  final Offset buttonLeftTopCorner;
   final Size buttonSize;
   final LiteDropSelectorViewType dropSelectorViewType;
   final LiteDropSelectorActionType dropSelectorActionType;
@@ -144,7 +165,7 @@ class LiteDropSelectorRoute extends ModalRoute {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    return AdaptiveMenuView(
+    return DropSelectorView(
       animation: animation,
       args: args,
     );
@@ -160,18 +181,18 @@ class LiteDropSelectorRoute extends ModalRoute {
   Duration get transitionDuration => kThemeAnimationDuration;
 }
 
-class AdaptiveMenuView extends StatefulWidget {
+class DropSelectorView extends StatefulWidget {
   final Animation<double> animation;
   final LiteDropSelectorRouteArgs args;
 
-  const AdaptiveMenuView({
+  const DropSelectorView({
     Key? key,
     required this.animation,
     required this.args,
   }) : super(key: key);
 
   @override
-  State<AdaptiveMenuView> createState() => _AdaptiveMenuViewState();
+  State<DropSelectorView> createState() => _DropSelectorViewState();
 }
 
 class _TempSelection {
@@ -181,7 +202,7 @@ class _TempSelection {
   });
 }
 
-class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin {
+class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin {
   final _sizeKey = GlobalKey();
   double _menuWidth = 0.0;
   Size? _size;
@@ -191,6 +212,8 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
   bool _isTopDirected = false;
   double _initialScreenHeight = 0.0;
   double _keyboardHeight = 0.0;
+  final _searchFieldSizeKey = GlobalKey();
+  double _searchFieldHeight = 0.0;
 
   /// for cancellation case
   List<_TempSelection> _initialSelection = [];
@@ -204,7 +227,7 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
       if (!_isSimple || _hasSearchField) {
         _menuWidth = max(
           _menuWidth,
-          250.0 - _totalHorizontalPadding,
+          kMinDropSelectorWidth - _totalHorizontalPadding,
         );
       }
       for (var d in widget.args.items) {
@@ -319,7 +342,9 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
             CupertinoButton(
               key: const Key('drop_selector_cancel_button'),
               onPressed: _onCancel,
-              child: Text(widget.args.group.translationBuilder.call('Cancel')!),
+              child: Text(
+                widget.args.group.translationBuilder.call('Cancel')!,
+              ),
             ),
             const Spacer(),
             CupertinoButton(
@@ -334,7 +359,9 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
                   selectedItems,
                 );
               },
-              child: const Text('Done'),
+              child: Text(
+                widget.args.group.translationBuilder.call('Done')!,
+              ),
             ),
           ],
         ),
@@ -363,10 +390,19 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
     if (!_hasSearchField) {
       return;
     }
+    if (_searchFieldHeight == 0.0) {
+      WidgetsBinding.instance.ensureVisualUpdate();
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        setState(() {
+          _searchFieldHeight = _searchFieldSizeKey.currentContext?.size?.height ?? 0.0;
+        });
+      });
+    }
     if (_isTopDirected) {
       children.add(
         SizedBox(
           width: _menuWidth,
+          key: _searchFieldSizeKey,
           child: LiteSearchField(
             decoration: _settings.menuSearchConfiguration.searchFieldDecoration,
             settings: _settings.menuSearchConfiguration.innerFieldSettings,
@@ -388,6 +424,7 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
         0,
         SizedBox(
           width: _menuWidth,
+          key: _searchFieldSizeKey,
           child: LiteSearchField(
             autofocus: _settings.menuSearchConfiguration.autofocusSearchField,
             onSearch: _onSearch,
@@ -410,61 +447,102 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
     });
   }
 
+  bool get _requiresList {
+    return _totalButtonsHeight > _viewportHeight;
+  }
+
+  Widget _buildButton(
+    int index,
+    LiteDropSelectorItem item,
+    List items,
+  ) {
+    final isLast = index == items.length - 1;
+    Widget button;
+    if (widget.args.menuItemBuilder != null) {
+      button = widget.args.menuItemBuilder!(
+        index,
+        item,
+        isLast,
+      );
+    } else {
+      button = Padding(
+        padding: EdgeInsets.only(
+          bottom: isLast ? 0.0 : _settings.padding.bottom,
+        ),
+        child: LiteDropSelectorButton(
+          data: item,
+          sheetSettings: _settings,
+          decoration: widget.args.decoration,
+          style: widget.args.style,
+          paddingLeft: _settings.padding.left,
+          paddingRight: _settings.padding.right,
+          key: ValueKey(item),
+          buttonHeight: _singleButtonHeight,
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () {
+        _onButtonPressed(item);
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          button,
+        ],
+      ),
+    );
+  }
+
   Widget _buildMenuContent() {
     final items = _filteredItems;
     final List<Widget> children = [
       Flexible(
-        child: Scrollbar(
-          thickness: _settings.withScrollBar ? null : 0.0,
-          controller: _scrollController,
-          interactive: kIsWeb,
-          child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: kMinDropSelectorWidth,
+            maxHeight: _viewportHeight,
+          ),
+          child: Scrollbar(
+            thickness: _settings.withScrollBar ? null : 0.0,
             controller: _scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: items.mapIndexed(
-                (int index, item) {
-                  final isLast = index == items.length - 1;
-                  Widget button;
-                  if (widget.args.menuItemBuilder != null) {
-                    button = widget.args.menuItemBuilder!(
-                      index,
-                      item,
-                      isLast,
-                    );
-                  } else {
-                    button = Padding(
-                      padding: EdgeInsets.only(
-                        bottom: isLast ? 0.0 : _settings.padding.bottom,
+            interactive: kIsWeb,
+            child: _requiresList
+                ? CustomScrollView(
+                    shrinkWrap: true,
+                    slivers: [
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final item = items[index];
+                            return _buildButton(
+                              index,
+                              item,
+                              items,
+                            );
+                          },
+                          childCount: items.length,
+                        ),
                       ),
-                      child: LiteDropSelectorButton(
-                        data: item,
-                        sheetSettings: _settings,
-                        decoration: widget.args.decoration,
-                        style: widget.args.style,
-                        paddingLeft: _settings.padding.left,
-                        paddingRight: _settings.padding.right,
-                        key: ValueKey(item),
-                        buttonHeight: _singleButtonHeight,
-                      ),
-                    );
-                  }
-
-                  return GestureDetector(
-                    onTap: () {
-                      _onButtonPressed(item);
-                    },
-                    child: Row(
+                    ],
+                  )
+                : SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
-                      children: [
-                        button,
-                      ],
+                      children: items.mapIndexed(
+                        (int index, item) {
+                          return _buildButton(
+                            index,
+                            item,
+                            items,
+                          );
+                        },
+                      ).toList(),
                     ),
-                  );
-                },
-              ).toList(),
-            ),
+                  ),
           ),
         ),
       )
@@ -507,6 +585,9 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
   }
 
   double get _bottomInset {
+    if (_keyboardHeight > 0.0) {
+      return 0.0;
+    }
     return MediaQuery.of(context).viewPadding.bottom;
   }
 
@@ -526,8 +607,9 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
   }
 
   double get _minChildSize {
-    final value =
+    double value =
         (_singleButtonHeight + _totalVerticalPadding + _bottomInset) / _safeScreenHeight;
+
     if (value > _initialChildSize) {
       return _initialChildSize;
     }
@@ -536,19 +618,18 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
 
   double get _initialChildSize {
     return ((_totalButtonsHeight + _totalVerticalPadding + _bottomInset) /
-            _safeScreenHeight)
+            _viewportHeight)
         .clamp(0.0, 1.0);
   }
 
-  // InputDecoration? get _decoration {
-  //   return widget.args.decoration;
-  // }
-
   double get _totalVerticalPadding {
+    double padding =
+        _settings.padding.top + _settings.padding.bottom + _searchFieldHeight;
+
     if (_isBottomSheet) {
-      return _settings.padding.top + _settings.padding.bottom + kDefaultFormSmoothRadius;
+      return padding + kDefaultPadding + _topInset;
     }
-    return _settings.padding.top + _settings.padding.bottom;
+    return padding;
   }
 
   double get _totalHorizontalPadding {
@@ -563,6 +644,10 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
       return false;
     }
     return true;
+  }
+
+  double get _viewportHeight {
+    return _screenHeight - max(_keyboardHeight, 0) - _topInset;
   }
 
   ShapeBorder? get _shape {
@@ -592,23 +677,29 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
     if (_isBottomSheet) {
       return SafeArea(
         bottom: false,
-        child: DraggableScrollableSheet(
-          snap: true,
-          controller: _draggableScrollableController,
-          minChildSize: _minChildSize,
-          initialChildSize: _initialChildSize,
-          builder: (
-            BuildContext c,
-            ScrollController scrollController,
-          ) {
-            return Padding(
-              padding: EdgeInsets.only(
-                top: _settings.padding.top,
-              ),
-              child: Transform.translate(
+        child: SwipeDetector(
+          velocityThreshhold: 270.0,
+          acceptedSwipes: _isSimple ? AcceptedSwipes.vertical : AcceptedSwipes.none,
+          onSwipe: (SwipeDirection value) {
+            if (value == SwipeDirection.topToBottom) {
+              if (_scrollController.position.pixels <= 0) {
+                _onCancel();
+              }
+            }
+          },
+          child: DraggableScrollableSheet(
+            snap: true,
+            controller: _draggableScrollableController,
+            minChildSize: _minChildSize,
+            initialChildSize: _initialChildSize,
+            builder: (
+              BuildContext c,
+              ScrollController scrollController,
+            ) {
+              return Transform.translate(
                 offset: Offset(
                   0.0,
-                  20.0 * (1.0 - widget.animation.value),
+                  _screenHeight * (1.0 - widget.animation.value),
                 ),
                 child: Opacity(
                   opacity: widget.animation.value,
@@ -633,32 +724,31 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       );
     }
 
-    _isTopDirected = widget.args.buttonLeftBottomCorner.dy > (_screenHeight * .5);
+    _isTopDirected = widget.args.buttonLeftTopCorner.dy > (_screenHeight * .5);
 
     double availableHeight = 0.0;
     if (_isTopDirected) {
-      availableHeight = widget.args.buttonLeftBottomCorner.dy;
+      availableHeight = widget.args.buttonLeftTopCorner.dy;
     } else {
-      availableHeight =
-          _screenHeight - widget.args.buttonLeftBottomCorner.dy - _bottomInset;
+      availableHeight = _screenHeight - widget.args.buttonLeftTopCorner.dy - _bottomInset;
     }
-    double? top = widget.args.buttonLeftBottomCorner.dy;
+    double? top = widget.args.buttonLeftTopCorner.dy;
     double? bottom;
-    double left = widget.args.buttonLeftBottomCorner.dx;
-    bool isLeftAlignment = widget.args.buttonLeftBottomCorner.dx > (_screenWidth * .5);
+    double left = widget.args.buttonLeftTopCorner.dx;
+    bool isLeftAlignment = widget.args.buttonLeftTopCorner.dx > (_screenWidth * .5);
     if (isLeftAlignment) {
       left -= (_menuWidth - widget.args.buttonSize.width);
     }
     double initialOffset = -10.0;
     if (_isTopDirected) {
-      bottom = _screenHeight - widget.args.buttonLeftBottomCorner.dy;
+      bottom = _screenHeight - widget.args.buttonLeftTopCorner.dy;
       bottom -= widget.args.buttonSize.height;
       top = null;
       initialOffset = 10.0;
@@ -671,21 +761,31 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
     }
     if (bottom != null) {
       bottom -= _keyboardHeight;
-      if (bottom < _settings.padding.bottom) {
-        bottom = _settings.padding.bottom;
-      }
+      bottom = max(0.0, bottom);
+      availableHeight = min(
+        availableHeight,
+        _viewportHeight - _topInset,
+      );
     } else if (top != null) {
       final calculatedMenuBottom = availableHeight + top;
-      final overlap = _keyboardHeight - (_initialScreenHeight - calculatedMenuBottom);
-      if (overlap > 0) {
+      var overlap = _keyboardHeight - (_initialScreenHeight - calculatedMenuBottom);
+      if (overlap > 0.0) {
         top -= overlap + _settings.padding.top;
       }
-      final topPadding = _topInset + _settings.padding.top;
-      if (top < topPadding) {
-        availableHeight += top - topPadding;
-        top = topPadding;
+      if (_keyboardHeight > 0.0) {
+        bottom = 0.0;
+        top = null;
+      }
+
+      if (top != null) {
+        final topPadding = _topInset + _settings.padding.top;
+        if (top < topPadding) {
+          availableHeight += top - topPadding;
+          top = topPadding;
+        }
       }
     }
+    availableHeight = min(_viewportHeight, availableHeight);
 
     return Positioned(
       top: top,
@@ -759,32 +859,28 @@ class _AdaptiveMenuViewState extends State<AdaptiveMenuView> with PostFrameMixin
           extendBodyBehindAppBar: true,
           resizeToAvoidBottomInset: true,
           backgroundColor: Colors.transparent,
-          body: KeyboardVisibilityBuilder(
-            builder: (c, isKeyboardVisible) {
-              return LayoutBuilder(
-                builder: (c, BoxConstraints constraints) {
-                  _keyboardHeight = _initialScreenHeight - constraints.maxHeight;
-                  liteFormRebuildController.rebuild();
-                  return Stack(
-                    children: [
-                      GestureDetector(
-                        onTap: _onCancel,
-                        child: Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          color: _getVeilColor(
-                            widget.animation.value,
-                          ),
-                        ),
+          body: LayoutBuilder(
+            builder: (c, BoxConstraints constraints) {
+              _keyboardHeight = _initialScreenHeight - constraints.maxHeight;
+              liteFormRebuildController.rebuild();
+              return Stack(
+                children: [
+                  GestureDetector(
+                    onTap: _onCancel,
+                    child: Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: _getVeilColor(
+                        widget.animation.value,
                       ),
-                      LiteState<LiteFormRebuildController>(
-                        builder: (BuildContext c, LiteFormRebuildController controller) {
-                          return _buildMenu();
-                        },
-                      ),
-                    ],
-                  );
-                },
+                    ),
+                  ),
+                  LiteState<LiteFormRebuildController>(
+                    builder: (BuildContext c, LiteFormRebuildController controller) {
+                      return _buildMenu();
+                    },
+                  ),
+                ],
               );
             },
           ),

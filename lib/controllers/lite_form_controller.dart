@@ -8,6 +8,7 @@ import 'package:lite_forms/utils/value_serializer.dart';
 import 'package:lite_forms/utils/value_validator.dart';
 import 'package:lite_state/lite_state.dart';
 
+part '_form_group_field.dart';
 part '_global_functions.dart';
 part 'group_wrapper.dart';
 

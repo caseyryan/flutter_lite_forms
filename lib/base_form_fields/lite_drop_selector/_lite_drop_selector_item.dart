@@ -33,7 +33,7 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
 
   /// [iconBuilder] allows to provide a custom icon for each
   /// item in this drop selector separately
-  final DropSelectorItemIconBuilder? iconBuilder;
+  DropSelectorItemIconBuilder? iconBuilder;
 
   // ignore: unnecessary_getters_setters
   bool get isSelected {
@@ -51,7 +51,6 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
   LiteDropSelectorViewType? type;
   ValueChanged<List<LiteDropSelectorItem>>? onMultiSelection;
 
-
   /// [isSeparator] means the button won't have a view.
   /// Instead, a white space
   /// will be added
@@ -61,6 +60,7 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
 
   double? _menuWidth;
   double? get menuWidth => _menuWidth;
+
 
   @override
   bool operator ==(covariant LiteDropSelectorItem other) {

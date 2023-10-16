@@ -60,11 +60,11 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     if (E == String) {
       _initialValue = storedValue ??
           initialValueDeserializer?.call(rawInitialValue)?.toString() ??
-          initialValue?.toString();
+          rawInitialValue?.toString();
     } else {
       _initialValue = storedValue ??
           initialValueDeserializer?.call(rawInitialValue) as E? ??
-          initialValue as E?;
+          rawInitialValue as E?;
     }
   }
 

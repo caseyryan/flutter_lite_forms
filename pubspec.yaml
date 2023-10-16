@@ -16,7 +16,7 @@ dependencies:
   collection: any
   figma_squircle: ^0.5.3
   font_awesome_flutter: any
-  flutter_keyboard_visibility: ^5.4.1
+  country_icons: 2.0.2
 
 dev_dependencies:
   flutter_test:

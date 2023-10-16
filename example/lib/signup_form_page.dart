@@ -24,7 +24,7 @@ class SignupFormPage extends StatelessWidget {
         /// passing 'signupForm' key there
         /// this might come useful if you create a multipage onboarding
         /// and want to send the accumulated data to the backend in the end
-        autoDispose: false,
+        autoDispose: true,
         allowUnfocusOnTapOutside: false,
         name: formName,
         child: CustomScrollView(
@@ -79,116 +79,124 @@ class SignupFormPage extends StatelessWidget {
                     //   },
                     //   autovalidateMode: AutovalidateMode.always,
                     // ),
-                    const SizedBox(height: 300.0),
-                    // const SizedBox(height: 20.0),
-                    LiteDropSelector(
-                      name: 'classes',
-                      initialValue: [
-                        // 'Airplane Mode',
-                        'Notifications',
-                      ],
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      // dropSelectorType: LiteDropSelectorViewType.menu,
-                      dropSelectorType: LiteDropSelectorViewType.bottomsheet,
-                      // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
-                      // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
-                      dropSelectorActionType: LiteDropSelectorActionType.simple,
-                      // settings: LiteDropSelectorSheetSettings(
-                      //   // veilColor: Colors.red,
-                      //   // bottomLeftRadius: 10.0,
-                      //   padding: EdgeInsets.all(8.0),
-                      //   menuSearchConfiguration: MenuSearchConfiguration(
-                      //     searchFieldVisibility: SearchFieldVisibility.adaptive,
-                      //   ),
-                      // ),
-                      items: [
-                        LiteDropSelectorItem(
-                          title: 'Airplane Mode',
-                          payload: 'airplane mode',
-                          iconBuilder: (context, item, isSelected) {
-                            if (isSelected) {
-                              return Icon(
-                                Icons.airplanemode_active,
-                                color: Colors.green,
-                              );
-                            }
-                            return Icon(
-                              Icons.airplanemode_inactive,
-                              color: Colors.red,
-                            );
-                          },
-                        ),
-                        LiteDropSelectorItem(
-                          title: 'Notifications',
-                          payload: 'notifications',
-                          iconBuilder: (context, item, isSelected) {
-                            if (isSelected) {
-                              return Icon(
-                                Icons.notifications_active,
-                                color: Colors.lightGreen,
-                              );
-                            }
-                            return Icon(
-                              Icons.notifications_off,
-                              color: Colors.orange,
-                            );
-                          },
-                        ),
-                      ],
-
-                      // items: [
-                      //   'ActivateIntent',
-                      //   'Align',
-                      //   'Alignment',
-                      //   'AlignmentDirectional',
-                      //   'AlignmentGeometry',
-                      //   'AlignmentGeometryTween',
-                      //   'AlignmentTween',
-                      //   'AlignTransition',
-                      //   'AlwaysScrollableScrollPhysics',
-                      //   'AlwaysStoppedAnimation',
-                      //   'AndroidView',
-                      //   'AndroidViewSurface',
-                      //   'Animatable',
-                      //   'AnimatedAlign',
-                      //   'AnimatedBuilder',
-                      //   'AnimatedContainer',
-                      //   'AnimatedCrossFade',
-                      //   'AnimatedDefaultTextStyle',
-                      //   'AnimatedFractionallySizedBox',
-                      //   'AnimatedGrid',
-                      //   'AnimatedGridState',
-                      // ],
-                      validators: [
-                        (Object? value) async {
-                          // await Future.delayed(const Duration(seconds: 1));
-                          if (value is List<LiteDropSelectorItem>) {
-                            if (value.any((e) => e.title.contains('Airplane'))) {
-                              return 'No planes allowed here';
-                            } 
-                          }
-                          return null;
-                        }
-                      ],
-                      serializer: (value) {
-                        if (value is List) {
-                          return value.map(
-                            (e) {
-                              if (e is LiteDropSelectorItem) {
-                                return e.title;
-                              } else if (e is String) {
-                                return e;
-                              }
-                              return null;
-                            },
-                          ).toList();
-                        }
-                        return value;
-                      },
-                      initialValueDeserializer: (value) {
-                        return value;
-                      },
+                    LiteCountrySelector(
+                      name: 'countries',
+                      paddingTop: 20.0,
+                      initialValue: 'italy',
+                      dropSelectorType: LiteDropSelectorViewType.menu,
                     ),
+                    const SizedBox(height: 600.0),
+                    // const SizedBox(height: 300.0),
+                    // LiteDropSelector(
+                    //   name: 'classes',
+                    //   initialValue: [
+                    //     // 'Airplane Mode',
+                    //     'Notifications',
+                    //   ],
+                    //   autovalidateMode: AutovalidateMode.onUserInteraction,
+                    //   // dropSelectorType: LiteDropSelectorViewType.menu,
+                    //   dropSelectorType: LiteDropSelectorViewType.bottomsheet,
+                    //   // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
+                    //   // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
+                    //   dropSelectorActionType: LiteDropSelectorActionType.simple,
+                    //   settings: LiteDropSelectorSheetSettings(
+                    //     bottomLeftRadius: 10.0,
+                    //     bottomRightRadius: 10.0,
+                    //     topLeftRadius: 10.0,
+                    //     topRightRadius: 10.0,
+                    //     padding: EdgeInsets.all(12.0),
+                    //     menuSearchConfiguration: MenuSearchConfiguration(
+                    //       searchFieldVisibility: SearchFieldVisibility.always,
+                    //     ),
+                    //   ),
+                    //   // items: [
+                    //   //   LiteDropSelectorItem(
+                    //   //     title: 'Airplane Mode',
+                    //   //     payload: 'airplane mode',
+                    //   //     iconBuilder: (context, item, isSelected) {
+                    //   //       if (isSelected) {
+                    //   //         return Icon(
+                    //   //           Icons.airplanemode_active,
+                    //   //           color: Colors.green,
+                    //   //         );
+                    //   //       }
+                    //   //       return Icon(
+                    //   //         Icons.airplanemode_inactive,
+                    //   //         color: Colors.red,
+                    //   //       );
+                    //   //     },
+                    //   //   ),
+                    //   //   LiteDropSelectorItem(
+                    //   //     title: 'Notifications',
+                    //   //     payload: 'notifications',
+                    //   //     iconBuilder: (context, item, isSelected) {
+                    //   //       if (isSelected) {
+                    //   //         return Icon(
+                    //   //           Icons.notifications_active,
+                    //   //           color: Colors.lightGreen,
+                    //   //         );
+                    //   //       }
+                    //   //       return Icon(
+                    //   //         Icons.notifications_off,
+                    //   //         color: Colors.orange,
+                    //   //       );
+                    //   //     },
+                    //   //   ),
+                    //   // ],
+
+                    //   items: [
+                    //     'ActivateIntent',
+                    //     'Align',
+                    //     'Alignment',
+                    //     'AlignmentDirectional',
+                    //     'AlignmentGeometry',
+                    //     'AlignmentGeometryTween',
+                    //     'AlignmentTween',
+                    //     'AlignTransition',
+                    //     'AlwaysScrollableScrollPhysics',
+                    //     'AlwaysStoppedAnimation',
+                    //     'AndroidView',
+                    //     'AndroidViewSurface',
+                    //     'Animatable',
+                    //     'AnimatedAlign',
+                    //     // 'AnimatedBuilder',
+                    //     // 'AnimatedContainer',
+                    //     // 'AnimatedCrossFade',
+                    //     // 'AnimatedDefaultTextStyle',
+                    //     // 'AnimatedFractionallySizedBox',
+                    //     // 'AnimatedGrid',
+                    //     // 'AnimatedGridState',
+                    //   ],
+                    //   validators: [
+                    //     (Object? value) async {
+                    //       // await Future.delayed(const Duration(seconds: 1));
+                    //       if (value is List<LiteDropSelectorItem>) {
+                    //         if (value.any((e) => e.title.contains('Airplane'))) {
+                    //           return 'No planes allowed here';
+                    //         } 
+                    //       }
+                    //       return null;
+                    //     }
+                    //   ],
+                    //   serializer: (value) {
+                    //     if (value is List) {
+                    //       return value.map(
+                    //         (e) {
+                    //           if (e is LiteDropSelectorItem) {
+                    //             return e.title;
+                    //           } else if (e is String) {
+                    //             return e;
+                    //           }
+                    //           return null;
+                    //         },
+                    //       ).toList();
+                    //     }
+                    //     return value;
+                    //   },
+                    //   initialValueDeserializer: (value) {
+                    //     return value;
+                    //   },
+                    // ),
                     // const SizedBox(height: 20.0),
                     // LitePasswordField(
                     //   name: 'password',
