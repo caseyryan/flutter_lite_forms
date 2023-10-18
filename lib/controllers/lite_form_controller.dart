@@ -84,11 +84,18 @@ class LiteFormController extends LiteStateController<LiteFormController> {
   Object? tryGetValueForField({
     required String formName,
     required String fieldName,
+    bool applySerializer = false
   }) {
-    return tryGetField(
+    final field = tryGetField(
       formName: formName,
       fieldName: fieldName,
-    )?._value;
+    );
+
+    final rawValue = field?._value;
+    if (applySerializer) {
+      return field?.serializedValue;
+    }
+    return rawValue;
   }
 
   FormGroupField? tryGetField({

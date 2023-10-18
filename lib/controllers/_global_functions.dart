@@ -19,10 +19,12 @@ void clearLiteForm(String formName) {
 T? getFormFieldValue<T>({
   required String formName,
   required String fieldName,
+  bool applySerializer = false,
 }) {
   return liteFormController.tryGetValueForField(
     formName: formName,
     fieldName: fieldName,
+    applySerializer: applySerializer,
   ) as T?;
 }
 
