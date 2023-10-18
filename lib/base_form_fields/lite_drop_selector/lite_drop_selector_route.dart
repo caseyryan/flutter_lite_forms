@@ -14,7 +14,7 @@ Future showDropSelector({
   required LiteDropSelectorActionType dropSelectorActionType,
   required InputDecoration? decoration,
   required Size buttonSize,
-  required LiteDropSelectorSheetSettings settings,
+  required LiteDropSelectorSettings settings,
   required TextStyle? style,
   required LiteFormGroup group,
   MenuItemBuilder? menuItemBuilder,
@@ -57,27 +57,62 @@ class MenuSearchConfiguration {
   final bool autofocusSearchField;
 }
 
-class LiteDropSelectorSheetSettings {
-  const LiteDropSelectorSheetSettings({
+typedef MultiselectChipBuilder = Widget Function(
+  LiteDropSelectorItem item,
+  ValueChanged<LiteDropSelectorItem> removeItem,
+);
+
+enum MultiSelectorStyle {
+  wrap,
+  row,
+  column,
+}
+
+class LiteDropSelectorSettings {
+  const LiteDropSelectorSettings({
+    this.chipTextStyle,
+    this.multiselectorStyle = MultiSelectorStyle.wrap,
+    this.chipBuilder,
+    this.chipSpacing = 8.0,
+    this.chipCloseIconButtonColor,
+    this.chipCloseButtonColor,
     this.topLeftRadius,
     this.topRightRadius,
     this.bottomLeftRadius,
     this.bottomRightRadius,
+    this.chipTopLeftRadius = kDefaultChipRadius,
+    this.chipTopRightRadius = kDefaultChipRadius,
+    this.chipBottomLeftRadius = kDefaultChipRadius,
+    this.chipBottomRightRadius = kDefaultChipRadius,
     this.buttonHeight,
     this.menuSearchConfiguration = const MenuSearchConfiguration(),
     this.veilColor,
     this.maxVeilOpacity = .04,
     this.withScrollBar = true,
-    this.padding = const EdgeInsets.all(
+    this.sheetPadding = const EdgeInsets.all(
       16.0,
+    ),
+    this.chipContentPadding = const EdgeInsets.all(
+      6.0,
     ),
   });
 
+  /// [chipBuilder] use this callback if you need a completely custom
+  /// chip for multi selector
+  final MultiselectChipBuilder? chipBuilder;
+  final MultiSelectorStyle multiselectorStyle;
   final MenuSearchConfiguration menuSearchConfiguration;
+  final double? chipSpacing;
   final double? topLeftRadius;
   final double? topRightRadius;
   final double? bottomLeftRadius;
   final double? bottomRightRadius;
+
+  final double chipTopLeftRadius;
+  final double chipTopRightRadius;
+  final double chipBottomLeftRadius;
+  final double chipBottomRightRadius;
+
   final Color? veilColor;
   final double maxVeilOpacity;
 
@@ -85,9 +120,16 @@ class LiteDropSelectorSheetSettings {
   /// Defaults to the current height of the drop selector
   final double? buttonHeight;
   final bool withScrollBar;
-  final EdgeInsets padding;
+  final EdgeInsets sheetPadding;
 
-  LiteDropSelectorSheetSettings copyWith({
+  /// [chipContentPadding] is the padding around content inside
+  /// a multiselect chips
+  final EdgeInsets chipContentPadding;
+  final TextStyle? chipTextStyle;
+  final Color? chipCloseButtonColor;
+  final Color? chipCloseIconButtonColor;
+
+  LiteDropSelectorSettings copyWith({
     MenuSearchConfiguration? menuSearchConfiguration,
     double? topLeftRadius,
     double? topRightRadius,
@@ -97,10 +139,12 @@ class LiteDropSelectorSheetSettings {
     double? maxVeilOpacity,
     double? buttonHeight,
     bool? withScrollBar,
-    EdgeInsets? padding,
+    EdgeInsets? sheetPadding,
+    EdgeInsets? chipContentPadding,
   }) {
-    return LiteDropSelectorSheetSettings(
+    return LiteDropSelectorSettings(
       bottomLeftRadius: bottomLeftRadius ?? this.bottomLeftRadius,
+      chipContentPadding: chipContentPadding ?? this.chipContentPadding,
       bottomRightRadius: bottomRightRadius ?? this.bottomRightRadius,
       topLeftRadius: topLeftRadius ?? this.topLeftRadius,
       topRightRadius: topRightRadius ?? this.topRightRadius,
@@ -108,7 +152,7 @@ class LiteDropSelectorSheetSettings {
       maxVeilOpacity: maxVeilOpacity ?? this.maxVeilOpacity,
       buttonHeight: buttonHeight ?? this.buttonHeight,
       withScrollBar: withScrollBar ?? this.withScrollBar,
-      padding: padding ?? this.padding,
+      sheetPadding: sheetPadding ?? this.sheetPadding,
     );
   }
 }
@@ -140,7 +184,7 @@ class LiteDropSelectorRouteArgs {
   final Size buttonSize;
   final LiteDropSelectorViewType dropSelectorViewType;
   final LiteDropSelectorActionType dropSelectorActionType;
-  final LiteDropSelectorSheetSettings dropSelectorSettings;
+  final LiteDropSelectorSettings dropSelectorSettings;
   final TextStyle? style;
   MenuItemBuilder? menuItemBuilder;
 }
@@ -252,7 +296,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     super.dispose();
   }
 
-  LiteDropSelectorSheetSettings get _settings {
+  LiteDropSelectorSettings get _settings {
     return widget.args.dropSelectorSettings;
   }
 
@@ -335,7 +379,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       width: _menuWidth,
       child: Padding(
         padding: EdgeInsets.only(
-          bottom: _settings.padding.bottom,
+          bottom: _settings.sheetPadding.bottom,
         ),
         child: Row(
           children: [
@@ -409,13 +453,13 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
             onSearch: _onSearch,
             autofocus: _settings.menuSearchConfiguration.autofocusSearchField,
             style: widget.args.style,
-            paddingTop:
-                _settings.menuSearchConfiguration.padding?.top ?? _settings.padding.top,
+            paddingTop: _settings.menuSearchConfiguration.padding?.top ??
+                _settings.sheetPadding.top,
             paddingBottom: _settings.menuSearchConfiguration.padding?.bottom ?? 0.0,
-            paddingLeft:
-                _settings.menuSearchConfiguration.padding?.left ?? _settings.padding.left,
+            paddingLeft: _settings.menuSearchConfiguration.padding?.left ??
+                _settings.sheetPadding.left,
             paddingRight: _settings.menuSearchConfiguration.padding?.right ??
-                _settings.padding.right,
+                _settings.sheetPadding.right,
           ),
         ),
       );
@@ -430,11 +474,11 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
             onSearch: _onSearch,
             paddingTop: _settings.menuSearchConfiguration.padding?.top ?? 0.0,
             paddingBottom: _settings.menuSearchConfiguration.padding?.bottom ??
-                _settings.padding.bottom,
-            paddingLeft:
-                _settings.menuSearchConfiguration.padding?.left ?? _settings.padding.left,
+                _settings.sheetPadding.bottom,
+            paddingLeft: _settings.menuSearchConfiguration.padding?.left ??
+                _settings.sheetPadding.left,
             paddingRight: _settings.menuSearchConfiguration.padding?.right ??
-                _settings.padding.right,
+                _settings.sheetPadding.right,
           ),
         ),
       );
@@ -467,15 +511,15 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     } else {
       button = Padding(
         padding: EdgeInsets.only(
-          bottom: isLast ? 0.0 : _settings.padding.bottom,
+          bottom: isLast ? 0.0 : _settings.sheetPadding.bottom,
         ),
         child: LiteDropSelectorButton(
           data: item,
           sheetSettings: _settings,
           decoration: widget.args.decoration,
           style: widget.args.style,
-          paddingLeft: _settings.padding.left,
-          paddingRight: _settings.padding.right,
+          paddingLeft: _settings.sheetPadding.left,
+          paddingRight: _settings.sheetPadding.right,
           key: ValueKey(item),
           buttonHeight: _singleButtonHeight,
         ),
@@ -501,7 +545,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       Flexible(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: kMinDropSelectorWidth,
+            maxWidth: _isBottomSheet ? double.infinity : kMinDropSelectorWidth,
             maxHeight: _viewportHeight,
           ),
           child: Scrollbar(
@@ -510,6 +554,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
             interactive: kIsWeb,
             child: _requiresList
                 ? CustomScrollView(
+                    controller: _scrollController,
                     shrinkWrap: true,
                     slivers: [
                       SliverList(
@@ -557,8 +602,8 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       alignment: _isTopDirected ? Alignment.bottomLeft : Alignment.topLeft,
       child: Padding(
         padding: EdgeInsets.only(
-          top: _isBottomSheet ? _settings.padding.top : 0.0,
-          bottom: _isBottomSheet ? _settings.padding.bottom : 0.0,
+          top: _isBottomSheet ? _settings.sheetPadding.top : 0.0,
+          bottom: _isBottomSheet ? _settings.sheetPadding.bottom : 0.0,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -624,7 +669,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
 
   double get _totalVerticalPadding {
     double padding =
-        _settings.padding.top + _settings.padding.bottom + _searchFieldHeight;
+        _settings.sheetPadding.top + _settings.sheetPadding.bottom + _searchFieldHeight;
 
     if (_isBottomSheet) {
       return padding + kDefaultPadding + _topInset;
@@ -633,7 +678,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
   }
 
   double get _totalHorizontalPadding {
-    return _settings.padding.right + _settings.padding.left;
+    return _settings.sheetPadding.right + _settings.sheetPadding.left;
   }
 
   bool get _isBottomSheet {
@@ -699,7 +744,8 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
               return Transform.translate(
                 offset: Offset(
                   0.0,
-                  _screenHeight * (1.0 - widget.animation.value),
+                  min(_viewportHeight, _totalButtonsHeight) *
+                      (1.0 - widget.animation.value),
                 ),
                 child: Opacity(
                   opacity: widget.animation.value,
@@ -764,13 +810,14 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       bottom = max(0.0, bottom);
       availableHeight = min(
         availableHeight,
-        _viewportHeight - _topInset,
+        // _viewportHeight - _topInset,
+        _viewportHeight,
       );
     } else if (top != null) {
       final calculatedMenuBottom = availableHeight + top;
       var overlap = _keyboardHeight - (_initialScreenHeight - calculatedMenuBottom);
       if (overlap > 0.0) {
-        top -= overlap + _settings.padding.top;
+        top -= overlap + _settings.sheetPadding.top;
       }
       if (_keyboardHeight > 0.0) {
         bottom = 0.0;
@@ -778,7 +825,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       }
 
       if (top != null) {
-        final topPadding = _topInset + _settings.padding.top;
+        final topPadding = _topInset + _settings.sheetPadding.top;
         if (top < topPadding) {
           availableHeight += top - topPadding;
           top = topPadding;
@@ -811,8 +858,8 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
               shape: _shape,
               child: Padding(
                 padding: EdgeInsets.only(
-                  top: _settings.padding.top,
-                  bottom: _settings.padding.bottom,
+                  top: _settings.sheetPadding.top,
+                  bottom: _settings.sheetPadding.bottom,
                 ),
                 child: _buildMenuContent(),
               ),

@@ -24,7 +24,7 @@ class LiteFormsConfiguration {
   /// Has no effect on web
   final bool? allowUnfocusOnTapOutside;
 
-  final LiteDropSelectorSheetSettings dropSelectorSheetSettings;
+  final LiteDropSelectorSettings dropSelectorSettings;
 
   final LiteFormsTheme? lightTheme;
   final LiteFormsTheme? darkTheme;
@@ -41,6 +41,10 @@ class LiteFormsConfiguration {
     return _activeTheme?.shadowColor;
   }
 
+  Color? get dropSelectorChipColor {
+    return _activeTheme?.dropSelectorChipColor;
+  }
+
   LiteFormsTheme? get _activeTheme {
     return isDarkTheme ? darkTheme : lightTheme;
   }
@@ -49,7 +53,7 @@ class LiteFormsConfiguration {
     this.lightTheme,
     this.darkTheme,
     this.autovalidateMode,
-    this.dropSelectorSheetSettings = const LiteDropSelectorSheetSettings(
+    this.dropSelectorSettings = const LiteDropSelectorSettings(
       topLeftRadius: kDefaultFormSmoothRadius,
       topRightRadius: kDefaultFormSmoothRadius,
       bottomLeftRadius: kDefaultFormSmoothRadius,
@@ -70,12 +74,16 @@ class LiteFormsConfiguration {
 }
 
 class LiteFormsTheme {
-  final TextStyle? defaultTextStyle;
-  final InputDecoration? inputDecoration;
-  final Color? shadowColor;
+
   const LiteFormsTheme({
     this.defaultTextStyle,
     this.inputDecoration,
     this.shadowColor,
+    this.dropSelectorChipColor,
   });
+
+  final TextStyle? defaultTextStyle;
+  final InputDecoration? inputDecoration;
+  final Color? shadowColor;
+  final Color? dropSelectorChipColor;
 }

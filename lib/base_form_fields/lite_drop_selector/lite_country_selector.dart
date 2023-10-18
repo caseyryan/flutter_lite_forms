@@ -16,7 +16,7 @@ class LiteCountrySelector extends StatefulWidget {
     required this.name,
     this.menuItemBuilder,
     this.selectorViewBuilder,
-    this.settings = const LiteDropSelectorSheetSettings(),
+    this.settings = const LiteDropSelectorSettings(),
     this.dropSelectorType = LiteDropSelectorViewType.adaptive,
     this.dropSelectorActionType = LiteDropSelectorActionType.simple,
     this.initialValueDeserializer,
@@ -64,7 +64,7 @@ class LiteCountrySelector extends StatefulWidget {
   final LiteDropSelectorViewBuilder? selectorViewBuilder;
 
   /// [settings] for a sheet where all menu items are displayed
-  final LiteDropSelectorSheetSettings settings;
+  final LiteDropSelectorSettings settings;
 
   final LiteDropSelectorActionType dropSelectorActionType;
 

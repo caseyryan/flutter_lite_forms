@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
       config: LiteFormsConfiguration(
         defaultDateFormat: 'dd MMM, yyyy',
         defaultTimeFormat: 'HH:mm',
-        dropSelectorSheetSettings: const LiteDropSelectorSheetSettings(
+        dropSelectorSettings: const LiteDropSelectorSettings(
           bottomLeftRadius: 20.0,
         ),
         autovalidateMode: AutovalidateMode.onUserInteraction,

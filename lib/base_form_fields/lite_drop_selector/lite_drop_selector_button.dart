@@ -26,7 +26,7 @@ class LiteDropSelectorButton extends StatefulWidget {
   final double paddingRight;
   final TextStyle? style;
   final InputDecoration? decoration;
-  final LiteDropSelectorSheetSettings sheetSettings;
+  final LiteDropSelectorSettings sheetSettings;
 
   @override
   State<LiteDropSelectorButton> createState() => _LiteDropSelectorButtonState();
@@ -110,28 +110,28 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
     return SmoothBorderRadius.only(
       topLeft: SmoothRadius(
         cornerRadius: widget.sheetSettings.topLeftRadius ??
-            formConfig?.dropSelectorSheetSettings.topLeftRadius ??
+            formConfig?.dropSelectorSettings.topLeftRadius ??
             _defaultRadius?.topLeft.x ??
             kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,
       ),
       topRight: SmoothRadius(
         cornerRadius: widget.sheetSettings.topRightRadius ??
-            formConfig?.dropSelectorSheetSettings.topRightRadius ??
+            formConfig?.dropSelectorSettings.topRightRadius ??
             _defaultRadius?.topRight.x ??
             kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,
       ),
       bottomLeft: SmoothRadius(
         cornerRadius: widget.sheetSettings.bottomLeftRadius ??
-            formConfig?.dropSelectorSheetSettings.bottomLeftRadius ??
+            formConfig?.dropSelectorSettings.bottomLeftRadius ??
             _defaultRadius?.bottomLeft.x ??
             kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,
       ),
       bottomRight: SmoothRadius(
         cornerRadius: widget.sheetSettings.bottomRightRadius ??
-            formConfig?.dropSelectorSheetSettings.bottomRightRadius ??
+            formConfig?.dropSelectorSettings.bottomRightRadius ??
             _defaultRadius?.bottomRight.x ??
             kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,

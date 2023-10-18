@@ -42,7 +42,7 @@ class LiteDropSelector extends StatefulWidget {
     super.key,
     this.menuItemBuilder,
     this.selectorViewBuilder,
-    this.settings = const LiteDropSelectorSheetSettings(),
+    this.settings = const LiteDropSelectorSettings(),
     this.dropSelectorType = LiteDropSelectorViewType.adaptive,
     this.dropSelectorActionType = LiteDropSelectorActionType.simple,
     this.initialValueDeserializer,
@@ -59,6 +59,7 @@ class LiteDropSelector extends StatefulWidget {
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
     this.paddingRight = 0.0,
+    this.multiselectorSpacing = 8.0,
     this.textCapitalization = TextCapitalization.none,
     this.style,
     this.strutStyle,
@@ -85,7 +86,7 @@ class LiteDropSelector extends StatefulWidget {
   final LiteDropSelectorViewBuilder? selectorViewBuilder;
 
   /// [settings] for a sheet where all menu items are displayed
-  final LiteDropSelectorSheetSettings settings;
+  final LiteDropSelectorSettings settings;
 
   final LiteDropSelectorActionType dropSelectorActionType;
 
@@ -111,6 +112,11 @@ class LiteDropSelector extends StatefulWidget {
   final double paddingBottom;
   final double paddingLeft;
   final double paddingRight;
+
+  /// [multiselectPaddingTop] specifies the distance between the form field and
+  /// a multiselect chip container
+  final double multiselectorSpacing;
+
   final String? restorationId;
   final TextCapitalization textCapitalization;
   final TextStyle? style;
@@ -178,6 +184,52 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       fieldName: widget.name,
     );
     return value ?? <LiteDropSelectorItem>[];
+  }
+
+  void _updateList(dynamic list) {
+    if (list != null && list is List) {
+      for (var item in _items) {
+        item.isSelected = list.contains(item);
+      }
+    }
+    liteFormController.onValueChanged(
+      formName: group.name,
+      fieldName: widget.name,
+      value: list,
+      view: _getLabelView(list),
+    );
+    widget.onChanged?.call(list);
+    textEditingController?.text = _getLabelView(list) ?? '';
+    liteFormRebuildController.rebuild();
+  }
+
+  Future _onTap() async {
+    final renderBox = _globalKey.currentContext?.findRenderObject();
+    if (renderBox is RenderBox) {
+      var size = renderBox.size;
+      if (widget.settings.buttonHeight != null) {
+        size = Size(
+          size.width,
+          widget.settings.buttonHeight!,
+        );
+      }
+      final buttonLeftTopCorner = renderBox.localToGlobal(Offset.zero);
+
+      final list = await showDropSelector(
+        buttonDatas: _items,
+        style: widget.style,
+        group: group,
+        decoration: decoration,
+        tapPosition: buttonLeftTopCorner,
+        context: context,
+        dropSelectorType: widget.dropSelectorType,
+        dropSelectorActionType: widget.dropSelectorActionType,
+        buttonSize: size,
+        settings: widget.settings,
+        menuItemBuilder: widget.menuItemBuilder,
+      );
+      _updateList(list);
+    }
   }
 
   String? _getLabelView(
@@ -249,13 +301,24 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       initialValueDeserializer: widget.initialValueDeserializer,
     );
 
+    
+
     /// The `isSelected` flag is important here because
     /// the field allows for a multi selection
     /// and all selected fields must be highlighted
     if (initialValue != null && initialValue is List) {
+      /// It might be that the provided list does not contain
+      /// the initial value. Here we need to drop it if that's the case
+      for (var value in [...initialValue]) {
+        if (!_items.contains(value)) {
+          initialValue.remove(value);
+        }
+      }
+
       for (var item in _items) {
         item.isSelected = (initialValue as List).contains(item);
       }
+      
     }
 
     setInitialValue(
@@ -280,118 +343,88 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       }
     });
 
-    return Listener(
-      onPointerDown: (details) async {
-        final renderBox = _globalKey.currentContext?.findRenderObject();
-        if (renderBox is RenderBox) {
-          var size = renderBox.size;
-          if (widget.settings.buttonHeight != null) {
-            size = Size(
-              size.width,
-              widget.settings.buttonHeight!,
-            );
-          }
-          final buttonLeftTopCorner = renderBox.localToGlobal(Offset.zero);
-
-          final list = await showDropSelector(
-            buttonDatas: _items,
-            style: widget.style,
-            group: group,
-            decoration: decoration,
-            tapPosition: buttonLeftTopCorner,
-            context: context,
-            dropSelectorType: widget.dropSelectorType,
-            dropSelectorActionType: widget.dropSelectorActionType,
-            buttonSize: size,
-            settings: widget.settings,
-            menuItemBuilder: widget.menuItemBuilder,
-          );
-          if (list != null && list is List) {
-            for (var item in _items) {
-              item.isSelected = list.contains(item);
-            }
-          }
-          liteFormController.onValueChanged(
-            formName: group.name,
-            fieldName: widget.name,
-            value: list,
-            view: _getLabelView(list),
-          );
-          widget.onChanged?.call(list);
-          textEditingController?.text = _getLabelView(list) ?? '';
-          liteFormRebuildController.rebuild();
-        }
-      },
-      child: Container(
-        color: Colors.transparent,
-        child: IgnorePointer(
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: widget.paddingTop,
-              bottom: widget.paddingBottom,
-              left: widget.paddingLeft,
-              right: widget.paddingRight,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (widget.selectorViewBuilder != null)
-                  widget.selectorViewBuilder!(
-                    context,
-                    _selectedOptions,
-                  )
-                else
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextFormField(
-                        key: _globalKey,
-                        restorationId: widget.restorationId,
-                        validator: widget.validators != null
-                            ? (value) {
-                                return group.translationBuilder(field.error);
-                              }
-                            : null,
-                        autovalidateMode: null,
-                        controller: textEditingController,
-                        decoration: _useErrorDecoration
-                            ? decoration
-                            : decoration.copyWith(
-                                errorStyle: const TextStyle(
-                                  fontSize: .01,
-                                  color: Colors.transparent,
+    return Container(
+      color: Colors.transparent,
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: widget.paddingTop,
+          bottom: widget.paddingBottom,
+          left: widget.paddingLeft,
+          right: widget.paddingRight,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.selectorViewBuilder != null)
+              widget.selectorViewBuilder!(
+                context,
+                _selectedOptions,
+              )
+            else
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: _onTap,
+                    child: Container(
+                      color: Colors.transparent,
+                      child: IgnorePointer(
+                        child: TextFormField(
+                          key: _globalKey,
+                          restorationId: widget.restorationId,
+                          validator: widget.validators != null
+                              ? (value) {
+                                  return group.translationBuilder(field.error);
+                                }
+                              : null,
+                          autovalidateMode: null,
+                          controller: textEditingController,
+                          decoration: _useErrorDecoration
+                              ? decoration
+                              : decoration.copyWith(
+                                  errorStyle: const TextStyle(
+                                    fontSize: .01,
+                                    color: Colors.transparent,
+                                  ),
                                 ),
-                              ),
-                        strutStyle: widget.strutStyle,
-                        style:
-                            liteFormController.config?.defaultTextStyle ?? widget.style,
-                        textAlign: widget.textAlign,
-                        textAlignVertical: widget.textAlignVertical,
-                        textCapitalization: widget.textCapitalization,
-                        textDirection: widget.textDirection,
+                          strutStyle: widget.strutStyle,
+                          style:
+                              liteFormController.config?.defaultTextStyle ?? widget.style,
+                          textAlign: widget.textAlign,
+                          textAlignVertical: widget.textAlignVertical,
+                          textCapitalization: widget.textCapitalization,
+                          textDirection: widget.textDirection,
+                        ),
                       ),
-                      LiteState<LiteFormRebuildController>(
-                        builder: (BuildContext c, LiteFormRebuildController controller) {
-                          return LiteDropSelectorMultipleSheet(
-                            items: _selectedOptions,
-                          );
+                    ),
+                  ),
+                  LiteState<LiteFormRebuildController>(
+                    builder: (BuildContext c, LiteFormRebuildController controller) {
+                      return LiteDropSelectorMultipleSheet(
+                        items: _selectedOptions,
+                        paddingTop: widget.multiselectorSpacing,
+                        settings: widget.settings,
+                        onRemove: (LiteDropSelectorItem item) {
+                          item.isSelected = false;
+                          _selectedOptions.remove(item);
+                          _updateList(_selectedOptions);
                         },
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                if (widget.useSmoothError)
-                  LiteFormErrorLine(
-                    fieldName: widget.name,
-                    formName: group.name,
-                    errorStyle: decoration.errorStyle,
-                    paddingBottom: widget.smoothErrorPadding?.bottom,
-                    paddingTop: widget.smoothErrorPadding?.top,
-                    paddingLeft: widget.smoothErrorPadding?.left,
-                    paddingRight: widget.smoothErrorPadding?.right,
-                  ),
-              ],
-            ),
-          ),
+                ],
+              ),
+            if (widget.useSmoothError)
+              LiteFormErrorLine(
+                fieldName: widget.name,
+                formName: group.name,
+                errorStyle: decoration.errorStyle,
+                paddingBottom: widget.smoothErrorPadding?.bottom,
+                paddingTop: widget.smoothErrorPadding?.top,
+                paddingLeft: widget.smoothErrorPadding?.left,
+                paddingRight: widget.smoothErrorPadding?.right,
+              ),
+          ],
         ),
       ),
     );
