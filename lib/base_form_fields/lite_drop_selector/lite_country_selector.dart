@@ -45,6 +45,7 @@ class LiteCountrySelector extends StatefulWidget {
     ),
     this.useSmoothError = true,
     this.allowErrorTexts = true,
+    this.sortBySelection = true,
     this.countries,
   });
 
@@ -77,6 +78,7 @@ class LiteCountrySelector extends StatefulWidget {
   final Color? pickerBackgroundColor;
   final AutovalidateMode? autovalidateMode;
   final LiteDropSelectorViewType dropSelectorType;
+  final bool sortBySelection;
 
   /// [menuItemBuilder] if you want menu items to have a custom
   /// look and feel, just pass a builder for them
@@ -266,6 +268,7 @@ class _LiteCountrySelectorState extends State<LiteCountrySelector> {
       textDirection: widget.textDirection,
       strutStyle: widget.strutStyle,
       style: widget.style,
+      sortBySelection: widget.sortBySelection,
     );
   }
 }

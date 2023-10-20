@@ -79,6 +79,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     required TextStyle? errorStyle,
   }) {
     _group = LiteFormGroup.of(context)!;
+
     this._decoration =
         decoration ?? formConfig?.inputDecoration ?? const InputDecoration();
     this.hintText = group.translationBuilder(hintText);
@@ -92,6 +93,43 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
             hintText: this.hintText,
           );
     }
+
+    final TextDirection textDirection = Directionality.of(context);
+    final EdgeInsets? decorationContentPadding =
+        this._decoration!.contentPadding?.resolve(textDirection);
+
+    final EdgeInsets? contentPadding;
+    final decorationIsDense = this._decoration!.isDense == true;
+    final bool isError = this._decoration!.errorText != null;
+    InputBorder? border;
+    if (!this._decoration!.enabled) {
+      border = isError ? this._decoration!.errorBorder : this._decoration!.disabledBorder;
+    } else {
+      border = isError ? this._decoration!.errorBorder : this._decoration!.enabledBorder;
+    }
+    if (this._decoration!.isCollapsed) {
+      contentPadding = decorationContentPadding ?? EdgeInsets.zero;
+    } else if (border?.isOutline != true) {
+      if (this._decoration!.filled ?? false) {
+        contentPadding = decorationContentPadding ??
+            (decorationIsDense
+                ? const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0)
+                : const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0));
+      } else {
+        contentPadding = decorationContentPadding ??
+            (decorationIsDense
+                ? const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 8.0)
+                : const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 12.0));
+      }
+    } else {
+      contentPadding = decorationContentPadding ??
+          (decorationIsDense
+              ? const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0)
+              : const EdgeInsets.fromLTRB(12.0, 24.0, 12.0, 16.0));
+    }
+    this._decoration = this._decoration!.copyWith(
+          contentPadding: contentPadding,
+        );
 
     if (!_isInitialized) {
       _isInitialized = true;

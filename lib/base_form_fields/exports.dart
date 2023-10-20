@@ -4,6 +4,7 @@ export 'lite_drop_selector/lite_country_selector.dart';
 export 'lite_drop_selector/lite_drop_selector.dart';
 export 'lite_form_group.dart';
 export 'lite_password_field.dart';
+export 'lite_phone_input_field.dart';
 export 'lite_search_field.dart';
 export 'lite_switch.dart';
 export 'lite_text_form_field.dart';

@@ -45,6 +45,10 @@ List<CountryData?> tryFindCountries(String value) {
   return allCountries.where((e) => e.isMatchingSearch(value)).toList();
 }
 
+CountryData? findCountryById(String countryId) {
+  return allCountries.firstWhereOrNull((e) => e.isoCode == countryId);
+}
+
 final List<CountryData> allCountries = [
   CountryData(
     name: "Austria",

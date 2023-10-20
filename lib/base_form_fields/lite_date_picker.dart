@@ -463,7 +463,6 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
       fieldName: widget.name,
       autovalidateMode: widget.autovalidateMode,
       serializer: widget.serializer,
-      // initialValue: widget.initialValue,
       initialValueDeserializer: widget.initialValueDeserializer,
       validators: widget.validators,
       hintText: widget.hintText,

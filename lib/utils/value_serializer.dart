@@ -28,4 +28,14 @@ class LiteSerializers {
   static int toInt(Object? value) {
     return toDouble(value).toInt();
   }
+
+  static String? phoneDataToString(Object? value) {
+    if (value is String) {
+      return value;
+    } else if (value is PhoneData) {
+      return value.fullPhone;
+    }
+
+    return value?.toString();
+  }
 }

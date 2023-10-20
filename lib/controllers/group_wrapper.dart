@@ -96,6 +96,9 @@ class _FormGroupWrapper {
   ) {
     final map = <String, dynamic>{};
     for (var kv in _fields.entries) {
+      if (kv.key.isIgnoredInForm()) {
+        continue;
+      }
       if (applySerializers) {
         map[kv.key] = kv.value.serializedValue;
       } else {
