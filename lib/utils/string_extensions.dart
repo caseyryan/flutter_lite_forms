@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import '../lite_forms.dart';
+
 extension StringExtensions on String {
   static final RegExp _spaceRegexp = RegExp(r'[\s]+');
 
@@ -69,6 +71,14 @@ extension StringExtensions on String {
 
   bool get isNullOrWhiteSpace {
     return isEmpty;
+  }
+
+  double toDoubleAmount() {
+    if (isNotEmpty != true) {
+      return 0.0;
+    }
+    var numeric = toNumericString(this, allowPeriod: true);
+    return double.tryParse(numeric) ?? 0.0;
   }
 
   bool isMatchingSearch(String? searchFor) {

@@ -149,7 +149,7 @@ class LiteDropSelector extends StatefulWidget {
   /// Just pass the serializer like this: serializer: (value) => value.toIso8601String()
   /// And it will always store this date as a string in a form map which you can easily send
   /// wherever you need
-  final LiteFormValueConvertor serializer;
+  final LiteFormValueSerializer serializer;
 
   /// Allows you to convert initial value to a proper data type or
   /// format before using it. E.g. you have a iso8601 format but you need
@@ -158,7 +158,7 @@ class LiteDropSelector extends StatefulWidget {
   /// like so: initialValueDeserializer: (value) => DateTime.parse(value);
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
-  final LiteFormValueConvertor? initialValueDeserializer;
+  final LiteFormValueSerializer? initialValueDeserializer;
   final List<LiteFormFieldValidator<Object?>>? validators;
 
   @override

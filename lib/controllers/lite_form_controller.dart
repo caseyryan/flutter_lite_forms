@@ -176,7 +176,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
   FormGroupField<T> registerFormFieldIfNone<T>({
     required String formName,
     required String fieldName,
-    required LiteFormValueConvertor serializer,
+    required LiteFormValueSerializer serializer,
     required List<LiteFormFieldValidator<Object?>>? validators,
     required AutovalidateMode? autovalidateMode,
     required InputDecoration? decoration,

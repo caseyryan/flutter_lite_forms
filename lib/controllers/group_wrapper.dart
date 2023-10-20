@@ -44,7 +44,7 @@ class _FormGroupWrapper {
 
   FormGroupField<T> tryRegisterField<T>({
     required String name,
-    required LiteFormValueConvertor serializer,
+    required LiteFormValueSerializer serializer,
     required List<LiteFormFieldValidator<Object?>>? validators,
     required AutovalidateMode? autovalidateMode,
     required InputDecoration? decoration,

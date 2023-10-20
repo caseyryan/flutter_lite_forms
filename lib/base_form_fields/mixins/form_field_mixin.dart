@@ -51,7 +51,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
 
   void tryDeserializeInitialValueIfNecessary<E>({
     required Object? rawInitialValue,
-    required LiteFormValueConvertor? initialValueDeserializer,
+    required LiteFormValueSerializer? initialValueDeserializer,
   }) {
     final storedValue = liteFormController.tryGetValueForField(
       formName: group.name,
@@ -71,8 +71,8 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
   void initializeFormField<E>({
     required String fieldName,
     required AutovalidateMode? autovalidateMode,
-    required LiteFormValueConvertor serializer,
-    required LiteFormValueConvertor? initialValueDeserializer,
+    required LiteFormValueSerializer serializer,
+    required LiteFormValueSerializer? initialValueDeserializer,
     required List<LiteFormFieldValidator<Object?>>? validators,
     required String? hintText,
     required InputDecoration? decoration,

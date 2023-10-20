@@ -4,7 +4,7 @@ part of 'lite_form_controller.dart';
 
 class FormGroupField<T> {
   final String name;
-  LiteFormValueConvertor? _serializer;
+  LiteFormValueSerializer? _serializer;
   List<LiteFormFieldValidator<Object?>>? _validators;
   AutovalidateMode? _autovalidateMode;
   InputDecoration? _decoration;
