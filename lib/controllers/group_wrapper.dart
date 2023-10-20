@@ -26,7 +26,6 @@ THE SOFTWARE.
 */
 part of 'lite_form_controller.dart';
 
-
 class _FormGroupWrapper {
   final Map<String, FormGroupField> _fields = {};
 
@@ -139,4 +138,3 @@ class _FormGroupWrapper {
     _formState = null;
   }
 }
-

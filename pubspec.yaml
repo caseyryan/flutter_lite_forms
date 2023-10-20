@@ -13,10 +13,10 @@ dependencies:
   lite_state: ^2.3.0
   flutter_multi_formatter: ^2.11.10
   flutter_markdown: ^0.6.1
-  collection: any
+  collection: ^1.17.0
   figma_squircle: ^0.5.3
-  font_awesome_flutter: any
-  country_icons: 2.0.2
+  font_awesome_flutter: ^10.4.0
+  country_icons: ^2.0.2
 
 dev_dependencies:
   flutter_test:

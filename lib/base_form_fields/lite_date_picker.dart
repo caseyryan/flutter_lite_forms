@@ -354,13 +354,15 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                         CupertinoButton(
                           child: Text(
                             'Cancel',
-                            style:
-                                CupertinoTheme.of(context).textTheme.textStyle.copyWith(
-                                      color: CupertinoDynamicColor.resolve(
-                                        CupertinoColors.placeholderText,
-                                        context,
-                                      ),
-                                    ),
+                            style: CupertinoTheme.of(context)
+                                .textTheme
+                                .textStyle
+                                .copyWith(
+                                  color: CupertinoDynamicColor.resolve(
+                                    CupertinoColors.placeholderText,
+                                    context,
+                                  ),
+                                ),
                           ),
                           onPressed: () {
                             Navigator.of(context).pop(null);
@@ -534,7 +536,8 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                           ),
                         ),
                   strutStyle: widget.strutStyle,
-                  style: liteFormController.config?.defaultTextStyle ?? widget.style,
+                  style: liteFormController.config?.defaultTextStyle ??
+                      widget.style,
                   textAlign: widget.textAlign,
                   textAlignVertical: widget.textAlignVertical,
                   textCapitalization: widget.textCapitalization,

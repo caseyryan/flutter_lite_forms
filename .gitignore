@@ -29,3 +29,14 @@ migrate_working_dir/
 .dart_tool/
 .packages
 build/
+
+**/Flutter/ephemeral/ 
+ **/Pods/ 
+ **/macos/Flutter/GeneratedPluginRegistrant.swift 
+ **/macos/Flutter/ephemeral 
+ **/xcuserdata/ 
+  
+ # Windows 
+ **/windows/flutter/generated_plugin_registrant.cc 
+ **/windows/flutter/generated_plugin_registrant.h 
+ **/windows/flutter/generated_plugins.cmake

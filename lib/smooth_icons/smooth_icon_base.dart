@@ -46,7 +46,8 @@ class SmoothIconBase extends StatelessWidget {
               return Container(
                 decoration: ShapeDecoration(
                   color: backgroundColor ??
-                      (iconColor ?? Theme.of(context).iconTheme.color)!.withOpacity(
+                      (iconColor ?? Theme.of(context).iconTheme.color)!
+                          .withOpacity(
                         defaultBackgroundOpacity,
                       ),
                   shape: SmoothRectangleBorder(

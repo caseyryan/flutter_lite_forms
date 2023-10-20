@@ -74,7 +74,6 @@ class LiteFormsConfiguration {
 }
 
 class LiteFormsTheme {
-
   const LiteFormsTheme({
     this.defaultTextStyle,
     this.inputDecoration,

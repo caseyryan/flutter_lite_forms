@@ -4,19 +4,16 @@ LiteFormRebuildController get liteFormRebuildController {
   return findController<LiteFormRebuildController>();
 }
 
-class LiteFormRebuildController extends LiteStateController<LiteFormRebuildController> {
-  
+class LiteFormRebuildController
+    extends LiteStateController<LiteFormRebuildController> {
   @override
-  void reset() {
-    
-  }
+  void reset() {}
 
   Future rebuildAfterMillis(int millis) async {
     await delay(millis);
     rebuild();
   }
+
   @override
-  void onLocalStorageInitialized() {
-    
-  }
+  void onLocalStorageInitialized() {}
 }

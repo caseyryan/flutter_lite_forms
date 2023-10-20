@@ -43,7 +43,7 @@ class _LiteFormErrorLineState extends State<LiteFormErrorLine> {
         final group = LiteFormGroup.of(context)!;
         final errorText = group.translationBuilder(field?.error);
         final hasText = errorText?.isNotEmpty == true;
-        
+
         return AnimatedOpacity(
           opacity: hasText ? 1.0 : 0.0,
           duration: kThemeAnimationDuration,

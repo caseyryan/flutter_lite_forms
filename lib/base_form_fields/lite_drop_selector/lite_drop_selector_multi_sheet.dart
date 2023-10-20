@@ -123,23 +123,23 @@ class LiteDropSelectorChip extends StatelessWidget {
   SmoothBorderRadius get _borderRadius {
     return SmoothBorderRadius.only(
       topLeft: SmoothRadius(
-        cornerRadius:
-            formConfig?.dropSelectorSettings.chipTopLeftRadius ?? kDefaultChipRadius,
+        cornerRadius: formConfig?.dropSelectorSettings.chipTopLeftRadius ??
+            kDefaultChipRadius,
         cornerSmoothing: 1.0,
       ),
       topRight: SmoothRadius(
-        cornerRadius:
-            formConfig?.dropSelectorSettings.chipTopRightRadius ?? kDefaultChipRadius,
+        cornerRadius: formConfig?.dropSelectorSettings.chipTopRightRadius ??
+            kDefaultChipRadius,
         cornerSmoothing: 1.0,
       ),
       bottomLeft: SmoothRadius(
-        cornerRadius:
-            formConfig?.dropSelectorSettings.chipBottomLeftRadius ?? kDefaultChipRadius,
+        cornerRadius: formConfig?.dropSelectorSettings.chipBottomLeftRadius ??
+            kDefaultChipRadius,
         cornerSmoothing: 1.0,
       ),
       bottomRight: SmoothRadius(
-        cornerRadius:
-            formConfig?.dropSelectorSettings.chipBottomRightRadius ?? kDefaultChipRadius,
+        cornerRadius: formConfig?.dropSelectorSettings.chipBottomRightRadius ??
+            kDefaultChipRadius,
         cornerSmoothing: 1.0,
       ),
     );
@@ -175,7 +175,8 @@ class LiteDropSelectorChip extends StatelessWidget {
                 width: 20.0,
                 height: 20.0,
                 decoration: BoxDecoration(
-                  color: _settings?.chipCloseButtonColor ?? Theme.of(context).cardColor,
+                  color: _settings?.chipCloseButtonColor ??
+                      Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: Center(
@@ -194,7 +195,8 @@ class LiteDropSelectorChip extends StatelessWidget {
             ),
             Text(
               item.title,
-              style: _getTextStyle(context)?.copyWith(color: Theme.of(context).cardColor),
+              style: _getTextStyle(context)
+                  ?.copyWith(color: Theme.of(context).cardColor),
             ),
           ],
         ),

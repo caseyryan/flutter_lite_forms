@@ -13,6 +13,7 @@ enum AcceptedSwipes {
   all,
   horizontal,
   vertical,
+
   /// [none] will disable swipe detector
   none,
 }
@@ -59,8 +60,7 @@ class _SwipeDetectorState extends State<SwipeDetector> {
   bool _isSupportedDirection(SwipeDirection direction) {
     if (widget.acceptedSwipes == AcceptedSwipes.none) {
       return false;
-    }
-    else if (widget.acceptedSwipes == AcceptedSwipes.all) {
+    } else if (widget.acceptedSwipes == AcceptedSwipes.all) {
       return true;
     } else if (widget.acceptedSwipes == AcceptedSwipes.horizontal) {
       if (direction == SwipeDirection.leftToRight ||

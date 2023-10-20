@@ -91,6 +91,4 @@ extension StringExtensions on String {
     }
     return false;
   }
-
-
 }

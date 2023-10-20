@@ -61,7 +61,6 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
   double? _menuWidth;
   double? get menuWidth => _menuWidth;
 
-
   @override
   bool operator ==(covariant LiteDropSelectorItem other) {
     return other.title == title;

@@ -165,7 +165,8 @@ class LiteDropSelector extends StatefulWidget {
   State<LiteDropSelector> createState() => _LiteDropSelectorState();
 }
 
-class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin {
+class _LiteDropSelectorState extends State<LiteDropSelector>
+    with FormFieldMixin {
   final _globalKey = GlobalKey<State<StatefulWidget>>();
 
   bool get _useErrorDecoration {
@@ -301,8 +302,6 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       initialValueDeserializer: widget.initialValueDeserializer,
     );
 
-    
-
     /// The `isSelected` flag is important here because
     /// the field allows for a multi selection
     /// and all selected fields must be highlighted
@@ -318,7 +317,6 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       for (var item in _items) {
         item.isSelected = (initialValue as List).contains(item);
       }
-      
     }
 
     setInitialValue(
@@ -388,8 +386,8 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
                                   ),
                                 ),
                           strutStyle: widget.strutStyle,
-                          style:
-                              liteFormController.config?.defaultTextStyle ?? widget.style,
+                          style: liteFormController.config?.defaultTextStyle ??
+                              widget.style,
                           textAlign: widget.textAlign,
                           textAlignVertical: widget.textAlignVertical,
                           textCapitalization: widget.textCapitalization,
@@ -399,7 +397,8 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
                     ),
                   ),
                   LiteState<LiteFormRebuildController>(
-                    builder: (BuildContext c, LiteFormRebuildController controller) {
+                    builder:
+                        (BuildContext c, LiteFormRebuildController controller) {
                       return LiteDropSelectorMultipleSheet(
                         items: _selectedOptions,
                         paddingTop: widget.multiselectorSpacing,

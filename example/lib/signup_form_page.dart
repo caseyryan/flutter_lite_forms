@@ -106,7 +106,8 @@ class SignupFormPage extends StatelessWidget {
                       // dropSelectorType: LiteDropSelectorViewType.bottomsheet,
                       // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
                       // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
-                      dropSelectorActionType: LiteDropSelectorActionType.multiselect,
+                      dropSelectorActionType:
+                          LiteDropSelectorActionType.multiselect,
                       settings: LiteDropSelectorSettings(
                         bottomLeftRadius: 10.0,
                         bottomRightRadius: 10.0,
@@ -192,7 +193,8 @@ class SignupFormPage extends StatelessWidget {
                           // return 'invalid';
                           // await Future.delayed(const Duration(seconds: 1));
                           if (value is List<LiteDropSelectorItem>) {
-                            if (value.any((e) => e.title.contains('Airplane'))) {
+                            if (value
+                                .any((e) => e.title.contains('Airplane'))) {
                               return 'No planes allowed here';
                             }
                           }

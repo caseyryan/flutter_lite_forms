@@ -8,9 +8,10 @@ class ExtendedPlatform {
   static bool get isIOS {
     if (kIsWeb) {
       final userAgentLower = window.navigator.userAgent.toLowerCase();
-      return userAgentLower.contains('ios') || userAgentLower.contains('iphone') || userAgentLower.contains('ipad');
+      return userAgentLower.contains('ios') ||
+          userAgentLower.contains('iphone') ||
+          userAgentLower.contains('ipad');
     }
     return Platform.isIOS;
   }
-
 }

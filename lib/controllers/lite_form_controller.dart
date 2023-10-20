@@ -12,9 +12,6 @@ part '_form_group_field.dart';
 part '_global_functions.dart';
 part 'group_wrapper.dart';
 
-
-
-
 class LiteFormController extends LiteStateController<LiteFormController> {
   final Map<String, _FormGroupWrapper> _formGroups = {};
 
@@ -81,11 +78,10 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     }
   }
 
-  Object? tryGetValueForField({
-    required String formName,
-    required String fieldName,
-    bool applySerializer = false
-  }) {
+  Object? tryGetValueForField(
+      {required String formName,
+      required String fieldName,
+      bool applySerializer = false}) {
     final field = tryGetField(
       formName: formName,
       fieldName: fieldName,
