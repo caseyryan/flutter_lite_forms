@@ -17,6 +17,8 @@ dependencies:
   figma_squircle: ^0.5.3
   font_awesome_flutter: ^10.4.0
   country_icons: ^2.0.2
+  path: ^1.8.2
+  clock: ^1.1.1
 
 dev_dependencies:
   flutter_test:
