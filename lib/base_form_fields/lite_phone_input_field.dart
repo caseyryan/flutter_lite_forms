@@ -18,16 +18,25 @@ enum LitePhoneInputType {
 
 class PhoneData {
   PhoneData({
-    required this.fullPhone,
     required this.countryData,
   });
 
-  final String fullPhone;
   CountryData? countryData;
+
+  String get fullPhone {
+    if (_isManualCountry) {
+      final phone = '+${_phoneCountryData?.phoneCode}$_phoneNumber';
+      return formatAsPhoneNumber(phone) ?? '';
+    }
+    return _phoneNumber;
+  }
 
   /// For some rare cases when you need more data about a phone number
   PhoneCountryData? _phoneCountryData;
   PhoneCountryData? get phoneCountryData => _phoneCountryData;
+
+  bool _isManualCountry = false;
+  String _phoneNumber = '';
 }
 
 class LitePhoneInputField extends StatefulWidget {
@@ -180,6 +189,14 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
     liteFormRebuildController.rebuild();
   }
 
+  String _removeCountryCode(
+    String phoneWithCountryCode,
+  ) {
+    return PhoneCodes.removeCountryCode(
+      phoneWithCountryCode,
+    );
+  }
+
   PhoneData? _postProcessInitialValue(
     Object? value,
   ) {
@@ -206,16 +223,42 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
             phoneCountryData.countryCode!,
           );
           _initialData = PhoneData(
-            fullPhone: formattedPhone,
             countryData: countryData,
-          ).._phoneCountryData = phoneCountryData;
+          )
+            .._phoneCountryData = phoneCountryData
+            .._isManualCountry = false
+            .._phoneNumber = formattedPhone;
           return _initialData;
+        }
+      } else if (widget.phoneInputType == LitePhoneInputType.manualCode) {
+        if (_selectedCountry != null) {
+          if (value.startsWith('+')) {
+            value = _removeCountryCode(value);
+          }
+          final formattedPhone = formatAsPhoneNumber(
+            value,
+            defaultCountryCode: _selectedCountry!.isoCode,
+          );
+          if (formattedPhone != null) {
+            final phoneCountryData = PhoneCodes.getPhoneCountryDataByCountryCode(
+              _selectedCountry!.isoCode,
+            );
+            if (phoneCountryData != null) {
+              _initialData = PhoneData(
+                countryData: _selectedCountry,
+              )
+                .._phoneNumber = formattedPhone
+                .._isManualCountry = true
+                .._phoneCountryData = phoneCountryData;
+              return _initialData;
+            }
+          }
         }
       }
     } else if (value is PhoneData) {
       return value;
     }
-    return null;
+    return _initialData;
   }
 
   bool get _useErrorDecoration {
@@ -297,7 +340,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
           formName: group.name,
           value: postProcessedValue,
           isInitialValue: true,
-          view: postProcessedValue?.fullPhone,
+          view: postProcessedValue?._phoneNumber,
         );
       },
     );

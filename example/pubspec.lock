@@ -154,10 +154,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_multi_formatter
-      sha256: "78b04e4e347004dfc005bd397b172541cf2a61805c0db4ab128ce6e00c35249e"
+      sha256: c4c878eebbff7b8d4094967892e46c80d5c9a2df8e8d629aacaad213acee09a6
       url: "https://pub.dev"
     source: hosted
-    version: "2.11.10"
+    version: "2.11.15"
   flutter_test:
     dependency: "direct dev"
     description: flutter

@@ -49,7 +49,7 @@ class _FormGroupWrapper {
     required InputDecoration? decoration,
   }) {
     if (kDebugMode) {
-      print('TRY REGISTER FIELD: $name');
+      // print('TRY REGISTER FIELD: $name');
     }
     if (!isFieldInitiallySet(name)) {
       _fields[name] = FormGroupField<T>(

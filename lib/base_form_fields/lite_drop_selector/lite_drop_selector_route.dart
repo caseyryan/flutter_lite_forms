@@ -47,7 +47,7 @@ class MenuSearchConfiguration {
     this.innerFieldSettings = const LiteSearchFieldSettings(),
     this.searchFieldDecoration,
     this.padding,
-    this.autofocusSearchField = false,
+    this.autofocusSearchField = true,
   });
 
   final SearchFieldVisibility searchFieldVisibility;

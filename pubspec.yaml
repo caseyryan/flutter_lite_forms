@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   lite_state: ^2.3.0
-  flutter_multi_formatter: ^2.11.10
+  flutter_multi_formatter: ^2.11.15
   flutter_markdown: ^0.6.1
   collection: ^1.17.0
   figma_squircle: ^0.5.3

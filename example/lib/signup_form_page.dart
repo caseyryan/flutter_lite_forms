@@ -97,7 +97,7 @@ class SignupFormPage extends StatelessWidget {
                       paddingTop: 20.0,
                       paddingBottom: 20.0,
                       initialValue: '+79517773344',
-                      defaultCountry: 'italy',
+                      defaultCountry: 'russia',
                       // phoneInputType: LitePhoneInputType.autodetectCode,
                       phoneInputType: LitePhoneInputType.manualCode,
                       serializer: LiteSerializers.phoneDataToString,
