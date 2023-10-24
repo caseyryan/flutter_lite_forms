@@ -87,6 +87,7 @@ class LiteDropSelectorSettings {
     this.buttonHeight,
     this.menuSearchConfiguration = const MenuSearchConfiguration(),
     this.veilColor,
+    this.minMenuWidth,
     this.maxVeilOpacity = .04,
     this.withScrollBar = true,
     this.sheetPadding = const EdgeInsets.all(
@@ -107,6 +108,7 @@ class LiteDropSelectorSettings {
   final double? topRightRadius;
   final double? bottomLeftRadius;
   final double? bottomRightRadius;
+  final double? minMenuWidth;
 
   final double chipTopLeftRadius;
   final double chipTopRightRadius;
@@ -272,13 +274,17 @@ class _DropSelectorViewState extends State<DropSelectorView>
       if (!_isSimple || _hasSearchField) {
         _menuWidth = max(
           _menuWidth,
-          kMinDropSelectorWidth - _totalHorizontalPadding,
+          _minMenuWidth - _totalHorizontalPadding,
         );
       }
       for (var d in widget.args.items) {
         d._menuWidth = _menuWidth;
       }
     });
+  }
+
+  double get _minMenuWidth {
+    return _settings.minMenuWidth ?? kMinDropSelectorWidth;
   }
 
   @override
@@ -552,7 +558,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
       Flexible(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: _isBottomSheet ? double.infinity : kMinDropSelectorWidth,
+            maxWidth: _isBottomSheet ? double.infinity : _minMenuWidth,
             maxHeight: _viewportHeight,
           ),
           child: Scrollbar(

@@ -36,12 +36,21 @@ class FormGroupField<T> {
     if (controller != null) {
       _canDisposeController = false;
       _textEditingController = controller;
+      _textEditingController?.safeSetText(_lastTextValue);
     } else {
-      _textEditingController = TextEditingController();
+      _textEditingController = TextEditingController(
+        text: _lastTextValue,
+      );
     }
+    _textEditingController?.addListener(_onTextUpdate);
     return _textEditingController;
   }
 
+  void _onTextUpdate() {
+    _lastTextValue = _textEditingController?.text ?? '';
+  }
+
+  String _lastTextValue = '';
   FocusNode? _focusNode;
   FocusNode? get focusNode => _focusNode;
   bool _canDisposeFocusNode = true;
@@ -62,6 +71,9 @@ class FormGroupField<T> {
   }
 
   void clearDependencies() {
+    _textEditingController?.removeListener(
+      _onTextUpdate,
+    );
     if (_canDisposeController) {
       _textEditingController?.dispose();
     }

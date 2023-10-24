@@ -32,6 +32,10 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     return field.getOrCreateTextEditingController();
   }
 
+  FocusNode? get focusNode {
+    return field.getOrCreateFocusNode();
+  }
+
   /// Checks if a field is initially set to not let it
   /// set initially again
   bool setInitialValue({
@@ -45,7 +49,20 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     )) {
       setter();
       return true;
-    }
+    } 
+    // else {
+    //   if (textEditingController?.text.isNotEmpty != true) {
+    //     if (WidgetsBinding.instance.hasScheduledFrame) {
+    //       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //         final value = liteFormController.tryGetValueForField(
+    //           formName: formName,
+    //           fieldName: fieldName,
+    //         );
+    //         print(value);
+    //       });
+    //     }
+    //   }
+    // }
     return false;
   }
 

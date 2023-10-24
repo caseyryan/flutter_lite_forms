@@ -127,7 +127,7 @@ class LiteDropSelector extends StatefulWidget {
   final TextDirection? textDirection;
   final TextAlign textAlign;
   final TextAlignVertical? textAlignVertical;
-  final ValueChanged<DateTime?>? onChanged;
+  final ValueChanged<Object?>? onChanged;
 
   /// makes sense only of [useSmoothError] is true
   final EdgeInsets? smoothErrorPadding;

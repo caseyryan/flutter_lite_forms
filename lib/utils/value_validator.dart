@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:lite_forms/base_form_fields/lite_phone_input_field.dart';
 import 'package:lite_forms/utils/exports.dart';
 
 /// This validator type supports asynchronous validation
@@ -21,6 +22,16 @@ class LiteValidators {
     final doubleValue = value.toString().toDoubleAmount();
     if (doubleValue <= 0.0) {
       return 'Amount must be positive';
+    }
+    return null;
+  }
+
+  static String? phoneValidator(Object? value) {
+    if (value == null || value is! PhoneData) {
+      return 'A phone is required';
+    }
+    if (value.isValid != true) {
+      return 'A phone is invalid';
     }
     return null;
   }

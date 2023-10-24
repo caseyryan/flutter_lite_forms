@@ -43,7 +43,7 @@ class _CountryFlagState extends State<CountryFlag> {
       height: widget.height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(
-          widget.isCircle ? widget.height * widget.width : 0.0,
+          widget.isCircle ? widget.height * widget.width : 3.0,
         ),
         image: DecorationImage(
           image: AssetImage(

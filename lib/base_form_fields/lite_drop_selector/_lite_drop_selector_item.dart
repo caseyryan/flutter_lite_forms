@@ -23,7 +23,13 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
     if (payload is String) {
       list.add(payload as String);
     }
-    prepareSearch(list);
+    if (payload is SearchQueryMixin) {
+      prepareSearch([
+        (payload as SearchQueryMixin).searchString ?? title,
+      ]);
+    } else {
+      prepareSearch(list);
+    }
   }
   final Color? selectedBorderColor;
   final double? selectedBorderWidth;

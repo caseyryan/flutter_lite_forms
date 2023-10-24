@@ -29,11 +29,20 @@ class LiteSerializers {
     return toDouble(value).toInt();
   }
 
-  static String? phoneDataToString(Object? value) {
+  static String? phoneDataToFormattedString(Object? value) {
     if (value is String) {
       return value;
     } else if (value is PhoneData) {
       return value.fullPhone;
+    }
+
+    return value?.toString();
+  }
+  static String? phoneDataToUnformattedString(Object? value) {
+    if (value is String) {
+      return value;
+    } else if (value is PhoneData) {
+      return value.fullUnformattedPhone;
     }
 
     return value?.toString();

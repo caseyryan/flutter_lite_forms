@@ -29,6 +29,7 @@ class LiteCountrySelector extends StatefulWidget {
     this.autovalidateMode,
     this.hintText,
     this.decoration,
+    this.locale = 'en',
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
@@ -50,6 +51,8 @@ class LiteCountrySelector extends StatefulWidget {
   });
 
   final String name;
+  /// [locale] two-letter locale like "ru" or "en"
+  final String locale;
 
   /// [countries] you can pass a list of [CountryData] objects here
   /// or a list of String names. If you pass a list of Strings
@@ -98,7 +101,7 @@ class LiteCountrySelector extends StatefulWidget {
   final TextDirection? textDirection;
   final TextAlign textAlign;
   final TextAlignVertical? textAlignVertical;
-  final ValueChanged<DateTime?>? onChanged;
+  final ValueChanged<Object?>? onChanged;
 
   /// makes sense only of [useSmoothError] is true
   final EdgeInsets? smoothErrorPadding;

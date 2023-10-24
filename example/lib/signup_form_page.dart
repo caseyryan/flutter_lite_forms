@@ -23,7 +23,7 @@ class SignupFormPage extends StatelessWidget {
         /// passing 'signupForm' key there
         /// this might come useful if you create a multipage onboarding
         /// and want to send the accumulated data to the backend in the end
-        autoDispose: true,
+        autoDispose: false,
         allowUnfocusOnTapOutside: false,
         name: formName,
         child: CustomScrollView(
@@ -47,37 +47,37 @@ class SignupFormPage extends StatelessWidget {
                     //     iconPosition: LiteSearchFieldIconPosition.left,
                     //   ),
                     // ),
-                    // LiteTextFormField(
-                    //   paddingTop: 20.0,
-                    //   maxLines: 1,
-                    //   textEntryType: LiteTextEntryType.normal,
-                    //   useSmoothError: true,
-                    //   name: 'login',
-                    //   validators: [
-                    //     (value) async {
-                    //       if (value?.toString().isNotEmpty != true) {
-                    //         return 'Login cannot be empty';
-                    //       }
-                    //       return null;
-                    //     },
-                    //   ],
-                    //   onChanged: (value) {
-                    //     if (kDebugMode) {
-                    //       print('VALUE: $value');
-                    //     }
-                    //   },
-                    //   initialValue: 'Konstantin',
-                    //   initialValueDeserializer: (value) {
-                    //     if (value is String) {
-                    //       return value;
-                    //     }
-                    //     return value.toString();
-                    //   },
-                    //   serializer: (value) {
-                    //     return 'Mr. $value';
-                    //   },
-                    //   autovalidateMode: AutovalidateMode.always,
-                    // ),
+                    LiteTextFormField(
+                      paddingTop: 20.0,
+                      maxLines: 1,
+                      textEntryType: LiteTextEntryType.normal,
+                      useSmoothError: true,
+                      name: 'login',
+                      validators: [
+                        (value) async {
+                          if (value?.toString().isNotEmpty != true) {
+                            return 'Login cannot be empty';
+                          }
+                          return null;
+                        },
+                      ],
+                      onChanged: (value) {
+                        if (kDebugMode) {
+                          print('VALUE: $value');
+                        }
+                      },
+                      initialValue: 'Konstantin',
+                      initialValueDeserializer: (value) {
+                        if (value is String) {
+                          return value;
+                        }
+                        return value.toString();
+                      },
+                      serializer: (value) {
+                        return 'Mr. $value';
+                      },
+                      autovalidateMode: AutovalidateMode.always,
+                    ),
                     // const SizedBox(height: 600.0),
                     // LiteCountrySelector(
                     //   name: 'countries',
@@ -96,11 +96,16 @@ class SignupFormPage extends StatelessWidget {
                       name: 'phone',
                       paddingTop: 20.0,
                       paddingBottom: 20.0,
-                      initialValue: '+79517773344',
-                      defaultCountry: 'russia',
-                      // phoneInputType: LitePhoneInputType.autodetectCode,
-                      phoneInputType: LitePhoneInputType.manualCode,
-                      serializer: LiteSerializers.phoneDataToString,
+                      // initialValue: '+79517773344',
+                      // defaultCountry: 'russia',
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      phoneInputType: LitePhoneInputType.autodetectCode,
+                      // phoneInputType: LitePhoneInputType.manualCode,
+                      // serializer: LiteSerializers.phoneDataToFormattedString,
+                      serializer: LiteSerializers.phoneDataToUnformattedString,
+                      validators: [
+                        LiteValidators.phoneValidator,
+                      ],
                     ),
                     // LiteDropSelector(
                     //   paddingTop: 20.0,

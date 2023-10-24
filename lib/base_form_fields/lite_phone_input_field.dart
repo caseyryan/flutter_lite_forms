@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:lite_forms/base_form_fields/lite_drop_selector/country_flag.dart';
 import 'package:lite_forms/base_form_fields/mixins/post_frame_mixin.dart';
 import 'package:lite_forms/constants.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
@@ -29,6 +30,36 @@ class PhoneData {
       return formatAsPhoneNumber(phone) ?? '';
     }
     return _phoneNumber;
+  }
+
+  String get fullUnformattedPhone {
+    final value = toNumericString(
+      fullPhone,
+      allowAllZeroes: true,
+      allowHyphen: true,
+    );
+    return '+$value';
+  }
+
+  /// Almost the same as [fullPhone] but this one
+  /// will not return a country code if [_isManualCountry] == true
+  String get formattedPhone {
+    String? value;
+    if (_isManualCountry) {
+      value = formatAsPhoneNumber(
+        defaultCountryCode: _phoneCountryData?.countryCode,
+        _phoneNumber,
+        invalidPhoneAction: InvalidPhoneAction.DoNothing,
+      );
+    } else {
+      value = formatAsPhoneNumber(_phoneNumber);
+    }
+    _phoneNumber = value ?? _phoneNumber;
+    return value ?? '';
+  }
+
+  bool get isValid {
+    return isPhoneValid(fullPhone);
   }
 
   /// For some rare cases when you need more data about a phone number
@@ -63,20 +94,27 @@ class LitePhoneInputField extends StatefulWidget {
     this.strutStyle,
     this.textDirection,
     this.restorationId,
+    this.locale = 'en',
     this.textAlignVertical,
+    this.onChanged,
     this.countrySelectorSettings,
     this.menuItemBuilder,
     this.textAlign = TextAlign.start,
     this.smoothErrorPadding = const EdgeInsets.only(
       top: 6.0,
     ),
+    this.leadingWidth = 100.0,
     this.useSmoothError = true,
     this.allowErrorTexts = true,
     this.allowEndlessPhone = false,
-    this.countrySelectorViewType = LiteDropSelectorViewType.adaptive,
+    this.countrySelectorViewType = LiteDropSelectorViewType.menu,
   });
 
   final String name;
+  final ValueChanged<Object?>? onChanged;
+
+  /// [locale] two-letter locale like "ru" or "en"
+  final String locale;
 
   /// [countrySelectorViewType] specifies how the DropSelector sheet for
   /// the country code will look like. Makes sense only if [phoneInputType] is
@@ -96,6 +134,10 @@ class LitePhoneInputField extends StatefulWidget {
   final TextStyle? style;
   final TextStyle? errorStyle;
   final Object? initialValue;
+
+  /// [leadingWidth] the width of the drop selector for a country code
+  /// it makes sense only if [phoneInputType] == [LitePhoneInputType.manualCode]
+  final double leadingWidth;
   final LiteDropSelectorSettings? countrySelectorSettings;
 
   /// Pass false here if you don't want to display errors on invalid fields at all
@@ -166,21 +208,15 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
   final _globalKey = GlobalKey<State<StatefulWidget>>();
   CountryData? _selectedCountry;
 
-  @override
-  void initState() {
-    if (_isManualSelector) {
-      if (widget.defaultCountry != null) {
-        if (widget.defaultCountry is String) {
-          _selectedCountry = tryFindCountries(
-            widget.defaultCountry as String,
-          ).firstOrNull;
-        } else if (widget.defaultCountry is CountryData) {
-          _selectedCountry = widget.defaultCountry as CountryData;
-        }
-      }
-      _selectedCountry ??= tryFindCountries('US').first;
+  CountryData? _tryGetCountryFromDropSelector() {
+    final value = getFormFieldValue(
+      formName: formName,
+      fieldName: _dropSelectorName,
+    );
+    if (value is List) {
+      return value.firstOrNull.payload;
     }
-    super.initState();
+    return null;
   }
 
   @override
@@ -195,6 +231,41 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
     return PhoneCodes.removeCountryCode(
       phoneWithCountryCode,
     );
+  }
+
+  PhoneData get _selectedPhone {
+    PhoneData? phoneData = getFormFieldValue(
+      formName: formName,
+      fieldName: widget.name,
+    );
+    if (phoneData == null) {
+      phoneData = PhoneData(
+        countryData: null,
+      )
+        .._isManualCountry = _isManualSelector
+        .._phoneCountryData = _phoneCountryData
+        .._phoneNumber = textEditingController?.text ?? '';
+      textEditingController?.setSelectionToEnd(
+        focusNode,
+      );
+      liteFormController.onValueChanged(
+        isInitialValue: true,
+        formName: formName,
+        fieldName: widget.name,
+        value: phoneData,
+        view: phoneData.formattedPhone,
+      );
+    }
+    return phoneData;
+  }
+
+  PhoneCountryData? get _phoneCountryData {
+    if (_selectedCountry != null) {
+      return PhoneCodes.getPhoneCountryDataByCountryCode(
+        _selectedCountry!.isoCode,
+      );
+    }
+    return null;
   }
 
   PhoneData? _postProcessInitialValue(
@@ -240,9 +311,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
             defaultCountryCode: _selectedCountry!.isoCode,
           );
           if (formattedPhone != null) {
-            final phoneCountryData = PhoneCodes.getPhoneCountryDataByCountryCode(
-              _selectedCountry!.isoCode,
-            );
+            final phoneCountryData = _phoneCountryData;
             if (phoneCountryData != null) {
               _initialData = PhoneData(
                 countryData: _selectedCountry,
@@ -265,7 +334,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
     return !widget.useSmoothError && widget.allowErrorTexts;
   }
 
-  String? get _defaultCountryCode {
+  String? get _countryCode {
     if (_isManualSelector && _selectedCountry != null) {
       return _selectedCountry!.isoCode;
     }
@@ -274,6 +343,10 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
 
   bool get _isManualSelector {
     return widget.phoneInputType == LitePhoneInputType.manualCode;
+  }
+
+  String get _dropSelectorName {
+    return '${widget.name}_country_selector'.toFormIgnoreName();
   }
 
   Widget _buildCountryDropSelector() {
@@ -286,27 +359,88 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
           return const SizedBox.shrink();
         }
         return LiteCountrySelector(
+          locale: widget.locale,
           menuItemBuilder: widget.menuItemBuilder,
-          name: '${widget.name}_country_selector'.toFormIgnoreName(),
+          name: _dropSelectorName,
           dropSelectorType: widget.countrySelectorViewType,
           initialValue: _selectedCountry,
-          settings: widget.countrySelectorSettings ?? const LiteDropSelectorSettings(),
-          selectorViewBuilder: (context, selectedItems) {
+          onChanged: (value) {
+            setState(() {
+              _selectedCountry = (value as List).first.payload as CountryData;
+              final phoneCountryData = PhoneCodes.getPhoneCountryDataByCountryCode(
+                _selectedCountry!.isoCode,
+              );
+              _selectedPhone.countryData = _selectedCountry;
+              _selectedPhone._phoneCountryData = phoneCountryData!;
+              liteFormController.onValueChanged(
+                isInitialValue: false,
+                formName: formName,
+                fieldName: widget.name,
+                value: _selectedPhone,
+                view: _selectedPhone.formattedPhone,
+              );
+            });
+          },
+          settings: widget.countrySelectorSettings ??
+              const LiteDropSelectorSettings(
+                menuSearchConfiguration: MenuSearchConfiguration(
+                  autofocusSearchField: true,
+                ),
+                minMenuWidth: 330.0,
+              ),
+          selectorViewBuilder: (
+            context,
+            List<LiteDropSelectorItem> selectedItems,
+          ) {
+            final countyData = selectedItems.first.payload as CountryData;
+            final padding =
+                (decoration.contentPadding as EdgeInsets?)?.left ?? kDefaultPadding;
             return Padding(
               padding: EdgeInsets.only(
-                right:
-                    (decoration.contentPadding as EdgeInsets?)?.left ?? kDefaultPadding,
+                right: padding,
               ),
               child: Container(
-                width: 80.0,
+                width: widget.leadingWidth,
                 height: _dropSelectorHeight,
-                color: Colors.red,
+                color: Colors.transparent,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: padding,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      CountryFlag(
+                        countryId: countyData.isoCode,
+                        onFlagError: () {},
+                        isCircle: false,
+                        height: 25.0,
+                        width: 35.0,
+                      ),
+                      Expanded(
+                        child: Text(
+                          countyData.phoneCode,
+                          textAlign: TextAlign.center,
+                          style: _textStyle,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             );
           },
         );
       },
     );
+  }
+
+  TextStyle? get _textStyle {
+    return liteFormController.config?.defaultTextStyle ??
+        widget.style ??
+        Theme.of(context).textTheme.titleMedium;
   }
 
   @override
@@ -321,6 +455,24 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
     );
+    if (_selectedCountry == null) {
+      if (_isManualSelector) {
+        _selectedCountry = _tryGetCountryFromDropSelector();
+        if (_selectedCountry == null) {
+          if (widget.defaultCountry != null) {
+            if (widget.defaultCountry is String) {
+              _selectedCountry = tryFindCountries(
+                widget.defaultCountry as String,
+              ).firstOrNull;
+            } else if (widget.defaultCountry is CountryData) {
+              _selectedCountry = widget.defaultCountry as CountryData;
+            }
+          }
+        }
+        _selectedCountry ??= tryFindCountries('US').first;
+        print(_selectedCountry);
+      }
+    }
 
     tryDeserializeInitialValueIfNecessary(
       rawInitialValue: widget.initialValue,
@@ -344,6 +496,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
         );
       },
     );
+
     InputDecoration newDecoration = decoration;
     if (_isManualSelector) {
       newDecoration = decoration.copyWith(
@@ -373,6 +526,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
                         }
                       : null,
                   autovalidateMode: null,
+                  focusNode: focusNode,
                   controller: textEditingController,
                   decoration: _useErrorDecoration
                       ? newDecoration
@@ -385,15 +539,30 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
                   strutStyle: widget.strutStyle,
                   inputFormatters: [
                     PhoneInputFormatter(
-                      defaultCountryCode: _defaultCountryCode,
+                      defaultCountryCode: _countryCode,
                       allowEndlessPhone: widget.allowEndlessPhone,
+                      onCountrySelected: (value) {
+                        if (value is PhoneCountryData && _selectedCountry == null) {}
+                      },
                     ),
                   ],
-                  style: liteFormController.config?.defaultTextStyle ?? widget.style,
+                  onChanged: (value) {
+                    _selectedPhone._phoneNumber = value;
+                    liteFormController.onValueChanged(
+                      isInitialValue: false,
+                      formName: group.name,
+                      fieldName: widget.name,
+                      value: _selectedPhone,
+                      view: null,
+                    );
+                    widget.onChanged?.call(_selectedPhone);
+                  },
+                  style: _textStyle,
                   textAlign: widget.textAlign,
                   textAlignVertical: widget.textAlignVertical,
                   textCapitalization: widget.textCapitalization,
                   textDirection: widget.textDirection,
+                  keyboardType: TextInputType.phone,
                 ),
               ),
               _buildCountryDropSelector(),
