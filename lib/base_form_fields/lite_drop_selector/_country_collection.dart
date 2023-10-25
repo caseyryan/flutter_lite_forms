@@ -37,6 +37,17 @@ class CountryData with SearchQueryMixin {
     ]);
   }
 
+  Map toMap() {
+    return {
+      'name': name,
+      'simplifiedName': simplifiedName,
+      'isoCode': isoCode,
+      'threeLetterCode': threeLetterCode,
+      'phoneCode': phoneCode,
+      'localizedNames': localizedNames,
+    };
+  }
+
   @override
   bool operator ==(covariant CountryData other) {
     return other.isoCode == isoCode;

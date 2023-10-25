@@ -50,6 +50,7 @@ class LiteSearchField extends StatefulWidget {
     this.hintText = 'Search...',
     this.autofocus = false,
     this.style,
+    this.readOnly = false,
     this.settings = const LiteSearchFieldSettings(),
   });
 
@@ -65,6 +66,7 @@ class LiteSearchField extends StatefulWidget {
   final String? hintText;
   final ValueChanged<String> onSearch;
   final TextStyle? style;
+  final bool readOnly;
 
   @override
   State<LiteSearchField> createState() => _LiteSearchFieldState();
@@ -194,6 +196,7 @@ class _LiteSearchFieldState extends State<LiteSearchField>
         right: widget.paddingRight,
       ),
       child: TextFormField(
+        readOnly: widget.readOnly,
         style: widget.style,
         focusNode: widget.focusNode,
         autofocus: widget.autofocus,

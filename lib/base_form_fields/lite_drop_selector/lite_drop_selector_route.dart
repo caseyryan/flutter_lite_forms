@@ -312,13 +312,18 @@ class _DropSelectorViewState extends State<DropSelectorView>
         LiteDropSelectorActionType.multiselect;
   }
 
+  bool get _isSimpleWithNoSelection {
+    return widget.args.dropSelectorActionType ==
+        LiteDropSelectorActionType.simpleWithNoSelection;
+  }
+
   bool get _isSingleSelect {
     return widget.args.dropSelectorActionType ==
         LiteDropSelectorActionType.singleSelect;
   }
 
   bool get _isSimple {
-    return widget.args.dropSelectorActionType ==
+    return _isSimpleWithNoSelection || widget.args.dropSelectorActionType ==
         LiteDropSelectorActionType.simple;
   }
 
@@ -528,6 +533,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
         ),
         child: LiteDropSelectorButton(
           data: item,
+          showSelection: !_isSimpleWithNoSelection,
           sheetSettings: _settings,
           decoration: widget.args.decoration,
           style: widget.args.style,

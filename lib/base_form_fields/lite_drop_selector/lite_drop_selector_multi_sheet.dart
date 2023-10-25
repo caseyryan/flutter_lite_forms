@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/exports.dart';
 import 'package:lite_forms/constants.dart';
@@ -120,30 +119,47 @@ class LiteDropSelectorChip extends StatelessWidget {
         const EdgeInsets.all(6.0);
   }
 
-  SmoothBorderRadius get _borderRadius {
-    return SmoothBorderRadius.only(
-      topLeft: SmoothRadius(
-        cornerRadius: formConfig?.dropSelectorSettings.chipTopLeftRadius ??
-            kDefaultChipRadius,
-        cornerSmoothing: 1.0,
+  BorderRadius get _borderRadius {
+    return BorderRadius.only(
+      topLeft: Radius.circular(
+        formConfig?.dropSelectorSettings.chipTopLeftRadius ?? kDefaultChipRadius,
       ),
-      topRight: SmoothRadius(
-        cornerRadius: formConfig?.dropSelectorSettings.chipTopRightRadius ??
-            kDefaultChipRadius,
-        cornerSmoothing: 1.0,
+      topRight: Radius.circular(
+        formConfig?.dropSelectorSettings.chipTopRightRadius ?? kDefaultChipRadius,
       ),
-      bottomLeft: SmoothRadius(
-        cornerRadius: formConfig?.dropSelectorSettings.chipBottomLeftRadius ??
-            kDefaultChipRadius,
-        cornerSmoothing: 1.0,
+      bottomLeft: Radius.circular(
+        formConfig?.dropSelectorSettings.chipBottomLeftRadius ?? kDefaultChipRadius,
       ),
-      bottomRight: SmoothRadius(
-        cornerRadius: formConfig?.dropSelectorSettings.chipBottomRightRadius ??
-            kDefaultChipRadius,
-        cornerSmoothing: 1.0,
+      bottomRight: Radius.circular(
+        formConfig?.dropSelectorSettings.chipBottomRightRadius ?? kDefaultChipRadius,
       ),
     );
   }
+
+  // SmoothBorderRadius get _smoothBorderRadius {
+  //   return SmoothBorderRadius.only(
+  //     topLeft: SmoothRadius(
+  //       cornerRadius:
+  //           formConfig?.dropSelectorSettings.chipTopLeftRadius ?? kDefaultChipRadius,
+  //       cornerSmoothing: 1.0,
+  //     ),
+  //     topRight: SmoothRadius(
+  //       cornerRadius:
+  //           formConfig?.dropSelectorSettings.chipTopRightRadius ?? kDefaultChipRadius,
+  //       cornerSmoothing: 1.0,
+  //     ),
+  //     bottomLeft: SmoothRadius(
+  //       cornerRadius:
+  //           formConfig?.dropSelectorSettings.chipBottomLeftRadius ?? kDefaultChipRadius,
+  //       cornerSmoothing: 1.0,
+  //     ),
+  //     bottomRight: SmoothRadius(
+  //       cornerRadius:
+  //           formConfig?.dropSelectorSettings.chipBottomRightRadius ?? kDefaultChipRadius,
+  //       cornerSmoothing: 1.0,
+  //     ),
+  //   );
+  // }
 
   LiteDropSelectorSettings? get _settings {
     return settings ?? formConfig?.dropSelectorSettings;
@@ -159,9 +175,12 @@ class LiteDropSelectorChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: _getBackgroundColor(Theme.of(context)),
-      shape: SmoothRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: _borderRadius,
       ),
+      // shape: SmoothRectangleBorder(
+      //   borderRadius: _borderRadius,
+      // ),
       child: Padding(
         padding: _contentPadding,
         child: Row(
@@ -175,8 +194,7 @@ class LiteDropSelectorChip extends StatelessWidget {
                 width: 20.0,
                 height: 20.0,
                 decoration: BoxDecoration(
-                  color: _settings?.chipCloseButtonColor ??
-                      Theme.of(context).cardColor,
+                  color: _settings?.chipCloseButtonColor ?? Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: Center(
@@ -195,8 +213,7 @@ class LiteDropSelectorChip extends StatelessWidget {
             ),
             Text(
               item.title,
-              style: _getTextStyle(context)
-                  ?.copyWith(color: Theme.of(context).cardColor),
+              style: _getTextStyle(context)?.copyWith(color: Theme.of(context).cardColor),
             ),
           ],
         ),

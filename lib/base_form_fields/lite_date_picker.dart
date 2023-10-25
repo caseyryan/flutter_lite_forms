@@ -52,6 +52,7 @@ class LiteDatePicker extends StatefulWidget {
     ),
     this.useSmoothError = true,
     this.allowErrorTexts = true,
+    this.readOnly = false,
   });
 
   /// The look and feel of the picker
@@ -60,6 +61,7 @@ class LiteDatePicker extends StatefulWidget {
   /// set up according to the selected operating system
   final LiteDatePickerType pickerType;
   final String name;
+  final bool readOnly;
   final bool use24HourFormat;
 
   /// It is assumed that the initial value is DateTime? but you might
@@ -354,15 +356,13 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                         CupertinoButton(
                           child: Text(
                             'Cancel',
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .textStyle
-                                .copyWith(
-                                  color: CupertinoDynamicColor.resolve(
-                                    CupertinoColors.placeholderText,
-                                    context,
-                                  ),
-                                ),
+                            style:
+                                CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+                                      color: CupertinoDynamicColor.resolve(
+                                        CupertinoColors.placeholderText,
+                                        context,
+                                      ),
+                                    ),
                           ),
                           onPressed: () {
                             Navigator.of(context).pop(null);
@@ -493,6 +493,9 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
 
     return GestureDetector(
       onTap: () async {
+        if (widget.readOnly) {
+          return;
+        }
         final dateTime = await _onShowPickerPressed(
           context: context,
         );
@@ -535,8 +538,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                           ),
                         ),
                   strutStyle: widget.strutStyle,
-                  style: liteFormController.config?.defaultTextStyle ??
-                      widget.style,
+                  style: liteFormController.config?.defaultTextStyle ?? widget.style,
                   textAlign: widget.textAlign,
                   textAlignVertical: widget.textAlignVertical,
                   textCapitalization: widget.textCapitalization,

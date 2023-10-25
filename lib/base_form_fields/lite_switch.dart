@@ -86,6 +86,7 @@ class LiteSwitch extends StatefulWidget {
     this.child,
     this.text,
     this.useMarkdown = false,
+    this.readOnly = false,
     this.useSmoothError = true,
     this.markdownStyleSheet,
     this.style,
@@ -107,6 +108,7 @@ class LiteSwitch extends StatefulWidget {
 
   /// If you need to use markdown in the text description, pass true here.
   final bool useMarkdown;
+  final bool readOnly;
 
   /// Called when the user taps a link.
   final MarkdownTapLinkCallback? onTapLink;
@@ -299,6 +301,9 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
   void _onChanged(
     bool value,
   ) {
+    if (widget.readOnly) {
+      return;
+    }
     liteFormController.onValueChanged(
       formName: group.name,
       fieldName: widget.name,
@@ -384,8 +389,8 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
     setInitialValue(
       formName: widget.name,
       fieldName: group.name,
-      setter: () {
-        bool? value = _tryGetValue(
+      setter: () async {
+        bool? value = await _tryGetValue(
           fieldName: widget.name,
           formName: group.name,
         );

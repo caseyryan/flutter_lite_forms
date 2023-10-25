@@ -1,3 +1,5 @@
+part of 'lite_drop_selector.dart';
+
 enum LiteDropSelectorViewType {
   /// [bottomsheet] means the the selector will appear from the
   /// bottom of the screen
@@ -15,4 +17,7 @@ enum LiteDropSelectorActionType {
   singleSelect,
   multiselect,
   simple,
+  /// The same as simple but it will not highlight the 
+  /// selected button. Might be useful for action sheets
+  simpleWithNoSelection,
 }

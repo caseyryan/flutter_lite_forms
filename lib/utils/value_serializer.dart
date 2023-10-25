@@ -47,4 +47,20 @@ class LiteSerializers {
 
     return value?.toString();
   }
+  static Map? fullPhoneDataWithCountry(Object? value) {
+    if (value is String) {
+      return {
+        'phone': value,
+      };
+    } else if (value is PhoneData) {
+      return {
+        'phone': value.fullUnformattedPhone,
+        'country': value.countryData?.toMap(),
+      };
+    }
+
+    return {
+      'phone': value?.toString(),
+    };
+  }
 }

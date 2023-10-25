@@ -9,7 +9,6 @@ import 'package:lite_forms/lite_forms.dart';
 import 'package:lite_state/lite_state.dart';
 
 import 'error_line.dart';
-import 'lite_drop_selector/lite_drop_selector_enum.dart';
 import 'mixins/form_field_mixin.dart';
 
 enum LitePhoneInputType {
@@ -78,6 +77,7 @@ class LitePhoneInputField extends StatefulWidget {
     this.phoneInputType = LitePhoneInputType.autodetectCode,
     this.initialValue,
     this.decoration,
+    this.readOnly = false,
     this.hintText,
     this.autovalidateMode,
     this.defaultCountry,
@@ -155,6 +155,7 @@ class LitePhoneInputField extends StatefulWidget {
   /// that uses AnimateSize to display, unlike the standard
   /// Flutter's input error
   final bool useSmoothError;
+  final bool readOnly;
 
   final String? restorationId;
   final TextCapitalization textCapitalization;
@@ -349,6 +350,10 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
     return '${widget.name}_country_selector'.toFormIgnoreName();
   }
 
+  Future _focusField() async {
+    focusNode?.requestFocus();
+  }
+
   Widget _buildCountryDropSelector() {
     if (widget.phoneInputType == LitePhoneInputType.autodetectCode) {
       return const SizedBox.shrink();
@@ -359,6 +364,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
           return const SizedBox.shrink();
         }
         return LiteCountrySelector(
+          readOnly: widget.readOnly,
           locale: widget.locale,
           menuItemBuilder: widget.menuItemBuilder,
           name: _dropSelectorName,
@@ -379,6 +385,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
                 value: _selectedPhone,
                 view: _selectedPhone.formattedPhone,
               );
+              _focusField();
             });
           },
           settings: widget.countrySelectorSettings ??
@@ -470,7 +477,6 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
           }
         }
         _selectedCountry ??= tryFindCountries('US').first;
-        print(_selectedCountry);
       }
     }
 
@@ -519,6 +525,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
               SizedBox(
                 key: _globalKey,
                 child: TextFormField(
+                  readOnly: widget.readOnly,
                   restorationId: widget.restorationId,
                   validator: widget.validators != null
                       ? (value) {

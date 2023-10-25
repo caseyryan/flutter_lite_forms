@@ -11,6 +11,7 @@ class LiteDropSelectorButton extends StatefulWidget {
     required this.buttonHeight,
     required this.decoration,
     required this.style,
+    required this.showSelection,
     required this.sheetSettings,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
@@ -27,6 +28,7 @@ class LiteDropSelectorButton extends StatefulWidget {
   final TextStyle? style;
   final InputDecoration? decoration;
   final LiteDropSelectorSettings sheetSettings;
+  final bool showSelection;
 
   @override
   State<LiteDropSelectorButton> createState() => _LiteDropSelectorButtonState();
@@ -72,20 +74,20 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
   }
 
   BoxDecoration? _buildDecoration() {
-    return BoxDecoration(
-      border: Border.fromBorderSide(
-        BorderSide(
-          color: widget.data.isSelected
-              ? _selectedBorderColor
-              : Colors.transparent,
-          width: widget.data.selectedBorderWidth ?? _selectedBorderWidth,
-        ),
-      ),
-      color: widget.data.isSelected
-          ? _selectedBorderColor.withOpacity(.03)
-          : Colors.transparent,
-      borderRadius: _borderRadius,
-    );
+    return widget.showSelection
+        ? BoxDecoration(
+            border: Border.fromBorderSide(
+              BorderSide(
+                color: widget.data.isSelected ? _selectedBorderColor : Colors.transparent,
+                width: widget.data.selectedBorderWidth ?? _selectedBorderWidth,
+              ),
+            ),
+            color: widget.data.isSelected
+                ? _selectedBorderColor.withOpacity(.03)
+                : Colors.transparent,
+            borderRadius: _borderRadius,
+          )
+        : null;
   }
 
   BorderRadius? get _defaultRadius {
@@ -161,7 +163,8 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
         ),
       );
     }
-    return SizedBox(
+    return Container(
+      color: Colors.transparent,
       width: widget.data.menuWidth,
       height: widget.buttonHeight,
       child: Padding(

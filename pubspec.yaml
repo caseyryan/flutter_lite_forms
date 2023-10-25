@@ -19,6 +19,8 @@ dependencies:
   country_icons: ^2.0.2
   path: ^1.8.2
   clock: ^1.1.1
+  image_picker: ^1.0.4
+  image_picker_for_web: ^3.0.1
 
 dev_dependencies:
   flutter_test:

@@ -6,8 +6,6 @@ import 'package:lite_forms/base_form_fields/mixins/search_query_mixin.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
 import 'package:lite_forms/utils/value_validator.dart';
 
-import 'lite_drop_selector_enum.dart';
-
 part '_country_collection.dart';
 
 class LiteCountrySelector extends StatefulWidget {
@@ -47,10 +45,12 @@ class LiteCountrySelector extends StatefulWidget {
     this.useSmoothError = true,
     this.allowErrorTexts = true,
     this.sortBySelection = true,
+    this.readOnly = false,
     this.countries,
   });
 
   final String name;
+  final bool readOnly;
   /// [locale] two-letter locale like "ru" or "en"
   final String locale;
 
@@ -242,6 +242,7 @@ class _LiteCountrySelectorState extends State<LiteCountrySelector> {
     return LiteDropSelector(
       name: widget.name,
       items: items,
+      readOnly: widget.readOnly,
       textCapitalization: widget.textCapitalization,
       initialValueDeserializer: widget.initialValueDeserializer,
       dropSelectorActionType: widget.dropSelectorActionType,

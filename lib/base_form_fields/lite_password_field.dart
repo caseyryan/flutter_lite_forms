@@ -71,6 +71,7 @@ class LitePasswordField extends StatefulWidget {
   });
 
   final String name;
+  final bool readOnly;
   final String? repeatPlaceholder;
   final String? hintText;
   final TextEditingController? controller;
@@ -91,7 +92,6 @@ class LitePasswordField extends StatefulWidget {
   final TextAlign textAlign;
   final TextAlignVertical? textAlignVertical;
   final bool autofocus;
-  final bool readOnly;
   final bool? showCursor;
   final String obscuringCharacter;
   final bool enableSuggestions;

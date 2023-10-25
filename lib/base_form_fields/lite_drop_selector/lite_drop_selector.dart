@@ -21,10 +21,10 @@ import 'package:lite_forms/utils/value_validator.dart';
 import 'package:lite_state/lite_state.dart';
 
 import 'lite_drop_selector_button.dart';
-import 'lite_drop_selector_enum.dart';
 import 'lite_drop_selector_multi_sheet.dart';
 
 part '_lite_drop_selector_item.dart';
+part 'lite_drop_selector_enum.dart';
 part 'lite_drop_selector_route.dart';
 
 typedef DropSelectorItemBuilder = Widget Function(
@@ -73,6 +73,7 @@ class LiteDropSelector extends StatefulWidget {
     this.useSmoothError = true,
     this.allowErrorTexts = true,
     this.sortBySelection = false,
+    this.readOnly = false,
   }) {
     assert(items.isNotEmpty &&
         (items.every((e) => e is String) ||
@@ -81,6 +82,7 @@ class LiteDropSelector extends StatefulWidget {
 
   final String name;
   final bool sortBySelection;
+  final bool readOnly;
 
   /// [selectorViewBuilder] allows you to build a custom view for
   /// this drop selector. You might want to display something else instead
@@ -206,6 +208,9 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
   }
 
   Future _onTap() async {
+    if (widget.readOnly) {
+      return;
+    }
     final renderBox = _globalKey.currentContext?.findRenderObject();
     if (renderBox is RenderBox) {
       var size = renderBox.size;
@@ -435,6 +440,9 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
                       paddingTop: widget.multiselectorSpacing,
                       settings: widget.settings,
                       onRemove: (LiteDropSelectorItem item) {
+                        if (widget.readOnly) {
+                          return;
+                        }
                         item.isSelected = false;
                         _selectedOptions.remove(item);
                         _updateList(_selectedOptions);
