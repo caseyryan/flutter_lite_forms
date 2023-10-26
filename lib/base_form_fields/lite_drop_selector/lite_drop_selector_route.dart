@@ -917,9 +917,13 @@ class _DropSelectorViewState extends State<DropSelectorView>
 
   void _onCancel() {
     _reselectToInitial();
-    Navigator.of(context).pop(
-      widget.args.items.where((i) => i.isSelected).toList(),
-    );
+    if (_isSimpleWithNoSelection) {
+      Navigator.of(context).pop(null);
+    } else {
+      Navigator.of(context).pop(
+        widget.args.items.where((i) => i.isSelected).toList(),
+      );
+    }
   }
 
   @override

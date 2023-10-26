@@ -4,6 +4,12 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This is used to allow users to attach images</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This is used to allow users to take pictures if they need to attach anything</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone is required for a camera</string>
 	<key>CFBundleDisplayName</key>
 	<string>Example</string>
 	<key>CFBundleExecutable</key>

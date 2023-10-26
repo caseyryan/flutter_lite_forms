@@ -4,7 +4,6 @@
 import 'package:example/profile_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:lite_forms/base_form_fields/lite_image_picker.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
 
@@ -52,34 +51,27 @@ class SignupFormPage extends StatelessWidget {
                       children: [
                         LiteImagePicker(
                           name: 'image',
-                          // aspectRatio: 4.0 / 3.0,
+                          aspectRatio: 4.0 / 3.0,
                           paddingTop: 20.0,
                           paddingRight: 10.0,
-                          // constraints: BoxConstraints(
-                          //   maxWidth: 180.0,
-                          //   maxHeight: 100.0,
-                          // ),
+                          constraints: BoxConstraints(
+                            maxWidth: 180.0,
+                            maxHeight: 100.0,
+                          ),
                         ),
                         LiteImagePicker(
                           name: 'image2',
-                          // aspectRatio: 4.0 / 3.0,
+                          aspectRatio: 6.0 / 4.0,
+                          imageSpacing: 3.0,
                           paddingTop: 20.0,
+                          maxImages: 4,
                           paddingRight: 10.0,
-                          // constraints: BoxConstraints(
-                          //   maxWidth: 180.0,
-                          //   maxHeight: 100.0,
-                          // ),
+                          constraints: BoxConstraints(
+                            maxWidth: 220.0,
+                            maxHeight: 200.0,
+                          ),
                         ),
-                        LiteImagePicker(
-                          name: 'image3',
-                          // aspectRatio: 4.0 / 3.0,
-                          paddingTop: 20.0,
-                          paddingRight: 10.0,
-                          // constraints: BoxConstraints(
-                          //   maxWidth: 180.0,
-                          //   maxHeight: 100.0,
-                          // ),
-                        ),
+                        
                       ],
                     ),
                     LiteTextFormField(

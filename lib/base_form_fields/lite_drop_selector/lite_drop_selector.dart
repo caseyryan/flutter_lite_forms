@@ -195,16 +195,16 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       for (var item in _items) {
         item.isSelected = list.contains(item);
       }
+      liteFormController.onValueChanged(
+        formName: group.name,
+        fieldName: widget.name,
+        value: list,
+        view: _getLabelView(list as dynamic),
+      );
+      widget.onChanged?.call(list);
+      textEditingController?.text = _getLabelView(list as dynamic) ?? '';
+      liteFormRebuildController.rebuild();
     }
-    liteFormController.onValueChanged(
-      formName: group.name,
-      fieldName: widget.name,
-      value: list,
-      view: _getLabelView(list),
-    );
-    widget.onChanged?.call(list);
-    textEditingController?.text = _getLabelView(list) ?? '';
-    liteFormRebuildController.rebuild();
   }
 
   Future _onTap() async {
@@ -373,6 +373,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
         ),
         child: GestureDetector(
           onTap: _onTap,
+          onLongPress: _onTap,
           child: SizedBox(
             key: _globalKey,
             child: widget.selectorViewBuilder!(
@@ -401,6 +402,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
               children: [
                 GestureDetector(
                   onTap: _onTap,
+                  onLongPress: _onTap,
                   child: Container(
                     color: Colors.transparent,
                     child: IgnorePointer(
