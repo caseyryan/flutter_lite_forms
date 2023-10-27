@@ -51,10 +51,10 @@ LiteFormsConfiguration? get formConfig {
 ///
 /// [applySerializers] by default it calls a serializer on every field
 /// before putting it to the form. Pass false if you need to get raw form data
-Map<String, dynamic> getFormData({
+Future<Map<String, dynamic>> getFormData({
   required String formName,
   bool applySerializers = true,
-}) {
+}) async {
   return liteFormController.getFormData(
     formName: formName,
     applySerializers: applySerializers,

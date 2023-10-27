@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:lite_forms/lite_forms.dart';
 
 /// used to write custom value serializers / deserializers
-typedef LiteFormValueSerializer = Object? Function(dynamic value);
+typedef LiteFormValueSerializer = FutureOr<Object?> Function(dynamic value);
 
 /// The default for all fields. This means that the values is
 /// supposed to be accepted as is. If you need to convert the
@@ -28,6 +30,26 @@ class LiteSerializers {
   static int toInt(Object? value) {
     return toDouble(value).toInt();
   }
+  
+  static FutureOr<Object?> filesToMapList(Object? value) async {
+    if (value is XFileWrapper) {
+      final bytes = await value.xFile.readAsBytes();
+      return {
+        'name': value.name,
+        'bytes': bytes,
+      };
+    } else if (value is List) {
+      final tempList = <Map>[];
+      for (var file in value) {
+        if (file is XFileWrapper) {
+          final wrapper = await filesToMapList(file);
+          tempList.add(wrapper as Map);
+        }
+      }
+      return tempList;
+    }
+    return null;
+  }
 
   static String? phoneDataToFormattedString(Object? value) {
     if (value is String) {
@@ -38,6 +60,7 @@ class LiteSerializers {
 
     return value?.toString();
   }
+
   static String? phoneDataToUnformattedString(Object? value) {
     if (value is String) {
       return value;
@@ -47,6 +70,7 @@ class LiteSerializers {
 
     return value?.toString();
   }
+
   static Map? fullPhoneDataWithCountry(Object? value) {
     if (value is String) {
       return {

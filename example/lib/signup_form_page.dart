@@ -55,6 +55,7 @@ class SignupFormPage extends StatelessWidget {
                           aspectRatio: 4.0 / 3.0,
                           paddingTop: 20.0,
                           paddingRight: 10.0,
+                          serializer: LiteSerializers.filesToMapList,
                           constraints: BoxConstraints(
                             maxWidth: 180.0,
                             maxHeight: 100.0,
@@ -68,6 +69,7 @@ class SignupFormPage extends StatelessWidget {
                           paddingTop: 20.0,
                           maxImages: 4,
                           paddingRight: 10.0,
+                          serializer: LiteSerializers.filesToMapList,
                           constraints: BoxConstraints(
                             maxWidth: 220.0,
                             maxHeight: 200.0,
@@ -358,7 +360,7 @@ class SignupFormPage extends StatelessWidget {
                     MaterialButton(
                       onPressed: () async {
                         if (await validateLiteForm(formName)) {
-                          final formData = getFormData(
+                          final formData = await getFormData(
                             formName: formName,
                             applySerializers: true,
                           );

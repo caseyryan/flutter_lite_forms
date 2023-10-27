@@ -77,10 +77,11 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     }
   }
 
-  Object? tryGetValueForField(
-      {required String formName,
-      required String fieldName,
-      bool applySerializer = false}) {
+  FutureOr<Object?> tryGetValueForField({
+    required String formName,
+    required String fieldName,
+    bool applySerializer = false,
+  })  {
     final field = tryGetField(
       formName: formName,
       fieldName: fieldName,
@@ -88,7 +89,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
 
     final rawValue = field?._value;
     if (applySerializer) {
-      return field?.serializedValue;
+      return field?.getSerializedValue();
     }
     return rawValue;
   }
@@ -109,11 +110,11 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     return result;
   }
 
-  Map<String, dynamic> getFormData({
+  Future<Map<String, dynamic>> getFormData({
     required String formName,
     required bool applySerializers,
-  }) {
-    return _formGroups[formName]?.getFormData(applySerializers) ?? {};
+  }) async {
+    return await _formGroups[formName]?.getFormData(applySerializers) ?? {};
   }
 
   void onFormDisposed({

@@ -91,16 +91,16 @@ class _FormGroupWrapper {
     return _fields[fieldName];
   }
 
-  Map<String, dynamic> getFormData(
+  Future<Map<String, dynamic>> getFormData(
     bool applySerializers,
-  ) {
+  ) async {
     final map = <String, dynamic>{};
     for (var kv in _fields.entries) {
       if (kv.key.isIgnoredInForm()) {
         continue;
       }
       if (applySerializers) {
-        map[kv.key] = kv.value.serializedValue;
+        map[kv.key] = await kv.value.getSerializedValue();
       } else {
         map[kv.key] = kv.value;
       }

@@ -175,8 +175,8 @@ class FormGroupField<T> {
     _error = error;
   }
 
-  Object? get serializedValue {
-    return _serializer?.call(_value) ?? _value;
+  Future<Object?> getSerializedValue() async {
+    return  await _serializer?.call(_value) ?? _value;
   }
 
   FormGroupField({
