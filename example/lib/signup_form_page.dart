@@ -50,6 +50,7 @@ class SignupFormPage extends StatelessWidget {
                     Row(
                       children: [
                         LiteImagePicker(
+                          key: Key('image'),
                           name: 'image',
                           aspectRatio: 4.0 / 3.0,
                           paddingTop: 20.0,
@@ -60,6 +61,7 @@ class SignupFormPage extends StatelessWidget {
                           ),
                         ),
                         LiteImagePicker(
+                          key: Key('image2'),
                           name: 'image2',
                           aspectRatio: 6.0 / 4.0,
                           imageSpacing: 3.0,
@@ -130,9 +132,9 @@ class SignupFormPage extends StatelessWidget {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       // phoneInputType: LitePhoneInputType.autodetectCode,
                       phoneInputType: LitePhoneInputType.manualCode,
-                      // serializer: LiteSerializers.phoneDataToFormattedString,
+                      serializer: LiteSerializers.phoneDataToFormattedString,
                       // serializer: LiteSerializers.phoneDataToUnformattedString,
-                      serializer: LiteSerializers.fullPhoneDataWithCountry,
+                      // serializer: LiteSerializers.fullPhoneDataWithCountry,
                       validators: [
                         LiteValidators.phoneValidator,
                       ],
@@ -377,7 +379,7 @@ class SignupFormPage extends StatelessWidget {
                       child: Text('Sign Up'),
                     ),
                     SizedBox(
-                      height: 300,
+                      height: 2000,
                     )
                   ],
                 ),

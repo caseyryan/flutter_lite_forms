@@ -13,6 +13,7 @@ class LiteDropSelectorButton extends StatefulWidget {
     required this.style,
     required this.showSelection,
     required this.sheetSettings,
+    this.destructiveItemColor,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
@@ -26,6 +27,7 @@ class LiteDropSelectorButton extends StatefulWidget {
   final double paddingLeft;
   final double paddingRight;
   final TextStyle? style;
+  final Color? destructiveItemColor;
   final InputDecoration? decoration;
   final LiteDropSelectorSettings sheetSettings;
   final bool showSelection;
@@ -105,9 +107,21 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
   }
 
   TextStyle? get _textStyle {
-    return widget.style ??
+    final style = widget.style ??
         formConfig?.defaultTextStyle ??
         Theme.of(context).textTheme.titleMedium;
+    if (widget.data.isDestructive) {
+      return style?.copyWith(
+        color: widget.destructiveItemColor ?? _errorColor,
+      );
+    }
+    return style;
+  }
+
+  Color? get _errorColor {
+    return formConfig?.destructiveColor ??
+        formConfig?.inputDecoration?.errorStyle?.color ??
+        Theme.of(context).colorScheme.error;
   }
 
   BorderRadius? get _borderRadius {

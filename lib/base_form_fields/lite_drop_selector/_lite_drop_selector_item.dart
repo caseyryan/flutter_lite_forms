@@ -18,6 +18,7 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
     bool isSelected = false,
     this.isSeparator = false,
     this.isSingleAction = false,
+    this.isDestructive = false,
   }) : _isSelected = isSelected {
     final list = [title];
     if (payload is String) {
@@ -35,6 +36,8 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
   final double? selectedBorderWidth;
   final String title;
   final T payload;
+  /// [isDestructive] 
+  final bool isDestructive;
   bool _isSelected;
 
   /// [iconBuilder] allows to provide a custom icon for each

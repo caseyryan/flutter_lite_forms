@@ -107,8 +107,8 @@ class FormGroupField<T> {
   ]) {
     _value = value;
     if (value != null) {
+      _isInitiallySet = true;
       if (isInitialValue) {
-        _isInitiallySet = true;
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           try {
             textEditingController?.text = view ?? _value.toString();

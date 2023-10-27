@@ -37,8 +37,16 @@ class LiteFormsConfiguration {
     return _activeTheme?.inputDecoration;
   }
 
+  BoxDecoration? get filePickerDecoration {
+    return _activeTheme?.filePickerDecoration;
+  }
+
   Color? get shadowColor {
     return _activeTheme?.shadowColor;
+  }
+
+  Color? get destructiveColor {
+    return _activeTheme?.destructiveColor;
   }
 
   Color? get dropSelectorChipColor {
@@ -79,10 +87,14 @@ class LiteFormsTheme {
     this.inputDecoration,
     this.shadowColor,
     this.dropSelectorChipColor,
+    this.filePickerDecoration,
+    this.destructiveColor,
   });
 
   final TextStyle? defaultTextStyle;
+  final Color? destructiveColor;
   final InputDecoration? inputDecoration;
+  final BoxDecoration? filePickerDecoration;
   final Color? shadowColor;
   final Color? dropSelectorChipColor;
 }

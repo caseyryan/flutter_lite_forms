@@ -22,21 +22,22 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     const cornerRadius = 6.0;
-    const defaultBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(
-          cornerRadius,
-        ),
-        topRight: Radius.circular(
-          cornerRadius,
-        ),
-        bottomRight: Radius.circular(
-          cornerRadius,
-        ),
-        bottomLeft: Radius.circular(
-          cornerRadius,
-        ),
+    const borderRadius = BorderRadius.only(
+      topLeft: Radius.circular(
+        cornerRadius,
       ),
+      topRight: Radius.circular(
+        cornerRadius,
+      ),
+      bottomRight: Radius.circular(
+        cornerRadius,
+      ),
+      bottomLeft: Radius.circular(
+        cornerRadius,
+      ),
+    );
+    const defaultBorder = OutlineInputBorder(
+      borderRadius: borderRadius,
     );
 
     /// Must be called in the beginning.
@@ -57,6 +58,16 @@ class _MyAppState extends State<MyApp> {
           backgroundOpacity: .95,
         ),
         lightTheme: LiteFormsTheme(
+          destructiveColor: Colors.red,
+          filePickerDecoration: const BoxDecoration(
+            borderRadius: borderRadius,
+            border: Border.fromBorderSide(
+              BorderSide(
+                width: .2,
+              ),
+            ),
+          ),
+          
           inputDecoration: InputDecoration(
             filled: false,
             errorStyle: const TextStyle(
@@ -66,18 +77,19 @@ class _MyAppState extends State<MyApp> {
             border: defaultBorder,
             enabledBorder: defaultBorder.copyWith(
               borderSide: const BorderSide(
-                width: .1,
+                width: .2,
               ),
             ),
             focusedBorder: defaultBorder.copyWith(
               borderSide: const BorderSide(
-                width: .1,
+                width: .2,
                 color: Colors.blue,
               ),
             ),
           ),
         ),
         darkTheme: LiteFormsTheme(
+          destructiveColor: Colors.orangeAccent,
           inputDecoration: InputDecoration(
             filled: false,
             errorStyle: const TextStyle(
@@ -87,7 +99,7 @@ class _MyAppState extends State<MyApp> {
             border: defaultBorder,
             enabledBorder: defaultBorder.copyWith(
               borderSide: const BorderSide(
-                width: .1,
+                width: .2,
                 color: Colors.white,
               ),
             ),
@@ -95,6 +107,15 @@ class _MyAppState extends State<MyApp> {
               borderSide: const BorderSide(
                 width: .2,
                 color: Colors.white,
+              ),
+            ),
+          ),
+          filePickerDecoration: const BoxDecoration(
+            borderRadius: borderRadius,
+            border: Border.fromBorderSide(
+              BorderSide(
+                width: .1,
+                color: Colors.blue,
               ),
             ),
           ),

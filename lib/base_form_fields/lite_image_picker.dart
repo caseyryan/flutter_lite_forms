@@ -44,12 +44,25 @@ class _ImageInfo {
 }
 
 class XFileWrapper {
-  static Map<String, _ImageInfo> _infos = {};
+  static final Map<String, _ImageInfo> _infos = {};
+
+  /// Can be used to mark images in a multiselector
+  bool isSelected = false;
 
   XFileWrapper({
     required this.xFile,
   });
   final XFile xFile;
+
+  @override
+  bool operator ==(covariant XFileWrapper other) {
+    return other.name == name;
+  }
+
+  @override
+  int get hashCode {
+    return name.hashCode;
+  }
 
   String get name {
     return xFile.name;
@@ -70,7 +83,7 @@ class XFileWrapper {
     return width * height;
   }
 
-  Future _calculateSize() async {
+  Future _updateInfo() async {
     if (_infos.containsKey(name)) {
       return;
     }
@@ -236,15 +249,29 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
     return _supportedSources!;
   }
 
-  List<LiteDropSelectorItem<ImageSource>> _getSourceItems() {
-    return _getSources()
-        .map(
-          (e) => LiteDropSelectorItem(
-            title: group.translationBuilder(e.toName()) ?? e.toName(),
-            payload: e,
-          ),
-        )
-        .toList();
+  List<LiteDropSelectorItem<Object>> _getItems() {
+    final List<LiteDropSelectorItem<Object>> items = _getSources().map(
+      (e) {
+        return LiteDropSelectorItem<Object>(
+          title: group.translationBuilder(e.toName()) ?? e.toName(),
+          payload: e,
+        );
+      },
+    ).toList();
+    if (_selectedFiles.isNotEmpty) {
+      String itemName = 'Clear';
+      if (_hasSelection) {
+        itemName = 'Clear Selected';
+      }
+      items.add(
+        LiteDropSelectorItem<Object>(
+          title: group.translationBuilder(itemName) ?? itemName,
+          payload: 'clear',
+          isDestructive: true,
+        ),
+      );
+    }
+    return items;
   }
 
   List<XFileWrapper> get _selectedFiles {
@@ -256,42 +283,107 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
   }
 
   Future _onImageTap(XFileWrapper value) async {
-    print('Open Gallery ${value.name}');
+    if (_selectedFiles.length < 2) {
+      return;
+    }
+    value.isSelected = !value.isSelected;
+    liteFormRebuildController.rebuild();
+    // print('Open Gallery ${value.name}');
   }
 
   void _clear() {
+    if (_hasSelection) {
+      final unselected = _selectedFiles.where((e) => !e.isSelected).toList();
+      liteFormController.onValueChanged(
+        formName: formName,
+        fieldName: widget.name,
+        value: unselected,
+        view: null,
+      );
+    } else {
+      liteFormController.onValueChanged(
+        formName: formName,
+        fieldName: widget.name,
+        value: <XFileWrapper>[],
+        view: null,
+      );
+    }
+  }
 
+  bool get _hasSelection {
+    return _selectedFiles.any((s) => s.isSelected);
+  }
+
+  Widget _buildCheckBox(bool isSelected) {
+    return Align(
+      alignment: Alignment.topRight,
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: AnimatedOpacity(
+          duration: const Duration(
+            milliseconds: 200,
+          ),
+          curve: Curves.easeOutExpo,
+          opacity: _hasSelection ? 1.0 : 0.0,
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              !isSelected ? Icons.circle_outlined : Icons.check_circle,
+              color: Theme.of(context).indicatorColor,
+              size: 20.0,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildView() {
-    return LiteState<LiteFormRebuildController>(
-      builder: (BuildContext c, LiteFormRebuildController controller) {
-        final files = _selectedFiles;
-        if (files.isNotEmpty) {
-          return Padding(
-            padding: EdgeInsets.all(
-              files.length == 1 ? 0.0 : widget.imageSpacing * .5,
-            ),
-            child: TreeMapLayout(
-              tile: Binary(),
-              round: true,
-              duration: const Duration(milliseconds: 80),
-              children: _selectedFiles.map(
-                (e) {
-                  return TreeNode.leaf(
-                    value: e._leafWeight,
-                    builder: (context) {
-                      return GestureDetector(
-                        onLongPress: () {
-                          _onImageTap(e);
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.all(
-                            files.length == 1
-                                ? widget.imageSpacing
-                                : widget.imageSpacing * .5,
-                          ),
-                          child: Container(
+    final files = _selectedFiles;
+    if (widget.viewBuilder != null) {
+      return widget.viewBuilder!.call(
+        context,
+        files,
+      );
+    }
+
+    if (files.isNotEmpty) {
+      return Padding(
+        padding: EdgeInsets.all(
+          files.length == 1 ? 0.0 : widget.imageSpacing * .5,
+        ),
+        child: TreeMapLayout(
+          tile: Binary(),
+          round: true,
+          duration: const Duration(milliseconds: 80),
+          children: _selectedFiles.map(
+            (e) {
+              return TreeNode.leaf(
+                value: e._leafWeight,
+                builder: (context) {
+                  return GestureDetector(
+                    onTap: _hasSelection
+                        ? () {
+                            _onImageTap(e);
+                          }
+                        : null,
+                    onLongPress: _hasSelection
+                        ? null
+                        : () {
+                            _onImageTap(e);
+                          },
+                    child: Padding(
+                      padding: EdgeInsets.all(
+                        files.length == 1
+                            ? widget.imageSpacing
+                            : widget.imageSpacing * .5,
+                      ),
+                      child: Stack(
+                        children: [
+                          Container(
                             width: double.infinity,
                             height: double.infinity,
                             decoration: BoxDecoration(
@@ -303,26 +395,56 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                          _buildCheckBox(e.isSelected),
+                        ],
+                      ),
+                    ),
                   );
                 },
-              ).toList(),
-            ),
-          );
-        }
-        return Center(
-          child: Icon(
-            Icons.camera_alt,
-          ),
-        );
-      },
+              );
+            },
+          ).toList(),
+        ),
+      );
+    }
+    return const Center(
+      child: Icon(
+        Icons.camera_alt,
+      ),
     );
   }
 
   BoxDecoration _buildDecoration() {
-    return widget.decoration ?? const BoxDecoration();
+    return widget.decoration ??
+        liteFormController.config?.filePickerDecoration ??
+        const BoxDecoration();
+  }
+
+  Widget _buildLoader({
+    required Widget child,
+  }) {
+    return child;
+  }
+
+  List<XFileWrapper> _mergeWrappers({
+    required List<XFileWrapper> firstList,
+    required List<XFileWrapper> secondList,
+  }) {
+    _deselectAll();
+    final tempList = <XFileWrapper>[...firstList];
+    for (var file in secondList) {
+      if (!tempList.contains(file)) {
+        tempList.add(file);
+      }
+    }
+
+    return tempList;
+  }
+
+  void _deselectAll() {
+    for (var file in _selectedFiles) {
+      file.isSelected = false;
+    }
   }
 
   @override
@@ -365,76 +487,93 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
       ),
       child: _tryWrapWithConstraints(
         child: _tryWrapWithAspectRatio(
-          child: LiteDropSelector(
-            dropSelectorType: widget.dropSelectorType,
-            dropSelectorActionType: LiteDropSelectorActionType.simpleWithNoSelection,
-            settings: LiteDropSelectorSettings(
-              buttonHeight: widget.menuButtonHeight,
-            ),
-            selectorViewBuilder: (context, selectedItems) {
-              return Container(
-                width: widget.width,
-                height: widget.height,
-                margin: widget.margin,
-                decoration: _buildDecoration(),
-                child: _buildView(),
-              );
-            },
-            onChanged: (value) async {
-              if (value is List && value.isNotEmpty) {
-                final source = value.first.payload;
-                if (source == ImageSource.camera) {
-                } else if (source == ImageSource.gallery) {
-                  if (widget.maxImages > 1) {
-                    final xFiles = await _picker.pickMultiImage(
-                      imageQuality: widget.imageQuality,
-                      maxHeight: widget.maxHeight,
-                      maxWidth: widget.maxHeight,
-                      requestFullMetadata: widget.requestFullMetadata,
-                    );
-                    final wrappers = xFiles
-                        .take(widget.maxImages)
-                        .map(
-                          (e) => XFileWrapper(xFile: e),
-                        )
-                        .toList();
-                    if (wrappers.isNotEmpty) {
-                      for (var w in wrappers) {
-                        await w._calculateSize();
+          child: LiteState<LiteFormRebuildController>(
+            builder: (BuildContext c, LiteFormRebuildController controller) {
+              return LiteDropSelector(
+                dropSelectorType: widget.dropSelectorType,
+                dropSelectorActionType: LiteDropSelectorActionType.simpleWithNoSelection,
+                settings: LiteDropSelectorSettings(
+                  buttonHeight: widget.menuButtonHeight,
+                ),
+                selectorViewBuilder: (context, selectedItems) {
+                  return Container(
+                    width: widget.width,
+                    height: widget.height,
+                    margin: widget.margin,
+                    decoration: _buildDecoration(),
+                    child: _buildLoader(
+                      child: _buildView(),
+                    ),
+                  );
+                },
+                onChanged: (value) async {
+                  if (value is List && value.isNotEmpty) {
+                    final payload = value.first.payload;
+                    if (payload is ImageSource) {
+                      if (payload == ImageSource.camera) {
+                      } else if (payload == ImageSource.gallery) {
+                        if (widget.maxImages > 1) {
+                          final xFiles = await _picker.pickMultiImage(
+                            imageQuality: widget.imageQuality,
+                            maxHeight: widget.maxHeight,
+                            maxWidth: widget.maxHeight,
+                            requestFullMetadata: widget.requestFullMetadata,
+                          );
+                          final wrappers = xFiles
+                              .take(widget.maxImages)
+                              .map(
+                                (e) => XFileWrapper(xFile: e),
+                              )
+                              .toList();
+                          if (wrappers.isNotEmpty) {
+                            for (var w in wrappers) {
+                              await w._updateInfo();
+                            }
+                            final result = _mergeWrappers(
+                              firstList: wrappers,
+                              secondList: _selectedFiles,
+                            );
+
+                            liteFormController.onValueChanged(
+                              formName: formName,
+                              fieldName: widget.name,
+                              value: result,
+                              view: null,
+                            );
+                          }
+                          liteFormRebuildController.rebuild();
+                        } else {
+                          final xFile = await _picker.pickImage(
+                            source: payload,
+                            imageQuality: widget.imageQuality,
+                            maxHeight: widget.maxHeight,
+                            maxWidth: widget.maxHeight,
+                            requestFullMetadata: widget.requestFullMetadata,
+                          );
+                          if (xFile != null) {
+                            final wrapper = XFileWrapper(xFile: xFile);
+                            await wrapper._updateInfo();
+                            liteFormController.onValueChanged(
+                              formName: formName,
+                              fieldName: widget.name,
+                              value: [wrapper],
+                              view: null,
+                            );
+                            liteFormRebuildController.rebuild();
+                          }
+                        }
                       }
-                      liteFormController.onValueChanged(
-                        formName: formName,
-                        fieldName: widget.name,
-                        value: wrappers,
-                        view: null,
-                      );
-                    }
-                    liteFormRebuildController.rebuild();
-                  } else {
-                    final xFile = await _picker.pickImage(
-                      source: source,
-                      imageQuality: widget.imageQuality,
-                      maxHeight: widget.maxHeight,
-                      maxWidth: widget.maxHeight,
-                      requestFullMetadata: widget.requestFullMetadata,
-                    );
-                    if (xFile != null) {
-                      final wrapper = XFileWrapper(xFile: xFile);
-                      await wrapper._calculateSize();
-                      liteFormController.onValueChanged(
-                        formName: formName,
-                        fieldName: widget.name,
-                        value: [wrapper],
-                        view: null,
-                      );
-                      liteFormRebuildController.rebuild();
+                    } else if (payload is String) {
+                      if (payload == 'clear') {
+                        _clear();
+                      }
                     }
                   }
-                }
-              }
+                },
+                name: widget.name.toFormIgnoreName(),
+                items: _getItems(),
+              );
             },
-            name: widget.name.toFormIgnoreName(),
-            items: _getSourceItems(),
           ),
         ),
       ),
