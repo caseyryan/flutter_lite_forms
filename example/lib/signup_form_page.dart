@@ -67,7 +67,7 @@ class SignupFormPage extends StatelessWidget {
                           aspectRatio: 6.0 / 4.0,
                           imageSpacing: 3.0,
                           paddingTop: 20.0,
-                          maxImages: 4,
+                          maxFiles: 4,
                           paddingRight: 10.0,
                           serializer: LiteSerializers.filesToMapList,
                           constraints: BoxConstraints(

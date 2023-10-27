@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -137,7 +138,7 @@ class LiteImagePicker extends StatefulWidget {
     required this.name,
     super.key,
     this.autovalidateMode,
-    this.maxImages = 1,
+    this.maxFiles = 1,
     this.viewBuilder,
     this.initialValueDeserializer,
     this.initialValue,
@@ -195,8 +196,8 @@ class LiteImagePicker extends StatefulWidget {
   /// [imageSpacing] the space between images in a multiselector
   final double imageSpacing;
 
-  /// [maxImages] the maximum number of image a user can attach
-  final int maxImages;
+  /// [maxFiles] the maximum number of image a user can attach
+  final int maxFiles;
 
   /// [viewBuilder] builds a completely custom view for the image picker
   final ViewBuilder? viewBuilder;
@@ -436,10 +437,13 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
         ),
       );
     }
-    return const Center(
-      child: Icon(
-        Icons.camera_alt,
-      ),
+    return Center(
+      child: _isAttaching
+          ? null
+          : Icon(
+              Icons.camera_alt,
+              color: Theme.of(context).iconTheme.color,
+            ),
     );
   }
 
@@ -449,10 +453,29 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
         const BoxDecoration();
   }
 
+  bool get _isAttaching {
+    return liteFormRebuildController.getIsLoading(
+      _loaderKey,
+    );
+  }
+
   Widget _buildLoader({
     required Widget child,
   }) {
-    return child;
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        AnimatedOpacity(
+          duration: kThemeAnimationDuration,
+          opacity: _isAttaching ? .5 : 1.0,
+          child: child,
+        ),
+        if (_isAttaching)
+          const CupertinoActivityIndicator(
+            animating: true,
+          ),
+      ],
+    );
   }
 
   List<XFileWrapper> _mergeWrappers({
@@ -474,6 +497,10 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
     for (var file in _selectedFiles) {
       file.isSelected = false;
     }
+  }
+
+  String get _loaderKey {
+    return 'loadingFile${widget.name}${group.name}';
   }
 
   @override
@@ -541,14 +568,18 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                     if (payload is ImageSource) {
                       if (payload == ImageSource.camera) {
                       } else if (payload == ImageSource.gallery) {
-                        if (widget.maxImages > 1) {
+                        if (widget.maxFiles > 1) {
                           final xFiles = await _picker.pickMultiImage(
                             imageQuality: widget.imageQuality,
                             maxHeight: widget.maxHeight,
                             maxWidth: widget.maxHeight,
                             requestFullMetadata: widget.requestFullMetadata,
                           );
-                          final wrappers = xFiles.take(widget.maxImages).map(
+                          liteFormRebuildController.setIsLoading(
+                            _loaderKey,
+                            true,
+                          );
+                          final wrappers = xFiles.take(widget.maxFiles).map(
                             (e) {
                               return XFileWrapper(xFile: e);
                             },
@@ -569,7 +600,10 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                               view: null,
                             );
                           }
-                          liteFormRebuildController.rebuild();
+                          liteFormRebuildController.setIsLoading(
+                            _loaderKey,
+                            false,
+                          );
                         } else {
                           final xFile = await _picker.pickImage(
                             source: payload,
@@ -579,6 +613,10 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                             requestFullMetadata: widget.requestFullMetadata,
                           );
                           if (xFile != null) {
+                            liteFormRebuildController.setIsLoading(
+                              _loaderKey,
+                              true,
+                            );
                             final wrapper = XFileWrapper(xFile: xFile);
                             await wrapper._updateInfo();
                             liteFormController.onValueChanged(
@@ -587,7 +625,10 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                               value: [wrapper],
                               view: null,
                             );
-                            liteFormRebuildController.rebuild();
+                            liteFormRebuildController.setIsLoading(
+                              _loaderKey,
+                              false,
+                            );
                           }
                         }
                       }
