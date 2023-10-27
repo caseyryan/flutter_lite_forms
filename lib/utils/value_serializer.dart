@@ -33,11 +33,9 @@ class LiteSerializers {
   
   static FutureOr<Object?> filesToMapList(Object? value) async {
     if (value is XFileWrapper) {
-      final bytes = await value.xFile.readAsBytes();
-      return {
-        'name': value.name,
-        'bytes': bytes,
-      };
+      
+      return await value.toMap();
+      
     } else if (value is List) {
       final tempList = <Map>[];
       for (var file in value) {

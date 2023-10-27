@@ -9,6 +9,7 @@ import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
 import 'package:lite_state/lite_state.dart';
+import 'package:mime/mime.dart';
 
 import 'mixins/form_field_mixin.dart';
 import 'treemap/src/tiles/binary.dart';
@@ -102,6 +103,32 @@ class XFileWrapper {
       byteSize: asUiImage.sizeBytes,
     );
     _infos[name] = info;
+  }
+
+  Future<String> getMimeType() async {
+    return lookupMimeType(
+          name,
+          headerBytes: await bytes,
+        ) ??
+        '';
+  }
+
+  List<int>? _bytes;
+
+  Future<List<int>?> get bytes async {
+    if (_bytes != null) {
+      return _bytes!;
+    }
+    _bytes = await xFile.readAsBytes();
+    return _bytes;
+  }
+
+  Future<Map> toMap() async {
+    return {
+      'name': name,
+      'bytes': await bytes,
+      'mimeType': await getMimeType(),
+    };
   }
 }
 
@@ -288,7 +315,6 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
     }
     value.isSelected = !value.isSelected;
     liteFormRebuildController.rebuild();
-    // print('Open Gallery ${value.name}');
   }
 
   void _clear() {
@@ -353,7 +379,7 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
     if (files.isNotEmpty) {
       return Padding(
         padding: EdgeInsets.all(
-          files.length == 1 ? 0.0 : widget.imageSpacing * .5,
+          files.length == 1 ? widget.imageSpacing : widget.imageSpacing * .5,
         ),
         child: TreeMapLayout(
           tile: Binary(),
@@ -387,6 +413,9 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                             width: double.infinity,
                             height: double.infinity,
                             decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                3.0,
+                              ),
                               image: DecorationImage(
                                 fit: BoxFit.cover,
                                 image: FileImage(
@@ -519,12 +548,11 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                             maxWidth: widget.maxHeight,
                             requestFullMetadata: widget.requestFullMetadata,
                           );
-                          final wrappers = xFiles
-                              .take(widget.maxImages)
-                              .map(
-                                (e) => XFileWrapper(xFile: e),
-                              )
-                              .toList();
+                          final wrappers = xFiles.take(widget.maxImages).map(
+                            (e) {
+                              return XFileWrapper(xFile: e);
+                            },
+                          ).toList();
                           if (wrappers.isNotEmpty) {
                             for (var w in wrappers) {
                               await w._updateInfo();
