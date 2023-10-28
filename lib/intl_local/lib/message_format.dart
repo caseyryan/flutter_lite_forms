@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+// ignore_for_file: unnecessary_type_check
+
 // `MessageFormat` is a "locale aware printf", with plural / gender support.
 ///
 /// `MessageFormat` prepares strings for display to users, with optional
@@ -11,6 +13,7 @@
 library message_format;
 
 import 'dart:collection';
+
 import 'intl.dart';
 
 /// **MessageFormat grammar:**

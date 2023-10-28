@@ -49,7 +49,7 @@ class SignupFormPage extends StatelessWidget {
                     ),
                     Row(
                       children: [
-                        LiteImagePicker(
+                        LiteFilePicker(
                           key: Key('image'),
                           name: 'image',
                           aspectRatio: 4.0 / 3.0,
@@ -61,7 +61,7 @@ class SignupFormPage extends StatelessWidget {
                             maxHeight: 100.0,
                           ),
                         ),
-                        LiteImagePicker(
+                        LiteFilePicker(
                           key: Key('image2'),
                           name: 'image2',
                           aspectRatio: 6.0 / 4.0,

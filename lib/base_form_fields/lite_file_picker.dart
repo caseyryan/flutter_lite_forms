@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:lite_forms/base_form_fields/treemap/src/treenode.dart';
+import 'package:lite_forms/constants.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
@@ -16,125 +16,10 @@ import 'mixins/form_field_mixin.dart';
 import 'treemap/src/tiles/binary.dart';
 import 'treemap/src/treemap_layout.dart';
 
-typedef ViewBuilder = Widget Function(
-  BuildContext context,
-  List<XFileWrapper> files,
-);
+part '_lite_file_picker_support.dart';
 
-extension _ImageSourceExtension on ImageSource {
-  String toName() {
-    if (this == ImageSource.camera) {
-      return 'Take a Picture';
-    } else if (this == ImageSource.gallery) {
-      return 'Pick from Gallery';
-    }
-    return '';
-  }
-}
-
-class _ImageInfo {
-  final String name;
-  final int width;
-  final int height;
-  final int byteSize;
-  _ImageInfo({
-    required this.name,
-    required this.width,
-    required this.height,
-    required this.byteSize,
-  });
-}
-
-class XFileWrapper {
-  static final Map<String, _ImageInfo> _infos = {};
-
-  /// Can be used to mark images in a multiselector
-  bool isSelected = false;
-
-  XFileWrapper({
-    required this.xFile,
-  });
-  final XFile xFile;
-
-  @override
-  bool operator ==(covariant XFileWrapper other) {
-    return other.name == name;
-  }
-
-  @override
-  int get hashCode {
-    return name.hashCode;
-  }
-
-  String get name {
-    return xFile.name;
-  }
-
-  int get width {
-    return _infos[name]?.width ?? 0;
-  }
-
-  int get height {
-    return _infos[name]?.height ?? 0;
-  }
-
-  int get _leafWeight {
-    if (height == 0 || width == 0) {
-      return 1;
-    }
-    return width * height;
-  }
-
-  Future _updateInfo() async {
-    if (_infos.containsKey(name)) {
-      return;
-    }
-    Image? image;
-    if (kIsWeb) {
-      final bytes = await xFile.readAsBytes();
-      image = Image.memory(bytes);
-    } else {
-      image = Image.file(File(xFile.path));
-    }
-    final asUiImage = await image.toUiImage();
-    final info = _ImageInfo(
-      name: name,
-      width: asUiImage.image.width,
-      height: asUiImage.image.height,
-      byteSize: asUiImage.sizeBytes,
-    );
-    _infos[name] = info;
-  }
-
-  Future<String> getMimeType() async {
-    return lookupMimeType(
-          name,
-          headerBytes: await bytes,
-        ) ??
-        '';
-  }
-
-  List<int>? _bytes;
-
-  Future<List<int>?> get bytes async {
-    if (_bytes != null) {
-      return _bytes!;
-    }
-    _bytes = await xFile.readAsBytes();
-    return _bytes;
-  }
-
-  Future<Map> toMap() async {
-    return {
-      'name': name,
-      'bytes': await bytes,
-      'mimeType': await getMimeType(),
-    };
-  }
-}
-
-class LiteImagePicker extends StatefulWidget {
-  const LiteImagePicker({
+class LiteFilePicker extends StatefulWidget {
+  const LiteFilePicker({
     required this.name,
     super.key,
     this.autovalidateMode,
@@ -165,19 +50,40 @@ class LiteImagePicker extends StatefulWidget {
     this.menuButtonHeight = 54.0,
     this.requestFullMetadata = false,
     this.sources = const [
-      ImageSource.camera,
-      ImageSource.gallery,
+      FileSource.camera,
+      FileSource.gallery,
+      FileSource.fileExplorer,
     ],
+    this.allowedExtensions,
+    // this.allowedExtensions = const [
+    //   'jpg',
+    //   'jpeg',
+    //   'pdf',
+    //   'doc',
+    //   'bmp',
+    //   'png',
+    //   'gif',
+    //   'mp4',
+    //   'mov',
+    //   'avi',
+    //   'webp',
+    //   'tif',
+    // ],
   }) : assert(sources.length > 0);
 
   final String name;
   final double menuButtonHeight;
 
+  /// [allowedExtensions] files extensions accepted by file picker
+  /// this will make sense only if you add
+  /// [FileSource.fileExplorer] to [sources]
+  final List<String>? allowedExtensions;
+
   /// [preferredCameraDevice] makes sense if you pass
   /// [ImageSource.camera] in the list
   /// of [sources] and the camera is supported by your device
   final CameraDevice preferredCameraDevice;
-  final List<ImageSource> sources;
+  final List<FileSource> sources;
   final LiteDropSelectorViewType dropSelectorType;
   final double paddingTop;
   final BoxConstraints? constraints;
@@ -193,7 +99,7 @@ class LiteImagePicker extends StatefulWidget {
   final double height;
   final EdgeInsets? margin;
 
-  /// [imageSpacing] the space between images in a multiselector
+  /// [imageSpacing] the gap size between images in a multiselector
   final double imageSpacing;
 
   /// [maxFiles] the maximum number of image a user can attach
@@ -227,10 +133,10 @@ class LiteImagePicker extends StatefulWidget {
   final List<LiteFormFieldValidator<Object?>>? validators;
 
   @override
-  State<LiteImagePicker> createState() => _LiteImagePickerState();
+  State<LiteFilePicker> createState() => _LiteFilePickerState();
 }
 
-class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
+class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
   final ImagePicker _picker = ImagePicker();
 
   Widget _tryWrapWithAspectRatio({
@@ -263,14 +169,18 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
     return child;
   }
 
-  List<ImageSource>? _supportedSources;
-  List<ImageSource> _getSources() {
+  List<FileSource>? _supportedSources;
+  List<FileSource> _getSources() {
     if (_supportedSources != null) {
       return _supportedSources!;
     }
-    _supportedSources = <ImageSource>[];
+    _supportedSources = <FileSource>[];
     for (var s in widget.sources) {
-      if (_picker.supportsImageSource(s)) {
+      if (s == FileSource.camera) {
+        if (_picker.supportsImageSource(ImageSource.camera)) {
+          _supportedSources!.add(s);
+        }
+      } else {
         _supportedSources!.add(s);
       }
     }
@@ -302,15 +212,15 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
     return items;
   }
 
-  List<XFileWrapper> get _selectedFiles {
-    final value = getFormFieldValue<List<XFileWrapper>>(
+  List<LitePickerFile> get _selectedFiles {
+    final value = getFormFieldValue<List<LitePickerFile>>(
       formName: formName,
       fieldName: widget.name,
     );
-    return value ?? <XFileWrapper>[];
+    return value ?? <LitePickerFile>[];
   }
 
-  Future _onImageTap(XFileWrapper value) async {
+  Future _onImageTap(LitePickerFile value) async {
     if (_selectedFiles.length < 2) {
       return;
     }
@@ -331,7 +241,7 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
       liteFormController.onValueChanged(
         formName: formName,
         fieldName: widget.name,
-        value: <XFileWrapper>[],
+        value: <LitePickerFile>[],
         view: null,
       );
     }
@@ -417,12 +327,12 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                               borderRadius: BorderRadius.circular(
                                 3.0,
                               ),
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: FileImage(
-                                  File(e.xFile.path),
-                                ),
-                              ),
+                              image: e._imageProvider != null
+                                  ? DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: e._imageProvider!,
+                                    )
+                                  : null,
                             ),
                           ),
                           _buildCheckBox(e.isSelected),
@@ -478,12 +388,12 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
     );
   }
 
-  List<XFileWrapper> _mergeWrappers({
-    required List<XFileWrapper> firstList,
-    required List<XFileWrapper> secondList,
+  List<LitePickerFile> _mergeWrappers({
+    required List<LitePickerFile> firstList,
+    required List<LitePickerFile> secondList,
   }) {
     _deselectAll();
-    final tempList = <XFileWrapper>[...firstList];
+    final tempList = <LitePickerFile>[...firstList];
     for (var file in secondList) {
       if (!tempList.contains(file)) {
         tempList.add(file);
@@ -501,6 +411,46 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
 
   String get _loaderKey {
     return 'loadingFile${widget.name}${group.name}';
+  }
+
+  Future _processFilePickResult(
+    FilePickerResult? result,
+    bool isMultiple,
+  ) async {
+    final temp = <LitePickerFile>[];
+    if (result == null) {
+      return;
+    }
+    liteFormRebuildController.setIsLoading(
+      _loaderKey,
+      true,
+    );
+    final files = result.files;
+    List<LitePickerFile> tempValue = [];
+    for (PlatformFile file in files) {
+      final wrapper = LitePickerFile(
+        platformFile: file,
+      );
+      await wrapper._updateFileInfo();
+      tempValue.add(wrapper);
+    }
+    List<LitePickerFile> newValue = _mergeWrappers(
+      firstList: tempValue,
+      secondList: _selectedFiles,
+    );
+    if (newValue.isNotEmpty) {
+      liteFormController.onValueChanged(
+        formName: formName,
+        fieldName: widget.name,
+        value: newValue,
+        view: null,
+      );
+    }
+    liteFormRebuildController.setIsLoading(
+      _loaderKey,
+      false,
+    );
+    return temp;
   }
 
   @override
@@ -565,10 +515,9 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                 onChanged: (value) async {
                   if (value is List && value.isNotEmpty) {
                     final payload = value.first.payload;
-                    if (payload is ImageSource) {
-                      if (payload == ImageSource.camera) {
-                      } else if (payload == ImageSource.gallery) {
-                        if (widget.maxFiles > 1) {
+                    if (payload is FileSource) {
+                      if (widget.maxFiles > 1) {
+                        if (payload.isSupportedByImagePicker) {
                           final xFiles = await _picker.pickMultiImage(
                             imageQuality: widget.imageQuality,
                             maxHeight: widget.maxHeight,
@@ -581,12 +530,12 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                           );
                           final wrappers = xFiles.take(widget.maxFiles).map(
                             (e) {
-                              return XFileWrapper(xFile: e);
+                              return LitePickerFile(xFile: e);
                             },
                           ).toList();
                           if (wrappers.isNotEmpty) {
                             for (var w in wrappers) {
-                              await w._updateInfo();
+                              await w._updateImageInfo();
                             }
                             final result = _mergeWrappers(
                               firstList: wrappers,
@@ -605,8 +554,19 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                             false,
                           );
                         } else {
+                          final result = await FilePicker.platform.pickFiles(
+                            allowMultiple: true,
+                            allowedExtensions: widget.allowedExtensions,
+                          );
+                          _processFilePickResult(
+                            result,
+                            true,
+                          );
+                        }
+                      } else {
+                        if (payload.isSupportedByImagePicker) {
                           final xFile = await _picker.pickImage(
-                            source: payload,
+                            source: payload.toImageSource()!,
                             imageQuality: widget.imageQuality,
                             maxHeight: widget.maxHeight,
                             maxWidth: widget.maxHeight,
@@ -617,12 +577,25 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                               _loaderKey,
                               true,
                             );
-                            final wrapper = XFileWrapper(xFile: xFile);
-                            await wrapper._updateInfo();
+                            final wrapper = LitePickerFile(xFile: xFile);
+                            await wrapper._updateImageInfo();
+                            List<LitePickerFile>? newValue;
+
+                            /// this condition may meet only for a camera
+                            if (widget.maxFiles > 1) {
+                              newValue = _selectedFiles
+                                  .take(
+                                    widget.maxFiles - 1,
+                                  )
+                                  .toList();
+                              newValue.add(wrapper);
+                            } else {
+                              newValue = [wrapper];
+                            }
                             liteFormController.onValueChanged(
                               formName: formName,
                               fieldName: widget.name,
-                              value: [wrapper],
+                              value: newValue,
                               view: null,
                             );
                             liteFormRebuildController.setIsLoading(
@@ -630,6 +603,16 @@ class _LiteImagePickerState extends State<LiteImagePicker> with FormFieldMixin {
                               false,
                             );
                           }
+                        } else {
+                          // print('Pick Single File');
+                          final result = await FilePicker.platform.pickFiles(
+                            allowMultiple: false,
+                            allowedExtensions: widget.allowedExtensions,
+                          );
+                          _processFilePickResult(
+                            result,
+                            false,
+                          );
                         }
                       }
                     } else if (payload is String) {

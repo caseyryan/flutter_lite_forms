@@ -4,8 +4,21 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Explain why your app uses music</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This is used to allow users to attach images</string>
+	<key>UISupportsDocumentBrowser</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Explain why your app uses photo library</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This is used to allow users to take pictures if they need to attach anything</string>
 	<key>NSMicrophoneUsageDescription</key>

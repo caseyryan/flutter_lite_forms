@@ -21,6 +21,7 @@ dependencies:
   clock: ^1.1.1
   image_picker: ^1.0.4
   image_picker_for_web: ^3.0.1
+  file_picker: ^5.3.1
   mime: ^1.0.4
 
 dev_dependencies:
@@ -34,6 +35,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/icons/
 
   # To add assets to your package, add an assets section, like this:
   # assets:
