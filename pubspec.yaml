@@ -23,6 +23,7 @@ dependencies:
   image_picker_for_web: ^3.0.1
   file_picker: ^5.3.1
   mime: ^1.0.4
+  video_compress: ^3.1.2
 
 dev_dependencies:
   flutter_test:

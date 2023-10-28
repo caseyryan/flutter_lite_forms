@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lite_forms/base_form_fields/treemap/src/treenode.dart';
 import 'package:lite_forms/constants.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
@@ -11,6 +12,7 @@ import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
 import 'package:lite_state/lite_state.dart';
 import 'package:mime/mime.dart';
+import 'package:video_compress/video_compress.dart';
 
 import 'mixins/form_field_mixin.dart';
 import 'treemap/src/tiles/binary.dart';
@@ -49,6 +51,7 @@ class LiteFilePicker extends StatefulWidget {
     this.imageSpacing = 1.0,
     this.menuButtonHeight = 54.0,
     this.requestFullMetadata = false,
+    this.allowVideo = true,
     this.sources = const [
       FileSource.camera,
       FileSource.gallery,
@@ -83,6 +86,11 @@ class LiteFilePicker extends StatefulWidget {
   /// [ImageSource.camera] in the list
   /// of [sources] and the camera is supported by your device
   final CameraDevice preferredCameraDevice;
+
+  /// [allowVideo] if true and [sources] contains [FileSource.camera] or
+  /// [FileSource.gallery] this will also allow an ImagePicker to
+  /// select videos
+  final bool allowVideo;
   final List<FileSource> sources;
   final LiteDropSelectorViewType dropSelectorType;
   final double paddingTop;
@@ -348,13 +356,31 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
       );
     }
     return Center(
-      child: _isAttaching
-          ? null
-          : Icon(
-              Icons.camera_alt,
-              color: Theme.of(context).iconTheme.color,
-            ),
+      child: _buildIcon(),
     );
+  }
+
+  Widget? _buildIcon() {
+    if (_isAttaching) {
+      return null;
+    }
+    IconData iconData = Icons.camera_alt;
+    return Icon(
+      iconData,
+      color: Theme.of(context).iconTheme.color,
+    );
+  }
+
+  bool get _isAllFiles {
+    return widget.sources.contains(FileSource.camera) &&
+        widget.sources.contains(FileSource.gallery) &&
+        widget.sources.contains(FileSource.fileExplorer);
+  }
+
+  bool get _isMultimedia {
+    return widget.sources.contains(FileSource.camera) &&
+        widget.sources.contains(FileSource.gallery) &&
+        widget.sources.contains(FileSource.fileExplorer);
   }
 
   BoxDecoration _buildDecoration() {
@@ -518,12 +544,22 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
                     if (payload is FileSource) {
                       if (widget.maxFiles > 1) {
                         if (payload.isSupportedByImagePicker) {
-                          final xFiles = await _picker.pickMultiImage(
-                            imageQuality: widget.imageQuality,
-                            maxHeight: widget.maxHeight,
-                            maxWidth: widget.maxHeight,
-                            requestFullMetadata: widget.requestFullMetadata,
-                          );
+                          List<XFile> xFiles;
+                          if (widget.allowVideo) {
+                            xFiles = await _picker.pickMultipleMedia(
+                              imageQuality: widget.imageQuality,
+                              maxHeight: widget.maxHeight,
+                              maxWidth: widget.maxHeight,
+                              requestFullMetadata: widget.requestFullMetadata,
+                            );
+                          } else {
+                            xFiles = await _picker.pickMultiImage(
+                              imageQuality: widget.imageQuality,
+                              maxHeight: widget.maxHeight,
+                              maxWidth: widget.maxHeight,
+                              requestFullMetadata: widget.requestFullMetadata,
+                            );
+                          }
                           liteFormRebuildController.setIsLoading(
                             _loaderKey,
                             true,
@@ -535,7 +571,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
                           ).toList();
                           if (wrappers.isNotEmpty) {
                             for (var w in wrappers) {
-                              await w._updateImageInfo();
+                              await w._updateMediaInfo();
                             }
                             final result = _mergeWrappers(
                               firstList: wrappers,
@@ -565,20 +601,31 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
                         }
                       } else {
                         if (payload.isSupportedByImagePicker) {
-                          final xFile = await _picker.pickImage(
-                            source: payload.toImageSource()!,
-                            imageQuality: widget.imageQuality,
-                            maxHeight: widget.maxHeight,
-                            maxWidth: widget.maxHeight,
-                            requestFullMetadata: widget.requestFullMetadata,
-                          );
+                          XFile? xFile;
+                          if (widget.allowVideo) {
+                            xFile = await _picker.pickMedia(
+                              // source: payload.toImageSource()!,
+                              imageQuality: widget.imageQuality,
+                              maxHeight: widget.maxHeight,
+                              maxWidth: widget.maxHeight,
+                              requestFullMetadata: widget.requestFullMetadata,
+                            );
+                          } else {
+                            xFile = await _picker.pickImage(
+                              source: payload.toImageSource()!,
+                              imageQuality: widget.imageQuality,
+                              maxHeight: widget.maxHeight,
+                              maxWidth: widget.maxHeight,
+                              requestFullMetadata: widget.requestFullMetadata,
+                            );
+                          }
                           if (xFile != null) {
                             liteFormRebuildController.setIsLoading(
                               _loaderKey,
                               true,
                             );
                             final wrapper = LitePickerFile(xFile: xFile);
-                            await wrapper._updateImageInfo();
+                            await wrapper._updateMediaInfo();
                             List<LitePickerFile>? newValue;
 
                             /// this condition may meet only for a camera

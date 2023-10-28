@@ -5,6 +5,7 @@ import com.mr.flutter.plugin.filepicker.FilePickerPlugin;
 import io.flutter.plugins.flutter_plugin_android_lifecycle.FlutterAndroidLifecyclePlugin;
 import io.flutter.plugins.imagepicker.ImagePickerPlugin;
 import io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin;
+import com.example.video_compress.VideoCompressPlugin;
 
 /**
  * Generated file. Do not edit.
@@ -18,6 +19,7 @@ public final class GeneratedPluginRegistrant {
     FlutterAndroidLifecyclePlugin.registerWith(registry.registrarFor("io.flutter.plugins.flutter_plugin_android_lifecycle.FlutterAndroidLifecyclePlugin"));
     ImagePickerPlugin.registerWith(registry.registrarFor("io.flutter.plugins.imagepicker.ImagePickerPlugin"));
     SharedPreferencesPlugin.registerWith(registry.registrarFor("io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin"));
+    VideoCompressPlugin.registerWith(registry.registrarFor("com.example.video_compress.VideoCompressPlugin"));
   }
 
   private static boolean alreadyRegisteredWith(PluginRegistry registry) {

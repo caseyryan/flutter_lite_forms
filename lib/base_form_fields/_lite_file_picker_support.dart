@@ -8,11 +8,11 @@ typedef ViewBuilder = Widget Function(
 extension _ImageSourceExtension on FileSource {
   String toName() {
     if (this == FileSource.camera) {
-      return 'Take a Picture';
+      return 'Capture on Camera';
     } else if (this == FileSource.gallery) {
       return 'Pick from Gallery';
     } else if (this == FileSource.fileExplorer) {
-      return 'Pick as a File';
+      return 'Pick from File Explorer';
     }
     return '';
   }
@@ -66,7 +66,7 @@ class LitePickerFile {
 
   ImageProvider? _imageProvider;
 
-  bool get isImage {
+  bool get hasImageProvider {
     return _imageProvider != null;
   }
 
@@ -91,7 +91,7 @@ class LitePickerFile {
     if (height == 0 || width == 0) {
       return 1;
     }
-    return (width * height).clamp(1000000, 1600000);
+    return (width / height * 1000).toInt();
   }
 
   Future _imageToImageInfo(Image? image) async {
@@ -106,6 +106,14 @@ class LitePickerFile {
       byteSize: asUiImage.sizeBytes,
     );
     _infos[name] = info;
+  }
+
+  bool get _isImage {
+    return _mimeType?.startsWith('image') == true;
+  }
+
+  bool get _isVideo {
+    return _mimeType?.startsWith('video') == true;
   }
 
   Future _updateFileInfo() async {
@@ -161,28 +169,51 @@ class LitePickerFile {
     }
   }
 
-  Future _updateImageInfo() async {
+  Future _updateMediaInfo() async {
     if (_infos.containsKey(name) && _imageProvider != null) {
       return;
     }
     if (xFile == null) {
       return;
     }
+    await getMimeType();
+
     Image? image;
+
     if (kIsWeb) {
-      Uint8List? bytes;
-      if (xFile != null) {
-        bytes = await xFile?.readAsBytes();
-        _bytes = bytes;
+      // if (bytes != null) {
+      if (_isImage) {
+        image = Image.memory(_bytes!);
+        _imageProvider = MemoryImage(_bytes!);
+      } else if (_isVideo) {
+        final imageByteData = await rootBundle.load(
+          'packages/$kPackageName/assets/icons/video_icon.png',
+        );
+        final imageBytes = imageByteData.buffer.asUint8List();
+        image = Image.memory(imageBytes);
+        _imageProvider = MemoryImage(
+          imageBytes,
+        );
       }
-      if (bytes != null) {
-        image = Image.memory(bytes);
-        _imageProvider = MemoryImage(bytes);
-      }
+      // }
     } else {
-      final file = File(xFile!.path);
-      image = Image.file(file);
-      _imageProvider = FileImage(file);
+      // final file = File(xFile!.path);
+      if (_isImage) {
+        image = Image.memory(_bytes!);
+        _imageProvider = MemoryImage(
+          _bytes!,
+        );
+      } else if (_isVideo) {
+        final thumbBytes = await VideoCompress.getByteThumbnail(
+          xFile!.path,
+          quality: 50,
+          position: -1,
+        );
+        image = Image.memory(thumbBytes!);
+        _imageProvider = MemoryImage(
+          thumbBytes,
+        );
+      }
     }
     await _imageToImageInfo(image);
   }
@@ -221,8 +252,8 @@ class LitePickerFile {
   Future<Map> toMap() async {
     return {
       'name': name,
-      'bytes': await bytes,
       'mimeType': await getMimeType(),
+      'bytes': await bytes,
     };
   }
 }
