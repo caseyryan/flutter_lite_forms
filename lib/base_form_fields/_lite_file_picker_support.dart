@@ -91,7 +91,7 @@ class LitePickerFile {
     if (height == 0 || width == 0) {
       return 1;
     }
-    return  (width * height).clamp(1000000, 1600000);
+    return (width * height).clamp(1000000, 1600000);
   }
 
   Future _imageToImageInfo(Image? image) async {
@@ -109,7 +109,7 @@ class LitePickerFile {
   }
 
   Future _updateFileInfo() async {
-    if (_infos.containsKey(name)) {
+    if (_infos.containsKey(name) && _imageProvider != null) {
       return;
     }
     if (platformFile != null) {
@@ -142,6 +142,11 @@ class LitePickerFile {
           final image = Image.memory(_bytes!);
           isImage = true;
           await _imageToImageInfo(image);
+        } else {
+          _imageProvider = const AssetImage(
+            'assets/icons/unknown_icon.png',
+            package: kPackageName,
+          );
         }
         if (!isImage) {
           final info = _ImageInfo(
@@ -157,7 +162,7 @@ class LitePickerFile {
   }
 
   Future _updateImageInfo() async {
-    if (_infos.containsKey(name)) {
+    if (_infos.containsKey(name) && _imageProvider != null) {
       return;
     }
     if (xFile == null) {
