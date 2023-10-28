@@ -400,7 +400,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
       }
     }
 
-    return tempList;
+    return tempList.take(widget.maxFiles).toList();
   }
 
   void _deselectAll() {
@@ -595,7 +595,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
                             liteFormController.onValueChanged(
                               formName: formName,
                               fieldName: widget.name,
-                              value: newValue,
+                              value: newValue.take(widget.maxFiles).toList(),
                               view: null,
                             );
                             liteFormRebuildController.setIsLoading(
