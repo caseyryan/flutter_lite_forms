@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -49,6 +51,7 @@ class LiteSwitch extends StatefulWidget {
     this.switchPosition = LiteSwitchPosition.left,
     this.reactionArea = LiteSwitchReactionArea.full,
     this.onChanged,
+    this.label,
     this.onTapLink,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
@@ -121,6 +124,7 @@ class LiteSwitch extends StatefulWidget {
   final TextStyle? style;
   final ImageErrorListener? onInactiveThumbImageError;
   final String name;
+  final String? label;
   final double paddingTop;
   final double paddingBottom;
   final double paddingLeft;
@@ -187,7 +191,7 @@ class LiteSwitch extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueSerializer? initialValueDeserializer;
-  final List<LiteFormFieldValidator<Object?>>? validators;
+  final List<LiteValidator>? validators;
 
   /// even though the type here is specified as Object?
   /// it is assumed that the default value type is [bool]
@@ -207,7 +211,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
     super.initState();
   }
 
-  bool? _tryGetValue({
+  FutureOr<bool?> _tryGetValue({
     required String formName,
     required String fieldName,
   }) {
@@ -314,6 +318,12 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
     liteFormRebuildController.rebuild();
   }
 
+  TextStyle? get _textStyle {
+    return liteFormController.config?.defaultTextStyle ??
+        widget.style ??
+        Theme.of(context).textTheme.bodyMedium;
+  }
+
   Widget _buildChild() {
     Widget child = const SizedBox.shrink();
     if (widget.text != null) {
@@ -328,8 +338,10 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
                 }
               },
           styleSheet: widget.markdownStyleSheet ??
-              MarkdownStyleSheet(
-                p: liteFormController.config?.defaultTextStyle ?? widget.style,
+              MarkdownStyleSheet.fromTheme(
+                Theme.of(context),
+              ).copyWith(
+                p: _textStyle,
               ),
           softLineBreak: true,
           data: widget.text!,
@@ -354,8 +366,8 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
     );
     if (widget.reactionArea == LiteSwitchReactionArea.full) {
       child = GestureDetector(
-        onTap: () {
-          bool value = _tryGetValue(
+        onTap: () async {
+          bool value = await _tryGetValue(
                 fieldName: widget.name,
                 formName: group.name,
               ) ==
@@ -376,7 +388,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
       serializer: widget.serializer,
       initialValueDeserializer: widget.initialValueDeserializer,
       validators: widget.validators,
-      // initialValue: widget.initialValue,
+      label: widget.label,
       hintText: null,
       decoration: null,
       errorStyle: widget.errorStyle,
@@ -391,9 +403,10 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
       fieldName: group.name,
       setter: () async {
         bool? value = await _tryGetValue(
-          fieldName: widget.name,
-          formName: group.name,
-        );
+              fieldName: widget.name,
+              formName: group.name,
+            ) ==
+            true;
         liteFormController.onValueChanged(
           fieldName: widget.name,
           formName: group.name,

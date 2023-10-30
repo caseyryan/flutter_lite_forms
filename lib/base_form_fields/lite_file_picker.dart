@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lite_forms/base_form_fields/mixins/post_frame_mixin.dart';
 import 'package:lite_forms/base_form_fields/treemap/src/treenode.dart';
 import 'package:lite_forms/constants.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
@@ -14,6 +15,7 @@ import 'package:lite_state/lite_state.dart';
 import 'package:mime/mime.dart';
 import 'package:video_compress/video_compress.dart';
 
+import 'error_line.dart';
 import 'mixins/form_field_mixin.dart';
 import 'treemap/src/tiles/binary.dart';
 import 'treemap/src/treemap_layout.dart';
@@ -32,6 +34,7 @@ class LiteFilePicker extends StatefulWidget {
     this.serializer = nonConvertingValueConvertor,
     this.validators,
     this.hintText,
+    this.label,
     this.dropSelectorType = LiteDropSelectorViewType.adaptive,
     this.errorStyle,
     this.paddingTop = 0.0,
@@ -48,10 +51,15 @@ class LiteFilePicker extends StatefulWidget {
     this.margin,
     this.imageQuality,
     this.decoration,
+    this.menuItemBuilder,
+    this.smoothErrorPadding = const EdgeInsets.only(
+      top: 6.0,
+    ),
     this.imageSpacing = 1.0,
     this.menuButtonHeight = 54.0,
     this.requestFullMetadata = false,
     this.allowVideo = true,
+    this.allowImages = true,
     this.sources = const [
       FileSource.camera,
       FileSource.gallery,
@@ -87,10 +95,15 @@ class LiteFilePicker extends StatefulWidget {
   /// of [sources] and the camera is supported by your device
   final CameraDevice preferredCameraDevice;
 
-  /// [allowVideo] if true and [sources] contains [FileSource.camera] or
-  /// [FileSource.gallery] this will also allow an ImagePicker to
+  /// [allowVideo] if true and [sources] contains [FileSource.gallery]
   /// select videos
   final bool allowVideo;
+  final EdgeInsets? smoothErrorPadding;
+
+  /// [allowImages] if false, and [allowVideo] is true, it will allow
+  /// only videos to be attached from gallery
+  final bool allowImages;
+  final DropSelectorItemIconBuilder? menuItemBuilder;
   final List<FileSource> sources;
   final LiteDropSelectorViewType dropSelectorType;
   final double paddingTop;
@@ -100,6 +113,7 @@ class LiteFilePicker extends StatefulWidget {
   final double paddingRight;
   final Object? initialValue;
   final String? hintText;
+  final String? label;
   final AutovalidateMode? autovalidateMode;
   final TextStyle? errorStyle;
   final double? aspectRatio;
@@ -138,14 +152,17 @@ class LiteFilePicker extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueSerializer? initialValueDeserializer;
-  final List<LiteFormFieldValidator<Object?>>? validators;
+  final List<LiteValidator>? validators;
 
   @override
   State<LiteFilePicker> createState() => _LiteFilePickerState();
 }
 
-class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
+class _LiteFilePickerState extends State<LiteFilePicker>
+    with FormFieldMixin, PostFrameMixin {
   final ImagePicker _picker = ImagePicker();
+  final _sizeKey = GlobalKey<State<StatefulWidget>>();
+  double _widgetWidth = 0.0;
 
   Widget _tryWrapWithAspectRatio({
     required Widget child,
@@ -159,6 +176,13 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
     return child;
   }
 
+  @override
+  void didFirstLayoutFinished(BuildContext context) {
+    setState(() {
+      _widgetWidth = _sizeKey.currentContext?.size?.width ?? 0.0;
+    });
+  }
+
   Widget _tryWrapWithConstraints({
     required Widget child,
   }) {
@@ -168,7 +192,30 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
         children: [
           Container(
             constraints: widget.constraints,
-            child: child,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: SizedBox(
+                    key: _sizeKey,
+                    child: child,
+                  ),
+                ),
+                if (_widgetWidth > 0.0)
+                  SizedBox(
+                    width: _widgetWidth,
+                    child: LiteFormErrorLine(
+                      fieldName: widget.name,
+                      formName: group.name,
+                      errorStyle: decoration.errorStyle,
+                      paddingBottom: widget.smoothErrorPadding?.bottom,
+                      paddingTop: widget.smoothErrorPadding?.top,
+                      paddingLeft: widget.smoothErrorPadding?.left,
+                      paddingRight: widget.smoothErrorPadding?.right,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       );
@@ -179,9 +226,6 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
 
   List<FileSource>? _supportedSources;
   List<FileSource> _getSources() {
-    if (_supportedSources != null) {
-      return _supportedSources!;
-    }
     _supportedSources = <FileSource>[];
     for (var s in widget.sources) {
       if (s == FileSource.camera) {
@@ -200,6 +244,26 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
       (e) {
         return LiteDropSelectorItem<Object>(
           title: group.translationBuilder(e.toName()) ?? e.toName(),
+          iconBuilder: widget.menuItemBuilder ??
+              (context, item, isSelected) {
+                if (item.payload is FileSource) {
+                  if (item.payload == FileSource.camera) {
+                    return const Icon(
+                      Icons.camera_alt,
+                    );
+                  } else if (item.payload == FileSource.gallery) {
+                    return const Icon(
+                      Icons.image,
+                    );
+                  } else if (item.payload == FileSource.fileExplorer) {
+                    return const Icon(
+                      Icons.file_open,
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }
+                return const SizedBox.shrink();
+              },
           payload: e,
         );
       },
@@ -214,21 +278,30 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
           title: group.translationBuilder(itemName) ?? itemName,
           payload: 'clear',
           isDestructive: true,
+          iconBuilder: widget.menuItemBuilder ??
+              (context, item, isSelected) {
+                if (item.payload == 'clear') {
+                  return const Icon(
+                    Icons.cleaning_services,
+                  );
+                }
+                return const SizedBox.shrink();
+              },
         ),
       );
     }
     return items;
   }
 
-  List<LitePickerFile> get _selectedFiles {
-    final value = getFormFieldValue<List<LitePickerFile>>(
+  List<LiteFile> get _selectedFiles {
+    final value = getFormFieldValue<List<LiteFile>>(
       formName: formName,
       fieldName: widget.name,
     );
-    return value ?? <LitePickerFile>[];
+    return value ?? <LiteFile>[];
   }
 
-  Future _onImageTap(LitePickerFile value) async {
+  Future _onImageTap(LiteFile value) async {
     if (_selectedFiles.length < 2) {
       return;
     }
@@ -249,7 +322,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
       liteFormController.onValueChanged(
         formName: formName,
         fieldName: widget.name,
-        value: <LitePickerFile>[],
+        value: <LiteFile>[],
         view: null,
       );
     }
@@ -286,6 +359,21 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
     );
   }
 
+  Widget _buildFilmIcon(bool isVideo) {
+    if (isVideo) {
+      return Positioned(
+        bottom: 5.0,
+        right: 5.0,
+        child: Icon(
+          Icons.local_movies_sharp,
+          color: Theme.of(context).primaryIconTheme.color,
+          size: 18.0,
+        ),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
   Widget _buildView() {
     final files = _selectedFiles;
     if (widget.viewBuilder != null) {
@@ -309,42 +397,50 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
               return TreeNode.leaf(
                 value: e._leafWeight,
                 builder: (context) {
-                  return GestureDetector(
-                    onTap: _hasSelection
-                        ? () {
-                            _onImageTap(e);
-                          }
-                        : null,
-                    onLongPress: _hasSelection
-                        ? null
-                        : () {
-                            _onImageTap(e);
-                          },
-                    child: Padding(
-                      padding: EdgeInsets.all(
-                        files.length == 1
-                            ? widget.imageSpacing
-                            : widget.imageSpacing * .5,
-                      ),
-                      child: Stack(
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                3.0,
+                  return AnimatedPadding(
+                    duration: kThemeAnimationDuration,
+                    curve: Curves.easeInOutExpo,
+                    padding: EdgeInsets.all(
+                      e.isSelected ? 5.0 : 0.0,
+                    ),
+                    child: GestureDetector(
+                      onTap: _hasSelection
+                          ? () {
+                              _onImageTap(e);
+                            }
+                          : null,
+                      onLongPress: _hasSelection
+                          ? null
+                          : () {
+                              _onImageTap(e);
+                            },
+                      child: Padding(
+                        padding: EdgeInsets.all(
+                          files.length == 1
+                              ? widget.imageSpacing
+                              : widget.imageSpacing * .5,
+                        ),
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(
+                                  3.0,
+                                ),
+                                image: e._imageProvider != null
+                                    ? DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: e._imageProvider!,
+                                      )
+                                    : null,
                               ),
-                              image: e._imageProvider != null
-                                  ? DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: e._imageProvider!,
-                                    )
-                                  : null,
                             ),
-                          ),
-                          _buildCheckBox(e.isSelected),
-                        ],
+                            _buildCheckBox(e.isSelected),
+                            _buildFilmIcon(e.isVideo),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -364,9 +460,19 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
     if (_isAttaching) {
       return null;
     }
-    IconData iconData = Icons.camera_alt;
+    if (_isAllFiles) {
+      return Icon(
+        Icons.file_open,
+        color: Theme.of(context).iconTheme.color,
+      );
+    } else if (_isMultimedia) {
+      return Icon(
+        Icons.camera,
+        color: Theme.of(context).iconTheme.color,
+      );
+    }
     return Icon(
-      iconData,
+      Icons.camera_alt,
       color: Theme.of(context).iconTheme.color,
     );
   }
@@ -379,8 +485,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
 
   bool get _isMultimedia {
     return widget.sources.contains(FileSource.camera) &&
-        widget.sources.contains(FileSource.gallery) &&
-        widget.sources.contains(FileSource.fileExplorer);
+        widget.sources.contains(FileSource.gallery);
   }
 
   BoxDecoration _buildDecoration() {
@@ -414,12 +519,12 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
     );
   }
 
-  List<LitePickerFile> _mergeWrappers({
-    required List<LitePickerFile> firstList,
-    required List<LitePickerFile> secondList,
+  List<LiteFile> _mergeWrappers({
+    required List<LiteFile> firstList,
+    required List<LiteFile> secondList,
   }) {
     _deselectAll();
-    final tempList = <LitePickerFile>[...firstList];
+    final tempList = <LiteFile>[...firstList];
     for (var file in secondList) {
       if (!tempList.contains(file)) {
         tempList.add(file);
@@ -443,7 +548,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
     FilePickerResult? result,
     bool isMultiple,
   ) async {
-    final temp = <LitePickerFile>[];
+    final temp = <LiteFile>[];
     if (result == null) {
       return;
     }
@@ -452,15 +557,15 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
       true,
     );
     final files = result.files;
-    List<LitePickerFile> tempValue = [];
+    List<LiteFile> tempValue = [];
     for (PlatformFile file in files) {
-      final wrapper = LitePickerFile(
+      final wrapper = LiteFile(
         platformFile: file,
       );
       await wrapper._updateFileInfo();
       tempValue.add(wrapper);
     }
-    List<LitePickerFile> newValue = _mergeWrappers(
+    List<LiteFile> newValue = _mergeWrappers(
       firstList: tempValue,
       secondList: _selectedFiles,
     );
@@ -488,6 +593,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
       initialValueDeserializer: widget.initialValueDeserializer,
       validators: widget.validators,
       hintText: widget.hintText,
+      label: widget.label,
       decoration: null,
       errorStyle: widget.errorStyle,
     );
@@ -527,6 +633,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
                 settings: LiteDropSelectorSettings(
                   buttonHeight: widget.menuButtonHeight,
                 ),
+                validators: widget.validators,
                 selectorViewBuilder: (context, selectedItems) {
                   return Container(
                     width: widget.width,
@@ -543,22 +650,48 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
                     final payload = value.first.payload;
                     if (payload is FileSource) {
                       if (widget.maxFiles > 1) {
-                        if (payload.isSupportedByImagePicker) {
+                        if (payload.isSupportedByImagePicker &&
+                            (widget.allowImages || widget.allowVideo)) {
                           List<XFile> xFiles;
+
                           if (widget.allowVideo) {
-                            xFiles = await _picker.pickMultipleMedia(
-                              imageQuality: widget.imageQuality,
-                              maxHeight: widget.maxHeight,
-                              maxWidth: widget.maxHeight,
-                              requestFullMetadata: widget.requestFullMetadata,
-                            );
+                            if (widget.allowImages) {
+                              xFiles = await _picker.pickMultipleMedia(
+                                imageQuality: widget.imageQuality,
+                                maxHeight: widget.maxHeight,
+                                maxWidth: widget.maxHeight,
+                                requestFullMetadata: widget.requestFullMetadata,
+                              );
+                            } else {
+                              final result = await _picker.pickVideo(
+                                source: payload.toImageSource()!,
+                                preferredCameraDevice: widget.preferredCameraDevice,
+                              );
+                              if (result != null) {
+                                xFiles = [result];
+                              } else {
+                                xFiles = [];
+                              }
+                            }
                           } else {
-                            xFiles = await _picker.pickMultiImage(
-                              imageQuality: widget.imageQuality,
-                              maxHeight: widget.maxHeight,
-                              maxWidth: widget.maxHeight,
-                              requestFullMetadata: widget.requestFullMetadata,
-                            );
+                            if (payload == FileSource.camera) {
+                              final result = await _picker.pickVideo(
+                                source: payload.toImageSource()!,
+                                preferredCameraDevice: widget.preferredCameraDevice,
+                              );
+                              if (result != null) {
+                                xFiles = [result];
+                              } else {
+                                xFiles = [];
+                              }
+                            } else {
+                              xFiles = await _picker.pickMultiImage(
+                                imageQuality: widget.imageQuality,
+                                maxHeight: widget.maxHeight,
+                                maxWidth: widget.maxHeight,
+                                requestFullMetadata: widget.requestFullMetadata,
+                              );
+                            }
                           }
                           liteFormRebuildController.setIsLoading(
                             _loaderKey,
@@ -566,7 +699,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
                           );
                           final wrappers = xFiles.take(widget.maxFiles).map(
                             (e) {
-                              return LitePickerFile(xFile: e);
+                              return LiteFile(xFile: e);
                             },
                           ).toList();
                           if (wrappers.isNotEmpty) {
@@ -600,11 +733,11 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
                           );
                         }
                       } else {
-                        if (payload.isSupportedByImagePicker) {
+                        if (payload.isSupportedByImagePicker &&
+                            (widget.allowImages || widget.allowVideo)) {
                           XFile? xFile;
                           if (widget.allowVideo) {
                             xFile = await _picker.pickMedia(
-                              // source: payload.toImageSource()!,
                               imageQuality: widget.imageQuality,
                               maxHeight: widget.maxHeight,
                               maxWidth: widget.maxHeight,
@@ -624,9 +757,9 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
                               _loaderKey,
                               true,
                             );
-                            final wrapper = LitePickerFile(xFile: xFile);
+                            final wrapper = LiteFile(xFile: xFile);
                             await wrapper._updateMediaInfo();
-                            List<LitePickerFile>? newValue;
+                            List<LiteFile>? newValue;
 
                             /// this condition may meet only for a camera
                             if (widget.maxFiles > 1) {
@@ -651,7 +784,6 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin {
                             );
                           }
                         } else {
-                          // print('Pick Single File');
                           final result = await FilePicker.platform.pickFiles(
                             allowMultiple: false,
                             allowedExtensions: widget.allowedExtensions,

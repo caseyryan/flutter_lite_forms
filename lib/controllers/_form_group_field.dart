@@ -4,8 +4,9 @@ part of 'lite_form_controller.dart';
 
 class FormGroupField<T> {
   final String name;
+  String? label;
   LiteFormValueSerializer? _serializer;
-  List<LiteFormFieldValidator<Object?>>? _validators;
+  List<LiteValidator>? _validators;
   AutovalidateMode? _autovalidateMode;
   InputDecoration? _decoration;
   _FormGroupWrapper? _parent;
@@ -157,7 +158,10 @@ class FormGroupField<T> {
     String? error;
     List? validators = fieldAsDynamic._validators as List? ?? const [];
     for (var validator in validators) {
-      error = await validator.call(_value);
+      error = await validator.validate(
+        _value,
+        fieldName: label ?? name,
+      );
       if (error != null) {
         break;
       }
@@ -176,10 +180,11 @@ class FormGroupField<T> {
   }
 
   Future<Object?> getSerializedValue() async {
-    return  await _serializer?.call(_value) ?? _value;
+    return await _serializer?.call(_value) ?? _value;
   }
 
   FormGroupField({
     required this.name,
+    required this.label,
   });
 }

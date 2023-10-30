@@ -248,8 +248,7 @@ class _TempSelection {
   });
 }
 
-class _DropSelectorViewState extends State<DropSelectorView>
-    with PostFrameMixin {
+class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin {
   final _sizeKey = GlobalKey();
   double _menuWidth = 0.0;
   Size? _size;
@@ -308,8 +307,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
   }
 
   bool get _isMultiselect {
-    return widget.args.dropSelectorActionType ==
-        LiteDropSelectorActionType.multiselect;
+    return widget.args.dropSelectorActionType == LiteDropSelectorActionType.multiselect;
   }
 
   bool get _isSimpleWithNoSelection {
@@ -318,13 +316,12 @@ class _DropSelectorViewState extends State<DropSelectorView>
   }
 
   bool get _isSingleSelect {
-    return widget.args.dropSelectorActionType ==
-        LiteDropSelectorActionType.singleSelect;
+    return widget.args.dropSelectorActionType == LiteDropSelectorActionType.singleSelect;
   }
 
   bool get _isSimple {
-    return _isSimpleWithNoSelection || widget.args.dropSelectorActionType ==
-        LiteDropSelectorActionType.simple;
+    return _isSimpleWithNoSelection ||
+        widget.args.dropSelectorActionType == LiteDropSelectorActionType.simple;
   }
 
   void _onButtonPressed(
@@ -346,8 +343,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
     } else {
       if (_isMultiselect) {
         value.isSelected = !value.isSelected;
-        final allSelected =
-            widget.args.items.where((d) => d.isSelected).toList();
+        final allSelected = widget.args.items.where((d) => d.isSelected).toList();
         value.onMultiSelection?.call(allSelected);
       } else if (_isSingleSelect) {
         for (var d in widget.args.items) {
@@ -404,6 +400,9 @@ class _DropSelectorViewState extends State<DropSelectorView>
               onPressed: _onCancel,
               child: Text(
                 widget.args.group.translationBuilder.call('Cancel')!,
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                ),
               ),
             ),
             const Spacer(),
@@ -421,6 +420,9 @@ class _DropSelectorViewState extends State<DropSelectorView>
               },
               child: Text(
                 widget.args.group.translationBuilder.call('Done')!,
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                ),
               ),
             ),
           ],
@@ -454,8 +456,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
       WidgetsBinding.instance.ensureVisualUpdate();
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         setState(() {
-          _searchFieldHeight =
-              _searchFieldSizeKey.currentContext?.size?.height ?? 0.0;
+          _searchFieldHeight = _searchFieldSizeKey.currentContext?.size?.height ?? 0.0;
         });
       });
     }
@@ -472,8 +473,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
             style: widget.args.style,
             paddingTop: _settings.menuSearchConfiguration.padding?.top ??
                 _settings.sheetPadding.top,
-            paddingBottom:
-                _settings.menuSearchConfiguration.padding?.bottom ?? 0.0,
+            paddingBottom: _settings.menuSearchConfiguration.padding?.bottom ?? 0.0,
             paddingLeft: _settings.menuSearchConfiguration.padding?.left ??
                 _settings.sheetPadding.left,
             paddingRight: _settings.menuSearchConfiguration.padding?.right ??
@@ -672,8 +672,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
 
   double get _minChildSize {
     double value =
-        (_singleButtonHeight + _totalVerticalPadding + _bottomInset) /
-            _safeScreenHeight;
+        (_singleButtonHeight + _totalVerticalPadding + _bottomInset) / _safeScreenHeight;
 
     if (value > _initialChildSize) {
       return _initialChildSize;
@@ -688,9 +687,8 @@ class _DropSelectorViewState extends State<DropSelectorView>
   }
 
   double get _totalVerticalPadding {
-    double padding = _settings.sheetPadding.top +
-        _settings.sheetPadding.bottom +
-        _searchFieldHeight;
+    double padding =
+        _settings.sheetPadding.top + _settings.sheetPadding.bottom + _searchFieldHeight;
 
     if (_isBottomSheet) {
       return padding + kDefaultPadding + _topInset;
@@ -745,8 +743,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
         bottom: false,
         child: SwipeDetector(
           velocityThreshhold: 270.0,
-          acceptedSwipes:
-              _isSimple ? AcceptedSwipes.vertical : AcceptedSwipes.none,
+          acceptedSwipes: _isSimple ? AcceptedSwipes.vertical : AcceptedSwipes.none,
           onSwipe: (SwipeDirection value) {
             if (value == SwipeDirection.topToBottom) {
               if (_scrollController.position.pixels <= 0) {
@@ -778,8 +775,8 @@ class _DropSelectorViewState extends State<DropSelectorView>
                       maxWidth: _screenWidth,
                     ),
                     child: Material(
-                      shadowColor: formConfig?.shadowColor ??
-                          Colors.black.withOpacity(.3),
+                      shadowColor:
+                          formConfig?.shadowColor ?? Colors.black.withOpacity(.3),
                       elevation: 10.0,
                       color: Theme.of(context).cardColor,
                       shape: _shape,
@@ -805,14 +802,12 @@ class _DropSelectorViewState extends State<DropSelectorView>
     if (_isTopDirected) {
       availableHeight = widget.args.buttonLeftTopCorner.dy;
     } else {
-      availableHeight =
-          _screenHeight - widget.args.buttonLeftTopCorner.dy - _bottomInset;
+      availableHeight = _screenHeight - widget.args.buttonLeftTopCorner.dy - _bottomInset;
     }
     double? top = widget.args.buttonLeftTopCorner.dy;
     double? bottom;
     double left = widget.args.buttonLeftTopCorner.dx;
-    bool isLeftAlignment =
-        widget.args.buttonLeftTopCorner.dx > (_screenWidth * .5);
+    bool isLeftAlignment = widget.args.buttonLeftTopCorner.dx > (_screenWidth * .5);
     if (isLeftAlignment) {
       left -= (_menuWidth - widget.args.buttonSize.width);
     }
@@ -839,8 +834,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
       );
     } else if (top != null) {
       final calculatedMenuBottom = availableHeight + top;
-      var overlap =
-          _keyboardHeight - (_initialScreenHeight - calculatedMenuBottom);
+      var overlap = _keyboardHeight - (_initialScreenHeight - calculatedMenuBottom);
       if (overlap > 0.0) {
         top -= overlap + _settings.sheetPadding.top;
       }
@@ -877,8 +871,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
               maxWidth: _screenWidth,
             ),
             child: Material(
-              shadowColor:
-                  formConfig?.shadowColor ?? Colors.black.withOpacity(.3),
+              shadowColor: formConfig?.shadowColor ?? Colors.black.withOpacity(.3),
               elevation: 10.0,
               color: Theme.of(context).cardColor,
               shape: _shape,
@@ -953,8 +946,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
                     ),
                   ),
                   LiteState<LiteFormRebuildController>(
-                    builder:
-                        (BuildContext c, LiteFormRebuildController controller) {
+                    builder: (BuildContext c, LiteFormRebuildController controller) {
                       return _buildMenu();
                     },
                   ),

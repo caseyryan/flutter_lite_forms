@@ -172,8 +172,9 @@ class LiteFormController extends LiteStateController<LiteFormController> {
   FormGroupField<T> registerFormFieldIfNone<T>({
     required String formName,
     required String fieldName,
+    required String? label,
     required LiteFormValueSerializer serializer,
-    required List<LiteFormFieldValidator<Object?>>? validators,
+    required List<LiteValidator>? validators,
     required AutovalidateMode? autovalidateMode,
     required InputDecoration? decoration,
   }) {
@@ -181,6 +182,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     final groupWrapper = _formGroups[formName]!;
     return groupWrapper.tryRegisterField(
       name: fieldName,
+      label: label,
       serializer: serializer,
       validators: validators,
       decoration: decoration,

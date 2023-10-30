@@ -13,6 +13,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
 
   late final FormGroupField field;
   late final String _fieldName;
+  String? _label;
 
   dynamic _initialValue;
   dynamic get initialValue {
@@ -49,7 +50,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     )) {
       setter();
       return true;
-    } 
+    }
     // else {
     //   if (textEditingController?.text.isNotEmpty != true) {
     //     if (WidgetsBinding.instance.hasScheduledFrame) {
@@ -87,15 +88,17 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
 
   void initializeFormField<E>({
     required String fieldName,
+    required String? label,
     required AutovalidateMode? autovalidateMode,
     required LiteFormValueSerializer serializer,
     required LiteFormValueSerializer? initialValueDeserializer,
-    required List<LiteFormFieldValidator<Object?>>? validators,
+    required List<LiteValidator>? validators,
     required String? hintText,
     required InputDecoration? decoration,
     required TextStyle? errorStyle,
   }) {
     _group = LiteFormGroup.of(context)!;
+    _label = label;
 
     this._decoration =
         decoration ?? formConfig?.inputDecoration ?? const InputDecoration();
@@ -155,6 +158,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
       field = liteFormController.registerFormFieldIfNone<E>(
         fieldName: _fieldName,
         formName: group.name,
+        label: _label,
         serializer: serializer,
         validators: validators,
         decoration: decoration,

@@ -4,12 +4,17 @@
 import 'package:example/signup_form_page.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/lite_forms.dart';
+import 'package:lite_forms/utils/controller_initializer.dart';
+import 'package:lite_forms/utils/lite_forms_configuration.dart';
 
 class StartPage extends StatelessWidget {
   const StartPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    initializeLiteForms(
+      config: LiteFormsConfiguration.vanila(context),
+    );
     return Scaffold(
       appBar: AppBar(),
       body: LiteFormGroup(

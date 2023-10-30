@@ -135,7 +135,7 @@ class LiteCountrySelector extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueSerializer? initialValueDeserializer;
-  final List<LiteFormFieldValidator<Object?>>? validators;
+  final List<LiteValidator>? validators;
 
   @override
   State<LiteCountrySelector> createState() => _LiteCountrySelectorState();

@@ -43,13 +43,22 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
         padding: EdgeInsets.only(
           right: widget.paddingRight,
         ),
-        child: SizedBox(
-          height: widget.buttonHeight,
-          child: Center(
-            child: widget.data.iconBuilder!(
-              context,
-              widget.data,
-              widget.data.isSelected,
+        child: Theme(
+          data: ThemeData(
+            iconTheme: IconThemeData(
+              color: widget.data.isDestructive
+                  ? widget.destructiveItemColor ?? _errorColor
+                  : null,
+            ),
+          ),
+          child: SizedBox(
+            height: widget.buttonHeight,
+            child: Center(
+              child: widget.data.iconBuilder!(
+                context,
+                widget.data,
+                widget.data.isSelected,
+              ),
             ),
           ),
         ),

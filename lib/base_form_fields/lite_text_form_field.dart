@@ -35,6 +35,7 @@ class LiteTextFormField extends StatefulWidget {
       top: 6.0,
     ),
     this.hintText,
+    this.label,
     this.serializer = nonConvertingValueConvertor,
     this.initialValueDeserializer,
     this.validators,
@@ -97,6 +98,7 @@ class LiteTextFormField extends StatefulWidget {
 
   final String name;
   final String? hintText;
+  final String? label;
   final TextEditingController? controller;
 
   /// makes sense only if [textEntryType] is [LiteTextEntryType.onModalRoute]
@@ -139,7 +141,7 @@ class LiteTextFormField extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueSerializer? initialValueDeserializer;
-  final List<LiteFormFieldValidator<Object?>>? validators;
+  final List<LiteValidator>? validators;
   final String? restorationId;
   final Object? initialValue;
   final FocusNode? focusNode;
@@ -243,6 +245,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField>
       initialValueDeserializer: widget.initialValueDeserializer,
       validators: widget.validators,
       hintText: widget.hintText,
+      label: widget.label,
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
     );

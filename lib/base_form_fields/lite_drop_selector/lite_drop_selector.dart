@@ -54,6 +54,7 @@ class LiteDropSelector extends StatefulWidget {
     this.pickerBackgroundColor,
     this.autovalidateMode,
     this.hintText,
+    this.label,
     this.decoration,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
@@ -111,6 +112,7 @@ class LiteDropSelector extends StatefulWidget {
   /// [items] It can be a list of Strings or a list of [LiteDropSelectorItem]'s
   final List<Object?> items;
   final String? hintText;
+  final String? label;
   final InputDecoration? decoration;
   final double paddingTop;
   final double paddingBottom;
@@ -163,7 +165,7 @@ class LiteDropSelector extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueSerializer? initialValueDeserializer;
-  final List<LiteFormFieldValidator<Object?>>? validators;
+  final List<LiteValidator>? validators;
 
   @override
   State<LiteDropSelector> createState() => _LiteDropSelectorState();
@@ -315,6 +317,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       initialValueDeserializer: widget.initialValueDeserializer,
       validators: widget.validators,
       hintText: widget.hintText,
+      label: widget.label,
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
     );

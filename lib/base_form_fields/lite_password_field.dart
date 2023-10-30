@@ -1,5 +1,7 @@
 // ignore_for_file: unused_element
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
@@ -220,29 +222,24 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
           maxLines: 1,
           minLines: 1,
           validators: [
-            (value) async {
-              final firstFieldValue = liteFormController
+            _PasswordValidator(
+              settings: widget.settings,
+              group: group,
+              firstValue: liteFormController
                   .tryGetField(
                     formName: group.name,
                     fieldName: widget.name,
                   )
                   ?.value
-                  ?.toString();
-              final secondaryFieldValue = liteFormController
+                  ?.toString(),
+              secondValue: liteFormController
                   .tryGetField(
                     formName: group.name,
                     fieldName: repeatName,
                   )
                   ?.value
-                  ?.toString();
-
-              bool? passwordsMatch = firstFieldValue == secondaryFieldValue;
-              return widget.settings._validate(
-                value: value as String?,
-                passwordsMatch: passwordsMatch,
-                group: group,
-              );
-            },
+                  ?.toString(),
+            ),
           ],
           maxLength: widget.maxLength,
           maxLengthEnforcement: null,
@@ -272,11 +269,7 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
             allowErrorTexts: allowErrorTexts,
             name: repeatName,
             validators: [
-              (value) async {
-                /// in this case no validation is required except for the password match
-                liteFormRebuildController.rebuild();
-                return null;
-              },
+              _RebuildingValidator(),
             ],
             initialValue: widget.initialValue,
             autocorrect: false,
@@ -347,6 +340,44 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
   }
 }
 
+class _PasswordValidator extends LiteValidator {
+  _PasswordValidator({
+    required this.firstValue,
+    required this.secondValue,
+    required this.group,
+    required this.settings,
+  });
+  final String? firstValue;
+  final String? secondValue;
+  final LiteFormGroup group;
+  final PasswordSettings settings;
+
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) async {
+    bool? passwordsMatch = firstValue == secondValue;
+    return settings._validate(
+      value: value as String?,
+      passwordsMatch: passwordsMatch,
+      group: group,
+    );
+  }
+}
+
+class _RebuildingValidator extends LiteValidator {
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) async {
+    /// in this case no validation is required except for the password match
+    liteFormRebuildController.rebuild();
+    return null;
+  }
+}
+
 typedef PasswordCheckBuilder = Widget Function(
   bool? digitsOk,
   bool? upperCaseOk,
@@ -375,7 +406,7 @@ class PasswordSettings {
           'You must provide either a validator or a requirements config',
         );
 
-  final LiteFormFieldValidator<String>? validator;
+  final LiteValidator? validator;
   final int minLength;
   final PasswordRequirements? requirements;
   final PasswordFieldCheckType passwordFieldCheckType;
@@ -480,7 +511,7 @@ class PasswordSettings {
           return errorText;
         }
       }
-      final result = await validator!(value);
+      final result = await validator!.validate(value);
 
       return result;
     }

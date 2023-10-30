@@ -30,6 +30,7 @@ class LiteDatePicker extends StatefulWidget {
     this.pickerBackgroundColor,
     this.autovalidateMode,
     this.hintText,
+    this.label,
     this.decoration,
     this.dateInputType = DateInputType.date,
     this.paddingTop = 0.0,
@@ -77,6 +78,7 @@ class LiteDatePicker extends StatefulWidget {
   final Color? pickerBackgroundColor;
   final AutovalidateMode? autovalidateMode;
   final String? hintText;
+  final String? label;
   final InputDecoration? decoration;
   final double paddingTop;
   final double paddingBottom;
@@ -129,7 +131,7 @@ class LiteDatePicker extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueSerializer? initialValueDeserializer;
-  final List<LiteFormFieldValidator<Object?>>? validators;
+  final List<LiteValidator>? validators;
 
   @override
   State<LiteDatePicker> createState() => _LiteDatePickerState();
@@ -374,7 +376,9 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                           onPressed: () {
                             Navigator.of(context).pop(dateTime);
                           },
-                          child: const Text('Done'),
+                          child: const Text(
+                            'Done',
+                          ),
                         ),
                       ],
                     ),
@@ -461,6 +465,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
   Widget build(BuildContext context) {
     initializeFormField<DateTime>(
       fieldName: widget.name,
+      label: widget.label,
       autovalidateMode: widget.autovalidateMode,
       serializer: widget.serializer,
       initialValueDeserializer: widget.initialValueDeserializer,

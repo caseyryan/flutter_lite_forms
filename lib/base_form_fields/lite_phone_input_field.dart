@@ -79,6 +79,7 @@ class LitePhoneInputField extends StatefulWidget {
     this.decoration,
     this.readOnly = false,
     this.hintText,
+    this.label,
     this.autovalidateMode,
     this.defaultCountry,
     this.focusNode,
@@ -185,6 +186,7 @@ class LitePhoneInputField extends StatefulWidget {
   /// wherever you need
   final LiteFormValueSerializer serializer;
   final String? hintText;
+  final String? label;
   final FocusNode? focusNode;
   final InputDecoration? decoration;
 
@@ -196,7 +198,7 @@ class LitePhoneInputField extends StatefulWidget {
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
   final LiteFormValueSerializer? initialValueDeserializer;
-  final List<LiteFormFieldValidator<Object?>>? validators;
+  final List<LiteValidator>? validators;
 
   @override
   State<LitePhoneInputField> createState() => _LitePhoneInputFieldState();
@@ -459,6 +461,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
       initialValueDeserializer: widget.initialValueDeserializer,
       validators: widget.validators,
       hintText: widget.hintText,
+      label: widget.label,
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
     );

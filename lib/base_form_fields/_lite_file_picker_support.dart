@@ -2,7 +2,7 @@ part of 'lite_file_picker.dart';
 
 typedef ViewBuilder = Widget Function(
   BuildContext context,
-  List<LitePickerFile> files,
+  List<LiteFile> files,
 );
 
 extension _ImageSourceExtension on FileSource {
@@ -46,13 +46,13 @@ class _ImageInfo {
   });
 }
 
-class LitePickerFile {
+class LiteFile {
   static final Map<String, _ImageInfo> _infos = {};
 
   /// Can be used to mark images in a multiselector
   bool isSelected = false;
 
-  LitePickerFile({
+  LiteFile({
     this.xFile,
     this.platformFile,
   });
@@ -60,7 +60,7 @@ class LitePickerFile {
   final PlatformFile? platformFile;
 
   @override
-  bool operator ==(covariant LitePickerFile other) {
+  bool operator ==(covariant LiteFile other) {
     return other.name == name;
   }
 
@@ -108,11 +108,11 @@ class LitePickerFile {
     _infos[name] = info;
   }
 
-  bool get _isImage {
+  bool get isImage {
     return _mimeType?.startsWith('image') == true;
   }
 
-  bool get _isVideo {
+  bool get isVideo {
     return _mimeType?.startsWith('video') == true;
   }
 
@@ -182,10 +182,10 @@ class LitePickerFile {
 
     if (kIsWeb) {
       // if (bytes != null) {
-      if (_isImage) {
+      if (isImage) {
         image = Image.memory(_bytes!);
         _imageProvider = MemoryImage(_bytes!);
-      } else if (_isVideo) {
+      } else if (isVideo) {
         final imageByteData = await rootBundle.load(
           'packages/$kPackageName/assets/icons/video_icon.png',
         );
@@ -198,12 +198,12 @@ class LitePickerFile {
       // }
     } else {
       // final file = File(xFile!.path);
-      if (_isImage) {
+      if (isImage) {
         image = Image.memory(_bytes!);
         _imageProvider = MemoryImage(
           _bytes!,
         );
-      } else if (_isVideo) {
+      } else if (isVideo) {
         final thumbBytes = await VideoCompress.getByteThumbnail(
           xFile!.path,
           quality: 50,
@@ -232,6 +232,11 @@ class LitePickerFile {
   }
 
   Uint8List? _bytes;
+
+  FutureOr<int> get kiloBytes async {
+    final numBytes = (await bytes)?.length ?? 0;
+    return numBytes ~/ 1024;
+  }
 
   Future<Uint8List?> get bytes async {
     if (_bytes != null) {
