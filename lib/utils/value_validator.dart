@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:lite_forms/base_form_fields/lite_file_picker.dart';
 import 'package:lite_forms/base_form_fields/lite_phone_input_field.dart';
+import 'package:lite_forms/utils/age_difference.dart';
 import 'package:lite_forms/utils/exports.dart';
 import 'package:lite_forms/utils/number_extension.dart';
 
@@ -24,8 +25,28 @@ abstract class LiteValidator {
     return PhoneValidator();
   }
 
-  static LiteValidator required() {
-    return RequiredFieldValidator();
+  static LiteValidator dateOfBirth({
+    int? minAgeYears,
+    int? maxAgeYears,
+    int? minAgeMonths,
+    int? maxAgeMonths,
+    String? errorText,
+  }) {
+    return DateOfBirthValidator(
+      errorText: errorText,
+      maxAgeMonths: maxAgeMonths,
+      minAgeMonths: minAgeMonths,
+      minAgeYears: minAgeYears,
+      maxAgeYears: maxAgeYears,
+    );
+  }
+
+  static LiteValidator required({
+    String? errorText,
+  }) {
+    return RequiredFieldValidator(
+      errorText: errorText,
+    );
   }
 }
 
@@ -35,6 +56,69 @@ class NonValidatingValidator extends LiteValidator {
     Object? value, {
     String? fieldName,
   }) {
+    return null;
+  }
+}
+
+class DateOfBirthValidator extends LiteValidator {
+  DateOfBirthValidator({
+    this.minAgeYears,
+    this.maxAgeYears,
+    this.minAgeMonths,
+    this.maxAgeMonths,
+    this.errorText,
+  });
+
+  final int? minAgeYears;
+  final int? maxAgeYears;
+  final int? minAgeMonths;
+  final int? maxAgeMonths;
+  final String? errorText;
+
+  bool get _isRequired {
+    return minAgeMonths != null ||
+        minAgeYears != null ||
+        maxAgeMonths != null ||
+        minAgeMonths != null;
+  }
+
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) {
+    if (!_isRequired) {
+      return null;
+    }
+    if (value == null) {
+      return errorText ?? '$fieldName is required';
+    }
+    if (value is DateTime) {
+      final difference = AgeDifference.fromNow(value);
+      final diffMonth = difference.months;
+      final diffYears = difference.years;
+      if (maxAgeYears != null) {
+        if (diffYears > maxAgeYears!) {
+          return errorText ?? 'You must not be older than $maxAgeYears years';
+        }
+      }
+      if (minAgeYears != null) {
+        if (diffYears < minAgeYears!) {
+          return errorText ?? 'You must be at least $minAgeYears years old';
+        }
+      }
+
+      if (maxAgeMonths != null) {
+        if (diffMonth > maxAgeMonths!) {
+          return errorText ?? 'You must not be older than $maxAgeMonths months';
+        }
+      }
+      if (minAgeMonths != null) {
+        if (diffMonth < minAgeMonths!) {
+          return errorText ?? 'You must be at least $minAgeMonths months old';
+        }
+      }
+    }
     return null;
   }
 }
@@ -100,13 +184,18 @@ class FileSize {
 }
 
 class RequiredFieldValidator extends LiteValidator {
+  RequiredFieldValidator({
+    this.errorText,
+  });
+  final String? errorText;
+
   @override
   FutureOr<String?> validate(
     Object? value, {
     String? fieldName,
   }) {
-    if (value == null) {
-      return '$fieldName is required';
+    if (value == null || (value is bool && value == false)) {
+      return errorText ?? '$fieldName is required';
     }
     return null;
   }

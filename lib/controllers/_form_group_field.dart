@@ -174,9 +174,13 @@ class FormGroupField<T> {
   }
 
   String? _error;
-  String? get error => _error;
+  String? get error {
+    print('$name, ERROR: $_error');
+    return _error;
+  }
   void _setError(String? error) {
     _error = error;
+    print('SETTING ERROR $_error');
   }
 
   Future<Object?> getSerializedValue() async {

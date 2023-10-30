@@ -100,14 +100,6 @@ class SignupFormPage extends StatelessWidget {
                     //   textEntryType: LiteTextEntryType.normal,
                     //   useSmoothError: true,
                     //   name: 'login',
-                    //   validators: [
-                    //     (value) async {
-                    //       if (value?.toString().isNotEmpty != true) {
-                    //         return 'Login cannot be empty';
-                    //       }
-                    //       return null;
-                    //     },
-                    //   ],
                     //   onChanged: (value) {
                     //     if (kDebugMode) {
                     //       print('VALUE: $value');
@@ -125,7 +117,7 @@ class SignupFormPage extends StatelessWidget {
                     //   },
                     //   autovalidateMode: AutovalidateMode.always,
                     // ),
-                    // const SizedBox(height: 600.0),
+                    // // const SizedBox(height: 600.0),
                     // LiteCountrySelector(
                     //   readOnly: false,
                     //   name: 'countries',
@@ -153,7 +145,7 @@ class SignupFormPage extends StatelessWidget {
                     //   // serializer: LiteSerializers.phoneDataToUnformattedString,
                     //   // serializer: LiteSerializers.fullPhoneDataWithCountry,
                     //   validators: [
-                    //     LiteValidators.phoneValidator,
+                    //     LiteValidator.phone(),
                     //   ],
                     // ),
                     // LiteDropSelector(
@@ -251,18 +243,7 @@ class SignupFormPage extends StatelessWidget {
                     //     // 'AnimatedGrid',
                     //     // 'AnimatedGridState',
                     //   ],
-                    //   validators: [
-                    //     (Object? value) async {
-                    //       // return 'invalid';
-                    //       // await Future.delayed(const Duration(seconds: 1));
-                    //       if (value is List<LiteDropSelectorItem>) {
-                    //         if (value.any((e) => e.title.contains('Airplane'))) {
-                    //           return 'No planes allowed here';
-                    //         }
-                    //       }
-                    //       return null;
-                    //     }
-                    //   ],
+
                     //   serializer: (value) {
                     //     if (value is List) {
                     //       return value.map(
@@ -305,37 +286,37 @@ class SignupFormPage extends StatelessWidget {
                     //     ),
                     //   ),
                     // ),
-                    // LiteDatePicker(
-                    //   readOnly: false,
-                    //   textAlign: TextAlign.center,
-                    //   dateInputType: DateInputType.both,
-                    //   name: 'dateOfBirth',
+                    LiteDatePicker(
+                      paddingTop: 20.0,
+                      readOnly: false,
+                      textAlign: TextAlign.center,
+                      dateInputType: DateInputType.both,
+                      name: 'dateOfBirth',
 
-                    //   /// notice that you can pass DateTime object here or
-                    //   /// a String representation of a date. Both cases
-                    //   /// will be processed by initialValueDeserializer below
-                    //   /// and the LiteDatePicker will get a valid DateTime
-                    //   /// object as an input
-                    //   // initialValue: DateTime.now(),
-                    //   initialValue: DateTime.now().toIso8601String(),
-                    //   pickerType: LiteDatePickerType.material,
-                    //   autovalidateMode: AutovalidateMode.disabled,
-                    //   initialValueDeserializer: (value) {
-                    //     if (value is DateTime) {
-                    //       return value;
-                    //     }
-                    //     if (value is String) {
-                    //       return DateTime.tryParse(value);
-                    //     }
-                    //     return value;
-                    //   },
-                    //   validators: [
-                    //     (value) async {
-                    //       // return 'Date is incorrect';
-                    //       return null;
-                    //     },
-                    //   ],
-                    // ),
+                      /// notice that you can pass DateTime object here or
+                      /// a String representation of a date. Both cases
+                      /// will be processed by initialValueDeserializer below
+                      /// and the LiteDatePicker will get a valid DateTime
+                      /// object as an input
+                      // initialValue: DateTime.now(),
+                      initialValue: DateTime.now().toIso8601String(),
+                      pickerType: LiteDatePickerType.material,
+                      autovalidateMode: AutovalidateMode.disabled,
+                      validators: [
+                        LiteValidator.dateOfBirth(
+                          minAgeYears: 18,
+                        ),
+                      ],
+                      initialValueDeserializer: (value) {
+                        if (value is DateTime) {
+                          return value;
+                        }
+                        if (value is String) {
+                          return DateTime.tryParse(value);
+                        }
+                        return value;
+                      },
+                    ),
                     // LiteSwitch(
                     //   readOnly: false,
                     //   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -355,12 +336,7 @@ class SignupFormPage extends StatelessWidget {
                     //   initialValue: false,
                     //   type: LiteSwitchType.adaptive,
                     //   validators: [
-                    //     (value) {
-                    //       if (value == false) {
-                    //         return 'You must accept the Privacy Policy';
-                    //       }
-                    //       return null;
-                    //     }
+                    //     LiteValidator.required(),
                     //   ],
                     //   initialValueDeserializer: (value) {
                     //     if (value is String) {
@@ -372,6 +348,7 @@ class SignupFormPage extends StatelessWidget {
                     //     return value == true ? 'Yes' : 'No';
                     //   },
                     // ),
+                    // const SizedBox(height: 1500,),
                     MaterialButton(
                       onPressed: () async {
                         if (await validateLiteForm(formName)) {

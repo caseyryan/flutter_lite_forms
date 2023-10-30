@@ -52,7 +52,7 @@ class _FormGroupWrapper {
     if (kDebugMode) {
       // print('TRY REGISTER FIELD: $name');
     }
-    if (!isFieldInitiallySet(name)) {
+    if (_fields[name] == null) {
       _fields[name] = FormGroupField<T>(
         name: name,
         label: label,

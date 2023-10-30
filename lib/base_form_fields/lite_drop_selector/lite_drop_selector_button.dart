@@ -39,6 +39,7 @@ class LiteDropSelectorButton extends StatefulWidget {
 class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
   Widget _buildIcon() {
     if (widget.data.iconBuilder != null) {
+      final theme = Theme.of(context);
       return Padding(
         padding: EdgeInsets.only(
           right: widget.paddingRight,
@@ -48,7 +49,7 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
             iconTheme: IconThemeData(
               color: widget.data.isDestructive
                   ? widget.destructiveItemColor ?? _errorColor
-                  : null,
+                  : theme.iconTheme.color,
             ),
           ),
           child: SizedBox(
