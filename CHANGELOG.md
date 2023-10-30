@@ -1,3 +1,5 @@
+## 0.0.3
+* added more exports
 ## 0.0.2
 * Added File Picker with validator classes
 ## 0.0.1
