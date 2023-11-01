@@ -488,6 +488,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
           width: _menuWidth,
           key: _searchFieldSizeKey,
           child: LiteSearchField(
+            style: widget.args.style,
             autofocus: _settings.menuSearchConfiguration.autofocusSearchField,
             onSearch: _onSearch,
             paddingTop: _settings.menuSearchConfiguration.padding?.top ?? 0.0,

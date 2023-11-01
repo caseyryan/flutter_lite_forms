@@ -369,6 +369,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
           locale: widget.locale,
           menuItemBuilder: widget.menuItemBuilder,
           name: _dropSelectorName,
+          style: _textStyle,
           dropSelectorType: widget.countrySelectorViewType,
           initialValue: _selectedCountry,
           onChanged: (value) {

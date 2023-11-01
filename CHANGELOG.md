@@ -1,3 +1,5 @@
+## 0.0.6
+* Fixed text style in search field
 ## 0.0.5
 * Automatic unregistering of the unmounted fields
 ## 0.0.4
