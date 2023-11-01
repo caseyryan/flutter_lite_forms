@@ -15,6 +15,11 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
   late final String _fieldName;
   String? _label;
 
+  /// needed to check if the field is in a tree
+  String get widgetName {
+    return (widget as dynamic).name;
+  }
+
   dynamic _initialValue;
   dynamic get initialValue {
     return _initialValue;
@@ -37,6 +42,11 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     return field.getOrCreateFocusNode();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   /// Checks if a field is initially set to not let it
   /// set initially again
   bool setInitialValue({
@@ -51,19 +61,6 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
       setter();
       return true;
     }
-    // else {
-    //   if (textEditingController?.text.isNotEmpty != true) {
-    //     if (WidgetsBinding.instance.hasScheduledFrame) {
-    //       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    //         final value = liteFormController.tryGetValueForField(
-    //           formName: formName,
-    //           fieldName: fieldName,
-    //         );
-    //         print(value);
-    //       });
-    //     }
-    //   }
-    // }
     return false;
   }
 
@@ -84,6 +81,29 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
           initialValueDeserializer?.call(rawInitialValue) as E? ??
           rawInitialValue as E?;
     }
+  }
+
+
+  @override
+  void activate() {
+    // print('ACTIVATE ${(widget as dynamic).name}');
+    super.activate();
+  }
+
+  void _mount() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        field.mount();
+      },
+    );
+  }
+  
+
+  @override
+  void deactivate() {
+    // print('DEACTIVATE ${(widget as dynamic).name}');
+    field.unmount();
+    super.deactivate();
   }
 
   void initializeFormField<E>({
@@ -165,6 +185,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
         autovalidateMode: autovalidateMode,
       );
     }
+    _mount();
   }
 
   TextStyle get errorStyle {

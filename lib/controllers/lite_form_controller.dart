@@ -68,20 +68,20 @@ class LiteFormController extends LiteStateController<LiteFormController> {
   /// the form has this field already registered
   ///
   /// This method will remove this sort of inputs and unregister them
-  void removeUnregisteredFields({
-    required String formName,
-  }) {
-    final form = _formGroups[formName];
-    if (form != null) {
-      form.unregisterAllOutdatedFields();
-    }
-  }
+  // void removeUnregisteredFields({
+  //   required String formName,
+  // }) {
+  //   final form = _formGroups[formName];
+  //   if (form != null) {
+  //     form.unregisterAllOutdatedFields();
+  //   }
+  // }
 
   FutureOr<Object?> tryGetValueForField({
     required String formName,
     required String fieldName,
     bool applySerializer = false,
-  })  {
+  }) {
     final field = tryGetField(
       formName: formName,
       fieldName: fieldName,
@@ -108,6 +108,21 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     final result = await _formGroups[formName]?.validate() ?? true;
     stopLoading();
     return result;
+  }
+
+  Iterable<FormGroupField> getAllFieldsOfForm({
+    required String formName,
+  }) {
+    final list = _formGroups[formName]
+            ?._fields
+            .values
+            .where(
+              (f) => !f.name.isIgnoredInForm(),
+            )
+            .toList() ??
+        <FormGroupField>[];
+
+    return list;
   }
 
   Future<Map<String, dynamic>> getFormData({

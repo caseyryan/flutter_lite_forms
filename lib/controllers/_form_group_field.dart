@@ -11,18 +11,39 @@ class FormGroupField<T> {
   InputDecoration? _decoration;
   _FormGroupWrapper? _parent;
 
+  bool _isMounted  = false;
+  bool get isMounted => _isMounted;
+
+  void unmount() {
+    _isMounted = false;
+    // if (kDebugMode && !name.isIgnoredInForm()) {
+    //   print('UNMOUNTED $name');
+    // }
+  }
+  
+  void mount() {
+    _isMounted = true;
+    _updatedAt = DateTime.now();
+    // if (kDebugMode && !name.isIgnoredInForm()) {
+    //   print('MOUNTED $name');
+    // }
+  }
+
   /// This allows us to unregister the fields that were not
   /// registered during this build stage. E.e. you removed
   /// a field by some condition. This filed might be automatically removed from
   /// form
   DateTime? _updatedAt;
-
-  bool _isOutdated() {
-    if (_updatedAt == null) {
-      return false;
-    }
-    return DateTime.now().difference(_updatedAt!).inMilliseconds > 60;
+  DateTime? get updatedAt {
+    return _updatedAt;
   }
+
+  // bool _isOutdated() {
+  //   if (_updatedAt == null) {
+  //     return false;
+  //   }
+  //   return DateTime.now().difference(_updatedAt!).inMilliseconds > 60;
+  // }
 
   TextEditingController? _textEditingController;
   TextEditingController? get textEditingController => _textEditingController;
@@ -175,12 +196,10 @@ class FormGroupField<T> {
 
   String? _error;
   String? get error {
-    print('$name, ERROR: $_error');
     return _error;
   }
   void _setError(String? error) {
     _error = error;
-    print('SETTING ERROR $_error');
   }
 
   Future<Object?> getSerializedValue() async {

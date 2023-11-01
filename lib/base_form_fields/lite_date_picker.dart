@@ -138,12 +138,6 @@ class LiteDatePicker extends StatefulWidget {
 }
 
 class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
-  // @override
-  // void didUpdateWidget(covariant LiteDatePicker oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   if (widget.dateInputType != oldWidget.dateInputType) {
-  //   }
-  // }
 
   LiteDatePickerType get _type {
     if (widget.pickerType == LiteDatePickerType.adaptive) {

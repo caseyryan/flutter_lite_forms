@@ -41,6 +41,8 @@ class _FormGroupWrapper {
     return field?.isInitiallySet == true;
   }
 
+  
+
   FormGroupField<T> tryRegisterField<T>({
     required String name,
     required String? label,
@@ -49,9 +51,9 @@ class _FormGroupWrapper {
     required AutovalidateMode? autovalidateMode,
     required InputDecoration? decoration,
   }) {
-    if (kDebugMode) {
+    // if (kDebugMode) {
       // print('TRY REGISTER FIELD: $name');
-    }
+    // }
     if (_fields[name] == null) {
       _fields[name] = FormGroupField<T>(
         name: name,
@@ -74,20 +76,20 @@ class _FormGroupWrapper {
     _fields.remove(fieldName);
   }
 
-  void unregisterFieldIfOutdated({
-    required FormGroupField field,
-  }) {
-    if (field._isOutdated() == true) {
-      unregisterField(fieldName: field.name);
-    }
-  }
+  // void unregisterFieldIfOutdated({
+  //   required FormGroupField field,
+  // }) {
+  //   if (field._isOutdated() == true) {
+  //     unregisterField(fieldName: field.name);
+  //   }
+  // }
 
-  void unregisterAllOutdatedFields() {
-    final tempFields = [..._fields.values];
-    for (var field in tempFields) {
-      unregisterFieldIfOutdated(field: field);
-    }
-  }
+  // void unregisterAllOutdatedFields() {
+  //   final tempFields = [..._fields.values];
+  //   for (var field in tempFields) {
+  //     unregisterFieldIfOutdated(field: field);
+  //   }
+  // }
 
   FormGroupField? tryFindField(String fieldName) {
     return _fields[fieldName];

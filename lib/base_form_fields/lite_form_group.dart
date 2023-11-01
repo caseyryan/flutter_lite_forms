@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lite_forms/base_form_fields/mixins/post_frame_mixin.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
-import 'package:lite_state/lite_state.dart';
 
 /// all of the forms' errors, hints and labels call this
 /// function before displaying. The value passed as a parameter.
@@ -119,13 +119,27 @@ class _LiteGroupWrapper extends StatefulWidget {
   State<_LiteGroupWrapper> createState() => __LiteGroupWrapperState();
 }
 
-class __LiteGroupWrapperState extends State<_LiteGroupWrapper> {
+class __LiteGroupWrapperState extends State<_LiteGroupWrapper> with PostFrameMixin {
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     widget.onDispose();
     super.dispose();
+  }
+  
+  /// Called after a frame has been built
+  Future _tryUnregisterFields(BuildContext _) async {
+    final allFields = liteFormController.getAllFieldsOfForm(
+      formName: widget.name,
+    );
+
+    
+    for (var field in allFields) {
+      if (field.isMounted == false) {
+        print('${field.name} ${field.isMounted}');
+      }
+    }
   }
 
   @override
@@ -135,15 +149,9 @@ class __LiteGroupWrapperState extends State<_LiteGroupWrapper> {
       Theme.of(context).brightness,
     );
     if (widget.autoRemoveUnregisteredFields) {
-      /// TODO: придумать как грамотно разрегистрировать
-      /// устаревшие поля. Здесь это удаляет их раньше валидации
-      // WidgetsBinding.instance.ensureVisualUpdate();
-      // WidgetsBinding.instance.addPostFrameCallback((c) {
-      //   liteFormController.removeUnregisteredFields(
-      //     formName: widget.name,
-      //   );
-      // });
+      callAfterFrame(_tryUnregisterFields);
     }
+
     liteFormController.checkAlwaysValidatingFields(
       formName: widget.name,
     );
@@ -164,4 +172,7 @@ class __LiteGroupWrapperState extends State<_LiteGroupWrapper> {
       ),
     );
   }
+
+  @override
+  void didFirstLayoutFinished(BuildContext context) {}
 }

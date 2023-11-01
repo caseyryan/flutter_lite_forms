@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
-import 'package:lite_state/lite_state.dart';
 
 enum PasswordFieldCheckType {
   /// if passed, this will create a second line
