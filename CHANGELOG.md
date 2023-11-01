@@ -1,3 +1,5 @@
+## 0.0.5
+* Automatic unregistering of the unmounted fields
 ## 0.0.4
 * Removed image picker for web dependency
 ## 0.0.3
