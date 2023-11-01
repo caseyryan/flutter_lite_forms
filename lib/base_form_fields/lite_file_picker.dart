@@ -22,9 +22,9 @@ import 'treemap/src/treemap_layout.dart';
 part '_lite_file_picker_support.dart';
 
 class LiteFilePicker extends StatefulWidget {
-  const LiteFilePicker({
+  LiteFilePicker({
     required this.name,
-    super.key,
+    Key? key,
     this.autovalidateMode,
     this.maxFiles = 1,
     this.viewBuilder,
@@ -79,7 +79,8 @@ class LiteFilePicker extends StatefulWidget {
     //   'webp',
     //   'tif',
     // ],
-  }) : assert(sources.length > 0);
+  })  : assert(sources.isNotEmpty),
+        super(key: key ?? Key(name));
 
   final String name;
   final double menuButtonHeight;
@@ -293,7 +294,7 @@ class _LiteFilePickerState extends State<LiteFilePicker>
   }
 
   List<LiteFile> get _selectedFiles {
-    final value = getFormFieldValue<List<LiteFile>>(
+    final value = getFieldValue<List<LiteFile>>(
       formName: formName,
       fieldName: widget.name,
     );

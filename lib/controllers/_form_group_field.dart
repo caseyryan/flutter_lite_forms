@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field, empty_catches
+// ignore_for_file: unused_field, empty_catches, prefer_final_fields
 
 part of 'lite_form_controller.dart';
 
@@ -11,39 +11,22 @@ class FormGroupField<T> {
   InputDecoration? _decoration;
   _FormGroupWrapper? _parent;
 
-  bool _isMounted  = false;
+  bool _isMounted = false;
   bool get isMounted => _isMounted;
+
+  /// This is used to automatically exclude
+  /// unregistered fields from
+  /// the final form data
+  bool _isRemoved = false;
+  bool get isRemoved => _isRemoved;
 
   void unmount() {
     _isMounted = false;
-    // if (kDebugMode && !name.isIgnoredInForm()) {
-    //   print('UNMOUNTED $name');
-    // }
   }
-  
+
   void mount() {
     _isMounted = true;
-    _updatedAt = DateTime.now();
-    // if (kDebugMode && !name.isIgnoredInForm()) {
-    //   print('MOUNTED $name');
-    // }
   }
-
-  /// This allows us to unregister the fields that were not
-  /// registered during this build stage. E.e. you removed
-  /// a field by some condition. This filed might be automatically removed from
-  /// form
-  DateTime? _updatedAt;
-  DateTime? get updatedAt {
-    return _updatedAt;
-  }
-
-  // bool _isOutdated() {
-  //   if (_updatedAt == null) {
-  //     return false;
-  //   }
-  //   return DateTime.now().difference(_updatedAt!).inMilliseconds > 60;
-  // }
 
   TextEditingController? _textEditingController;
   TextEditingController? get textEditingController => _textEditingController;
@@ -198,6 +181,7 @@ class FormGroupField<T> {
   String? get error {
     return _error;
   }
+
   void _setError(String? error) {
     _error = error;
   }

@@ -37,9 +37,9 @@ typedef LiteDropSelectorViewBuilder = Widget Function(
 
 class LiteDropSelector extends StatefulWidget {
   LiteDropSelector({
+    Key? key,
     required this.name,
     required this.items,
-    super.key,
     this.menuItemBuilder,
     this.selectorViewBuilder,
     this.settings = const LiteDropSelectorSettings(),
@@ -75,10 +75,14 @@ class LiteDropSelector extends StatefulWidget {
     this.allowErrorTexts = true,
     this.sortBySelection = false,
     this.readOnly = false,
-  }) {
-    assert(items.isNotEmpty &&
-        (items.every((e) => e is String) ||
-            items.every((e) => e is LiteDropSelectorItem)));
+  }) : super(key: key ?? Key(name)) {
+    assert(
+      items.isNotEmpty &&
+          (items.every((e) => e is String) ||
+              items.every(
+                (e) => e is LiteDropSelectorItem,
+              )),
+    );
   }
 
   final String name;
@@ -185,7 +189,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
   }
 
   List<LiteDropSelectorItem> get _selectedOptions {
-    final value = getFormFieldValue<List<LiteDropSelectorItem>>(
+    final value = getFieldValue<List<LiteDropSelectorItem>>(
       formName: formName,
       fieldName: widget.name,
     );

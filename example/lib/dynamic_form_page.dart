@@ -16,7 +16,6 @@ class DynamicFormPage extends StatefulWidget {
 }
 
 class _DynamicFormPageState extends State<DynamicFormPage> {
-
   final DynamicFormController _controller = DynamicFormController();
 
   @override
@@ -40,10 +39,27 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                   sliver: SliverList(
                     delegate: SliverChildListDelegate(
                       [
+                        LiteSwitch(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          name: 'usePhone',
+                          label: 'Privacy Policy',
+                          reactionArea: LiteSwitchReactionArea.full,
+                          switchPosition: LiteSwitchPosition.left,
+                          useMarkdown: true,
+                          childPadding: EdgeInsets.only(
+                            left: 8.0,
+                            top: 10.0,
+                            bottom: 10.0,
+                          ),
+                          onChanged: controller.onPhoneUseChange,
+                          text: 'Use phone',
+                          paddingTop: 20.0,
+                          initialValue: false,
+                          type: LiteSwitchType.adaptive,
+                        ),
                         Row(
                           children: [
                             LiteFilePicker(
-                              key: Key('profileImage'),
                               name: 'profileImage',
                               aspectRatio: 4.0 / 3.0,
                               paddingTop: 20.0,
@@ -206,57 +222,40 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                             return value;
                           },
                         ),
-                        LiteSwitch(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          name: 'usePhone',
-                          label: 'Privacy Policy',
-                          reactionArea: LiteSwitchReactionArea.full,
-                          switchPosition: LiteSwitchPosition.left,
-                          useMarkdown: true,
-                          childPadding: EdgeInsets.only(
-                            left: 8.0,
-                            top: 10.0,
-                            bottom: 10.0,
-                          ),
-                          onChanged: controller.onPhoneUseChange,
-                          text: 'Use phone',
-                          paddingTop: 20.0,
-                          initialValue: false,
-                          type: LiteSwitchType.adaptive,
-                        ),
-                        LiteSwitch(
-                          readOnly: false,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          name: 'policy',
-                          label: 'Privacy Policy',
-                          // customLiteToggleBuilder: simpleSquareToggleBuilder,
-                          reactionArea: LiteSwitchReactionArea.full,
-                          switchPosition: LiteSwitchPosition.left,
-                          useMarkdown: true,
-                          childPadding: EdgeInsets.only(
-                            left: 8.0,
-                            top: 10.0,
-                            bottom: 10.0,
-                          ),
-                          text:
-                              'Read and accept our [Privacy Policy](https://github.com/caseyryan/flutter_lite_forms)',
-                          paddingTop: 20.0,
-                          initialValue: false,
-                          type: LiteSwitchType.adaptive,
-                          validators: [
-                            LiteValidator.required(
-                                errorText: 'You must accept our Privacy Policy'),
-                          ],
-                          initialValueDeserializer: (value) {
-                            if (value is String) {
-                              return value == 'true';
-                            }
-                            return value;
-                          },
-                          serializer: (value) {
-                            return value == true ? 'Yes' : 'No';
-                          },
-                        ),
+
+                        // LiteSwitch(
+                        //   readOnly: false,
+                        //   autovalidateMode: AutovalidateMode.onUserInteraction,
+                        //   name: 'policy',
+                        //   label: 'Privacy Policy',
+                        //   // customLiteToggleBuilder: simpleSquareToggleBuilder,
+                        //   reactionArea: LiteSwitchReactionArea.full,
+                        //   switchPosition: LiteSwitchPosition.left,
+                        //   useMarkdown: true,
+                        //   childPadding: EdgeInsets.only(
+                        //     left: 8.0,
+                        //     top: 10.0,
+                        //     bottom: 10.0,
+                        //   ),
+                        //   text:
+                        //       'Read and accept our [Privacy Policy](https://github.com/caseyryan/flutter_lite_forms)',
+                        //   paddingTop: 20.0,
+                        //   initialValue: false,
+                        //   type: LiteSwitchType.adaptive,
+                        //   validators: [
+                        //     LiteValidator.required(
+                        //         errorText: 'You must accept our Privacy Policy'),
+                        //   ],
+                        //   initialValueDeserializer: (value) {
+                        //     if (value is String) {
+                        //       return value == 'true';
+                        //     }
+                        //     return value;
+                        //   },
+                        //   serializer: (value) {
+                        //     return value == true ? 'Yes' : 'No';
+                        //   },
+                        // ),
                         // const SizedBox(height: 1500,),
                         MaterialButton(
                           onPressed: () async {
@@ -265,6 +264,9 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                                 formName: formName,
                                 applySerializers: true,
                               );
+
+                              // final dob = getValue('$formName.dateOfBirth');
+                              // print(dob);
                               if (kDebugMode) {
                                 print(formData);
                               }

@@ -56,6 +56,7 @@ class LiteFormGroup extends InheritedWidget {
                 controller.createFormIfNull(
                   formName: name,
                   formState: formState,
+                  autoRemoveUnregisteredFields: autoRemoveUnregisteredFields,
                 );
 
                 return child;
@@ -127,18 +128,19 @@ class __LiteGroupWrapperState extends State<_LiteGroupWrapper> with PostFrameMix
     widget.onDispose();
     super.dispose();
   }
-  
+
   /// Called after a frame has been built
+  /// to make sure all dependencies are set
   Future _tryUnregisterFields(BuildContext _) async {
     final allFields = liteFormController.getAllFieldsOfForm(
       formName: widget.name,
     );
-
-    
     for (var field in allFields) {
-      if (field.isMounted == false) {
-        print('${field.name} ${field.isMounted}');
-      }
+      liteFormController.changeRemoveState(
+        fieldName: field.name,
+        formName: widget.name,
+        isRemoved: !field.isMounted,
+      );
     }
   }
 

@@ -29,9 +29,14 @@ part of 'lite_form_controller.dart';
 class _FormGroupWrapper {
   final Map<String, FormGroupField> _fields = {};
 
+  final bool autoRemoveUnregisteredFields;
+
+  _FormGroupWrapper({
+    required this.autoRemoveUnregisteredFields,
+  });
+
   /// required to call native validators
   FormState? _formState;
-
   bool get isBeingValidated {
     return _fields.values.any((e) => e._isBeingValidated);
   }
@@ -40,8 +45,6 @@ class _FormGroupWrapper {
     final FormGroupField? field = _fields[fieldName];
     return field?.isInitiallySet == true;
   }
-
-  
 
   FormGroupField<T> tryRegisterField<T>({
     required String name,
@@ -52,7 +55,7 @@ class _FormGroupWrapper {
     required InputDecoration? decoration,
   }) {
     // if (kDebugMode) {
-      // print('TRY REGISTER FIELD: $name');
+    // print('TRY REGISTER FIELD: $name');
     // }
     if (_fields[name] == null) {
       _fields[name] = FormGroupField<T>(
@@ -66,7 +69,7 @@ class _FormGroupWrapper {
     field._autovalidateMode = autovalidateMode;
     field._parent = this;
     field._decoration = decoration;
-    field._updatedAt = DateTime.now();
+    field.mount();
     return _fields[name] as FormGroupField<T>;
   }
 
@@ -100,7 +103,7 @@ class _FormGroupWrapper {
   ) async {
     final map = <String, dynamic>{};
     for (var kv in _fields.entries) {
-      if (kv.key.isIgnoredInForm()) {
+      if (kv.key.isIgnoredInForm() || kv.value._isRemoved) {
         continue;
       }
       if (applySerializers) {

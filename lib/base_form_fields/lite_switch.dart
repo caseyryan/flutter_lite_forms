@@ -44,8 +44,8 @@ enum LiteSwitchReactionArea {
 }
 
 class LiteSwitch extends StatefulWidget {
-  const LiteSwitch({
-    super.key,
+  LiteSwitch({
+    Key? key,
     required this.name,
     this.switchPosition = LiteSwitchPosition.left,
     this.reactionArea = LiteSwitchReactionArea.full,
@@ -97,10 +97,11 @@ class LiteSwitch extends StatefulWidget {
       top: 8.0,
     ),
     this.errorStyle,
-  }) : assert(
+  })  : assert(
           (child == null || text == null),
           'You cannot pass both `text` and `child` at the same time',
-        );
+        ),
+        super(key: key ?? Key(name));
 
   /// The position of the switch relative to a [child] or a [text]
   final LiteSwitchPosition switchPosition;
@@ -205,8 +206,6 @@ class LiteSwitch extends StatefulWidget {
 }
 
 class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
-  
-
   FutureOr<bool?> _tryGetValue({
     required String formName,
     required String fieldName,

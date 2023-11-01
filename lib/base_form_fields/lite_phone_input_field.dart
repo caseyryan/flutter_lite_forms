@@ -69,8 +69,8 @@ class PhoneData {
 }
 
 class LitePhoneInputField extends StatefulWidget {
-  const LitePhoneInputField({
-    super.key,
+  LitePhoneInputField({
+    Key? key,
     required this.name,
     this.initialValueDeserializer,
     this.phoneInputType = LitePhoneInputType.autodetectCode,
@@ -108,7 +108,7 @@ class LitePhoneInputField extends StatefulWidget {
     this.allowErrorTexts = true,
     this.allowEndlessPhone = false,
     this.countrySelectorViewType = LiteDropSelectorViewType.menu,
-  });
+  }) : super(key: key ?? Key(name));
 
   final String name;
   final ValueChanged<Object?>? onChanged;
@@ -211,7 +211,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
   CountryData? _selectedCountry;
 
   CountryData? _tryGetCountryFromDropSelector() {
-    final value = getFormFieldValue(
+    final value = getFieldValue(
       formName: formName,
       fieldName: _dropSelectorName,
     );
@@ -236,7 +236,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
   }
 
   PhoneData get _selectedPhone {
-    PhoneData? phoneData = getFormFieldValue(
+    PhoneData? phoneData = getFieldValue(
       formName: formName,
       fieldName: widget.name,
     );

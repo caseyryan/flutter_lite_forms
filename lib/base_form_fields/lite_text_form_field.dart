@@ -25,8 +25,8 @@ class TextEntryModalRouteSettings {
 }
 
 class LiteTextFormField extends StatefulWidget {
-  const LiteTextFormField({
-    super.key,
+  LiteTextFormField({
+    Key? key,
     required this.name,
     this.textEntryType = LiteTextEntryType.normal,
     this.useSmoothError = true,
@@ -94,7 +94,7 @@ class LiteTextFormField extends StatefulWidget {
     this.paddingLeft = 0.0,
     this.paddingRight = 0.0,
     this.modalRouteSettings,
-  });
+  }) : super(key: key ?? Key(name));
 
   final String name;
   final String? hintText;
@@ -200,8 +200,7 @@ class LiteTextFormField extends StatefulWidget {
   State<LiteTextFormField> createState() => _LiteTextFormFieldState();
 }
 
-class _LiteTextFormFieldState extends State<LiteTextFormField>
-    with FormFieldMixin {
+class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMixin {
   VoidCallback? _getTapMethod() {
     if (widget.textEntryType == LiteTextEntryType.onModalRoute) {
       return _openTextEntryRoute;
@@ -454,9 +453,8 @@ class __TextEntryPageState extends State<_TextEntryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final TextEntryModalRouteSettings? routeSettings =
-        widget.modalRouteSettings ??
-            liteFormController.config?.defaultTextEntryModalRouteSettings;
+    final TextEntryModalRouteSettings? routeSettings = widget.modalRouteSettings ??
+        liteFormController.config?.defaultTextEntryModalRouteSettings;
     _textEditingController = TextEditingController(
       text: widget.text,
     );

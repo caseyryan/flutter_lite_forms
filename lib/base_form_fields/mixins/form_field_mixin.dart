@@ -15,11 +15,6 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
   late final String _fieldName;
   String? _label;
 
-  /// needed to check if the field is in a tree
-  String get widgetName {
-    return (widget as dynamic).name;
-  }
-
   dynamic _initialValue;
   dynamic get initialValue {
     return _initialValue;
@@ -43,8 +38,47 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _reactivate();
+  }
+
+  @override
+  void didUpdateWidget(covariant oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _reactivate();
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    _reactivate();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _reactivate();
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    _reactivate();
+  }
+
+  void _reactivate() {
+    if (_isInitialized) {
+      field.mount();
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
+    if (_isInitialized) {
+      field.unmount();
+    }
   }
 
   /// Checks if a field is initially set to not let it
@@ -83,29 +117,6 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     }
   }
 
-
-  @override
-  void activate() {
-    // print('ACTIVATE ${(widget as dynamic).name}');
-    super.activate();
-  }
-
-  void _mount() {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        field.mount();
-      },
-    );
-  }
-  
-
-  @override
-  void deactivate() {
-    // print('DEACTIVATE ${(widget as dynamic).name}');
-    field.unmount();
-    super.deactivate();
-  }
-
   void initializeFormField<E>({
     required String fieldName,
     required String? label,
@@ -117,6 +128,11 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     required InputDecoration? decoration,
     required TextStyle? errorStyle,
   }) {
+    assert(
+      widget.key != null,
+      'You must add a key to your Form Field widget',
+    );
+
     _group = LiteFormGroup.of(context)!;
     _label = label;
 
@@ -184,8 +200,12 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
         decoration: decoration,
         autovalidateMode: autovalidateMode,
       );
+    } else {
+      _reactivate();
+      // if (!_fieldName.isIgnoredInForm()) {
+      //   if (group.autoRemoveUnregisteredFields) {}
+      // }
     }
-    _mount();
   }
 
   TextStyle get errorStyle {

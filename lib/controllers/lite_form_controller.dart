@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/utils/exports.dart';
@@ -38,10 +37,13 @@ class LiteFormController extends LiteStateController<LiteFormController> {
   /// was not created previously
   void createFormIfNull({
     required String formName,
+    required bool autoRemoveUnregisteredFields,
     FormState? formState,
   }) {
     if (!_formGroups.containsKey(formName)) {
-      _formGroups[formName] = _FormGroupWrapper();
+      _formGroups[formName] = _FormGroupWrapper(
+        autoRemoveUnregisteredFields: autoRemoveUnregisteredFields,
+      );
     }
     if (formState != null) {
       _formGroups[formName]?._formState = formState;
@@ -108,6 +110,20 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     final result = await _formGroups[formName]?.validate() ?? true;
     stopLoading();
     return result;
+  }
+
+  void changeRemoveState({
+    required String formName,
+    required String fieldName,
+    required bool isRemoved,
+  }) {
+    final field = tryGetField(
+      fieldName: fieldName,
+      formName: formName,
+    );
+    if (field != null) {
+      field._isRemoved = isRemoved;
+    }
   }
 
   Iterable<FormGroupField> getAllFieldsOfForm({
@@ -193,7 +209,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     required AutovalidateMode? autovalidateMode,
     required InputDecoration? decoration,
   }) {
-    createFormIfNull(formName: formName);
+    // createFormIfNull(formName: formName);
     final groupWrapper = _formGroups[formName]!;
     return groupWrapper.tryRegisterField(
       name: fieldName,

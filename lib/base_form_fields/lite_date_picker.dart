@@ -15,8 +15,8 @@ enum LiteDatePickerType {
 }
 
 class LiteDatePicker extends StatefulWidget {
-  const LiteDatePicker({
-    super.key,
+  LiteDatePicker({
+    Key? key,
     required this.name,
     this.serializer = nonConvertingValueConvertor,
     this.initialValueDeserializer,
@@ -54,7 +54,7 @@ class LiteDatePicker extends StatefulWidget {
     this.useSmoothError = true,
     this.allowErrorTexts = true,
     this.readOnly = false,
-  });
+  }) : super(key: key ?? Key(name));
 
   /// The look and feel of the picker
   /// [LiteDatePickerType.adaptive] is selected by default
@@ -138,7 +138,6 @@ class LiteDatePicker extends StatefulWidget {
 }
 
 class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
-
   LiteDatePickerType get _type {
     if (widget.pickerType == LiteDatePickerType.adaptive) {
       if (ExtendedPlatform.isIOS) {

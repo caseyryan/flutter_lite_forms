@@ -13,10 +13,22 @@ void clearLiteForm(String formName) {
   liteFormController.clearForm(formName);
 }
 
+/// It's just a shorthand for [getFieldValue]
+/// path is a dot separated path where the first part is
+/// form name and the second is field name
+/// e.g. signup.lastName
+T? getValue<T>(String path) {
+  final split = path.split('.');
+  return getFieldValue(
+    formName: split[0],
+    fieldName: split[1],
+  );
+}
+
 /// Returns current value for any form field.
 /// If the form is not disposed and the value was set
 /// you can get it here
-T? getFormFieldValue<T>({
+T? getFieldValue<T>({
   required String formName,
   required String fieldName,
   bool applySerializer = false,
@@ -60,8 +72,6 @@ Future<Map<String, dynamic>> getFormData({
     applySerializers: applySerializers,
   );
 }
-
-
 
 LiteFormController get liteFormController {
   return findController<LiteFormController>();
