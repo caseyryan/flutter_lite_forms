@@ -1,3 +1,5 @@
+## 0.0.7
+* Shorthand for phone setting
 ## 0.0.6
 * Fixed text style in search field
 ## 0.0.5
