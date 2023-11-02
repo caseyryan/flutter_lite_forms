@@ -1,3 +1,5 @@
+## 0.0.9
+* Fixed text editing controller in phone input
 ## 0.0.8
 * Country list restriction
 ## 0.0.7

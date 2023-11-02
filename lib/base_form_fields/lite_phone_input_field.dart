@@ -121,7 +121,7 @@ class LitePhoneInputField extends StatefulWidget {
   final String name;
   final bool autofocus;
   final ValueChanged<Object?>? onChanged;
-  
+
   /// [phoneCountries] you can pass a list of [CountryData] objects here
   /// or a list of String names. If you pass a list of Strings
   /// it will try to find countries by a provided names
@@ -539,6 +539,8 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
         }
       }
     }
+    (field.preprocessor as PhonePreprocessor).textEditingController =
+        textEditingController;
 
     return field.preprocessor! as PhonePreprocessor;
   }
