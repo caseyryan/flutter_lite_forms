@@ -1,4 +1,8 @@
+// ignore_for_file: library_private_types_in_public_api
+
 part of 'lite_form_controller.dart';
+
+
 
 bool get isDarkTheme {
   return liteFormController._brightness == Brightness.dark;

@@ -11,6 +11,10 @@ class FormGroupField<T> {
   InputDecoration? _decoration;
   _FormGroupWrapper? _parent;
 
+  IPreprocessor? preprocessor;
+  String? _formName;
+  String get formName => _formName ?? '';
+
   bool _isMounted = false;
   bool get isMounted => _isMounted;
 
@@ -100,13 +104,23 @@ class FormGroupField<T> {
     return _value;
   }
 
+  Object? getValue([
+    bool applySerializer = false,
+  ]) {
+    final rawValue = _value;
+    if (applySerializer) {
+      return getSerializedValue();
+    }
+    return rawValue;
+  }
+
   /// [view] is a String that will be displayed
   /// to a user. This must be null for text inputs
   /// since they are updated on user input but for
   /// other inputs e.g. a LiteDatePicker this must be a
   /// formatted date representation
   void onChange(
-    Object? value, [
+    dynamic value, [
     bool isInitialValue = false,
     String? view,
   ]) {
@@ -114,6 +128,15 @@ class FormGroupField<T> {
     if (value != null) {
       _isInitiallySet = true;
       if (isInitialValue) {
+        /// Some fields might have a preprocessor
+        /// e.g. [LitePhoneInputField]
+        if (preprocessor != null) {
+          try {
+            _value = preprocessor!.preprocess(value);
+          } catch (e) {}
+          view = preprocessor?.view;
+        }
+
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           try {
             textEditingController?.text = view ?? _value.toString();
@@ -156,6 +179,10 @@ class FormGroupField<T> {
   }
 
   Future _checkError() async {
+    if (isRemoved) {
+      _error = null;
+      return;
+    }
     _numValidations++;
     dynamic fieldAsDynamic = this as dynamic;
     final lastError = _error;

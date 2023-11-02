@@ -48,6 +48,7 @@ class _FormGroupWrapper {
 
   FormGroupField<T> tryRegisterField<T>({
     required String name,
+    required String formName,
     required String? label,
     required LiteFormValueSerializer serializer,
     required List<LiteValidator>? validators,
@@ -66,6 +67,7 @@ class _FormGroupWrapper {
     final field = _fields[name]! as FormGroupField<T>;
     field._serializer = serializer;
     field._validators = validators;
+    field._formName = formName;
     field._autovalidateMode = autovalidateMode;
     field._parent = this;
     field._decoration = decoration;

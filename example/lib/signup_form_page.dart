@@ -35,18 +35,18 @@ class SignupFormPage extends StatelessWidget {
               sliver: SliverList(
                 delegate: SliverChildListDelegate(
                   [
-                    LiteSearchField(
-                      paddingTop: 20.0,
-                      onSearch: (value) {
-                        if (kDebugMode) {
-                          print('Searching for: $value');
-                        }
-                      },
-                      settings: LiteSearchFieldSettings(
-                        searchTriggerType: SearchTriggerType.automatic,
-                        iconPosition: LiteSearchFieldIconPosition.left,
-                      ),
-                    ),
+                    // LiteSearchField(
+                    //   paddingTop: 20.0,
+                    //   onSearch: (value) {
+                    //     if (kDebugMode) {
+                    //       print('Searching for: $value');
+                    //     }
+                    //   },
+                    //   settings: LiteSearchFieldSettings(
+                    //     searchTriggerType: SearchTriggerType.automatic,
+                    //     iconPosition: LiteSearchFieldIconPosition.left,
+                    //   ),
+                    // ),
                     Row(
                       children: [
                         // LiteFilePicker(
@@ -65,32 +65,32 @@ class SignupFormPage extends StatelessWidget {
                         //     maxHeight: 100.0,
                         //   ),
                         // ),
-                        LiteFilePicker(
-                          key: Key('image2'),
-                          name: 'image2',
-                          aspectRatio: 6.0 / 4.0,
-                          imageSpacing: 3.0,
-                          validators: [
-                            LiteValidator.required(),
-                            FileSizeValidator(
-                              maxSize: FileSize(
-                                megaBytes: 3,
-                                kiloBytes: 0,
-                              ),
-                            )
-                          ],
-                          paddingTop: 20.0,
-                          allowImages: true,
-                          allowVideo: true,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          maxFiles: 4,
-                          paddingRight: 10.0,
-                          serializer: LiteSerializers.filesToMapList,
-                          constraints: BoxConstraints(
-                            maxWidth: 220.0,
-                            maxHeight: 200.0,
-                          ),
-                        ),
+                        // LiteFilePicker(
+                        //   key: Key('image2'),
+                        //   name: 'image2',
+                        //   aspectRatio: 6.0 / 4.0,
+                        //   imageSpacing: 3.0,
+                        //   validators: [
+                        //     LiteValidator.required(),
+                        //     FileSizeValidator(
+                        //       maxSize: FileSize(
+                        //         megaBytes: 3,
+                        //         kiloBytes: 0,
+                        //       ),
+                        //     )
+                        //   ],
+                        //   paddingTop: 20.0,
+                        //   allowImages: true,
+                        //   allowVideo: true,
+                        //   autovalidateMode: AutovalidateMode.onUserInteraction,
+                        //   maxFiles: 4,
+                        //   paddingRight: 10.0,
+                        //   serializer: LiteSerializers.filesToMapList,
+                        //   constraints: BoxConstraints(
+                        //     maxWidth: 220.0,
+                        //     maxHeight: 200.0,
+                        //   ),
+                        // ),
                       ],
                     ),
                     // LiteTextFormField(
@@ -144,6 +144,21 @@ class SignupFormPage extends StatelessWidget {
                       serializer: LiteSerializers.phoneDataToFormattedString,
                       // serializer: LiteSerializers.phoneDataToUnformattedString,
                       // serializer: LiteSerializers.fullPhoneDataWithCountry,
+                      validators: [
+                        LiteValidator.phone(),
+                      ],
+                    ),
+                    LitePhoneInputField(
+                      name: 'phone2',
+                      readOnly: false,
+                      paddingTop: 20.0,
+                      paddingBottom: 20.0,
+                      initialValue: '+79517773344',
+                      // defaultCountry: 'russia',
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      phoneInputType: LitePhoneInputType.autodetectCode,
+                      // phoneInputType: LitePhoneInputType.manualCode,
+                      serializer: LiteSerializers.phoneDataToFormattedString,
                       validators: [
                         LiteValidator.phone(),
                       ],
@@ -286,37 +301,37 @@ class SignupFormPage extends StatelessWidget {
                     //     ),
                     //   ),
                     // ),
-                    LiteDatePicker(
-                      paddingTop: 20.0,
-                      readOnly: false,
-                      textAlign: TextAlign.center,
-                      dateInputType: DateInputType.both,
-                      name: 'dateOfBirth',
+                    // LiteDatePicker(
+                    //   paddingTop: 20.0,
+                    //   readOnly: false,
+                    //   textAlign: TextAlign.center,
+                    //   dateInputType: DateInputType.both,
+                    //   name: 'dateOfBirth',
 
-                      /// notice that you can pass DateTime object here or
-                      /// a String representation of a date. Both cases
-                      /// will be processed by initialValueDeserializer below
-                      /// and the LiteDatePicker will get a valid DateTime
-                      /// object as an input
-                      // initialValue: DateTime.now(),
-                      initialValue: DateTime.now().toIso8601String(),
-                      pickerType: LiteDatePickerType.material,
-                      autovalidateMode: AutovalidateMode.disabled,
-                      validators: [
-                        LiteValidator.dateOfBirth(
-                          minAgeYears: 18,
-                        ),
-                      ],
-                      initialValueDeserializer: (value) {
-                        if (value is DateTime) {
-                          return value;
-                        }
-                        if (value is String) {
-                          return DateTime.tryParse(value);
-                        }
-                        return value;
-                      },
-                    ),
+                    //   /// notice that you can pass DateTime object here or
+                    //   /// a String representation of a date. Both cases
+                    //   /// will be processed by initialValueDeserializer below
+                    //   /// and the LiteDatePicker will get a valid DateTime
+                    //   /// object as an input
+                    //   // initialValue: DateTime.now(),
+                    //   initialValue: DateTime.now().toIso8601String(),
+                    //   pickerType: LiteDatePickerType.material,
+                    //   autovalidateMode: AutovalidateMode.disabled,
+                    //   validators: [
+                    //     // LiteValidator.dateOfBirth(
+                    //     //   minAgeYears: 18,
+                    //     // ),
+                    //   ],
+                    //   initialValueDeserializer: (value) {
+                    //     if (value is DateTime) {
+                    //       return value;
+                    //     }
+                    //     if (value is String) {
+                    //       return DateTime.tryParse(value);
+                    //     }
+                    //     return value;
+                    //   },
+                    // ),
                     // LiteSwitch(
                     //   readOnly: false,
                     //   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -371,6 +386,22 @@ class SignupFormPage extends StatelessWidget {
                         }
                       },
                       child: Text('Sign Up'),
+                    ),
+
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    MaterialButton(
+                      onPressed: () async {
+                        final value = await form('signupForm.phone').field.get(true);
+                        // print(value);
+                        // form('signupForm.phone').phone.set(
+                        //       '(999) 444 6677',
+                        //       country: CountryData.find('GB'),
+                        //     );
+                        form('signupForm.phone2').phone.set('+44 (999) 444 6677');
+                      },
+                      child: Text('Set Phone'),
                     ),
                     SizedBox(
                       height: 2000,

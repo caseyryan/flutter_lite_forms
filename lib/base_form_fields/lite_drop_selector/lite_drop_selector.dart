@@ -325,6 +325,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
     );
+    
 
     tryDeserializeInitialValueIfNecessary(
       rawInitialValue: preparedInitialValue,

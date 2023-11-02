@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_multi_formatter/widgets/country_flag.dart';
 import 'package:lite_forms/base_form_fields/exports.dart';
 import 'package:lite_forms/base_form_fields/mixins/search_query_mixin.dart';
+import 'package:lite_forms/interfaces/preprocessor.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
 import 'package:lite_forms/utils/value_validator.dart';
+
+import '../mixins/form_field_mixin.dart';
 
 part '_country_collection.dart';
 
 class LiteCountrySelector extends StatefulWidget {
-  const LiteCountrySelector({
-    super.key,
+  LiteCountrySelector({
+    Key? key,
     required this.name,
     this.menuItemBuilder,
     this.selectorViewBuilder,
@@ -26,6 +29,7 @@ class LiteCountrySelector extends StatefulWidget {
     this.pickerBackgroundColor,
     this.autovalidateMode,
     this.hintText,
+    this.label,
     this.decoration,
     this.locale = 'en',
     this.paddingTop = 0.0,
@@ -47,10 +51,11 @@ class LiteCountrySelector extends StatefulWidget {
     this.sortBySelection = true,
     this.readOnly = false,
     this.countries,
-  });
+  }) : super(key: key ?? Key(name));
 
   final String name;
   final bool readOnly;
+
   /// [locale] two-letter locale like "ru" or "en"
   final String locale;
 
@@ -88,6 +93,7 @@ class LiteCountrySelector extends StatefulWidget {
   final MenuItemBuilder? menuItemBuilder;
 
   final String? hintText;
+  final String? label;
   final InputDecoration? decoration;
   final double paddingTop;
   final double paddingBottom;
@@ -141,19 +147,28 @@ class LiteCountrySelector extends StatefulWidget {
   State<LiteCountrySelector> createState() => _LiteCountrySelectorState();
 }
 
-class _LiteCountrySelectorState extends State<LiteCountrySelector> {
-  List<LiteDropSelectorItem>? _prepareInitialValue(
+class CountryPreprocessor implements IPreprocessor {
+  @override
+  List<LiteDropSelectorItem<CountryData>>? preprocess(Object? value) {
+    return _prepareInitialValue(value);
+  }
+
+  List<LiteDropSelectorItem<CountryData>>? _prepareInitialValue(
     dynamic initialValue,
   ) {
     if (initialValue == null) {
       return null;
     }
+    if (initialValue is List<LiteDropSelectorItem>) {
+      return initialValue as dynamic;
+    }
+
     if (initialValue is String) {
       CountryData? initialCountry;
       initialCountry = tryFindCountries(initialValue).firstOrNull;
       if (initialCountry != null) {
         initialValue = [
-          LiteDropSelectorItem(
+          LiteDropSelectorItem<CountryData>(
             title: initialCountry.name,
             payload: initialCountry,
           )
@@ -163,13 +178,13 @@ class _LiteCountrySelectorState extends State<LiteCountrySelector> {
       }
     } else if (initialValue is CountryData) {
       initialValue = [
-        LiteDropSelectorItem(
+        LiteDropSelectorItem<CountryData>(
           title: initialValue.name,
           payload: initialValue,
         )
       ];
     } else if (initialValue is List) {
-      final tempList = <LiteDropSelectorItem>[];
+      final tempList = <LiteDropSelectorItem<CountryData>>[];
       for (var v in initialValue) {
         final list = _prepareInitialValue(v)?.toList() ?? [];
         tempList.addAll(list);
@@ -180,6 +195,11 @@ class _LiteCountrySelectorState extends State<LiteCountrySelector> {
     return initialValue;
   }
 
+  @override
+  String? get view => null;
+}
+
+class _LiteCountrySelectorState extends State<LiteCountrySelector> with FormFieldMixin {
   Widget _iconBuilder(
     BuildContext context,
     LiteDropSelectorItem item,
@@ -191,8 +211,25 @@ class _LiteCountrySelectorState extends State<LiteCountrySelector> {
     );
   }
 
+  CountryPreprocessor get _preprocessor {
+    field.preprocessor ??= CountryPreprocessor();
+    return field.preprocessor! as CountryPreprocessor;
+  }
+
   @override
   Widget build(BuildContext context) {
+    initializeFormField(
+      fieldName: widget.name,
+      autovalidateMode: widget.autovalidateMode,
+      serializer: widget.serializer,
+      initialValueDeserializer: widget.initialValueDeserializer,
+      validators: widget.validators,
+      hintText: widget.hintText,
+      label: widget.label,
+      decoration: widget.decoration,
+      errorStyle: widget.errorStyle,
+    );
+
     List<LiteDropSelectorItem> items = [];
     if (widget.countries?.isNotEmpty == true) {
       final tempDatas = widget.countries!.map((e) {
@@ -235,11 +272,12 @@ class _LiteCountrySelectorState extends State<LiteCountrySelector> {
       ).toList();
     }
 
-    dynamic initialValue = _prepareInitialValue(
+    Object? initialValue = _preprocessor.preprocess(
       widget.initialValue,
     );
 
     return LiteDropSelector(
+      key: Key(widget.name),
       name: widget.name,
       items: items,
       readOnly: widget.readOnly,
@@ -257,7 +295,7 @@ class _LiteCountrySelectorState extends State<LiteCountrySelector> {
       pickerBackgroundColor: widget.pickerBackgroundColor,
       onChanged: widget.onChanged,
       validators: widget.validators,
-      initialValue: initialValue,
+      initialValue: initialValue as dynamic,
       serializer: widget.serializer,
       errorStyle: widget.errorStyle,
       decoration: widget.decoration,

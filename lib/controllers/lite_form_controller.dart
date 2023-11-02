@@ -2,12 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
+import 'package:lite_forms/interfaces/preprocessor.dart';
 import 'package:lite_forms/utils/exports.dart';
 import 'package:lite_forms/utils/lite_forms_configuration.dart';
 import 'package:lite_state/lite_state.dart';
 
+import '../base_form_fields/exports.dart';
+
 part '_form_group_field.dart';
 part '_global_functions.dart';
+part '_shorthands.dart';
 part 'group_wrapper.dart';
 
 class LiteFormController extends LiteStateController<LiteFormController> {
@@ -88,12 +92,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
       formName: formName,
       fieldName: fieldName,
     );
-
-    final rawValue = field?._value;
-    if (applySerializer) {
-      return field?.getSerializedValue();
-    }
-    return rawValue;
+    return field?.getValue(applySerializer);
   }
 
   FormGroupField? tryGetField({
@@ -184,6 +183,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
             isInitialValue,
             view,
           );
+      liteFormRebuildController.rebuild();
     }
   }
 
@@ -213,6 +213,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     final groupWrapper = _formGroups[formName]!;
     return groupWrapper.tryRegisterField(
       name: fieldName,
+      formName: formName,
       label: label,
       serializer: serializer,
       validators: validators,
