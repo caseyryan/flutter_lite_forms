@@ -1,3 +1,5 @@
+## 0.0.8
+* Country list restriction
 ## 0.0.7
 * Shorthand for phone setting
 ## 0.0.6

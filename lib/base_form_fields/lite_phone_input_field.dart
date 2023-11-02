@@ -39,7 +39,7 @@ class PhoneData {
     );
     return '+$value';
   }
-  
+
   @override
   String toString() {
     return 'PhoneData(`$fullPhone`)';
@@ -81,6 +81,7 @@ class LitePhoneInputField extends StatefulWidget {
     this.initialValueDeserializer,
     this.phoneInputType = LitePhoneInputType.autodetectCode,
     this.initialValue,
+    this.phoneCountries,
     this.decoration,
     this.readOnly = false,
     this.hintText,
@@ -98,6 +99,7 @@ class LitePhoneInputField extends StatefulWidget {
     this.paddingRight = 0.0,
     this.textCapitalization = TextCapitalization.none,
     this.strutStyle,
+    this.autofocus = false,
     this.textDirection,
     this.restorationId,
     this.locale = 'en',
@@ -117,7 +119,16 @@ class LitePhoneInputField extends StatefulWidget {
   }) : super(key: key ?? Key(name));
 
   final String name;
+  final bool autofocus;
   final ValueChanged<Object?>? onChanged;
+  
+  /// [phoneCountries] you can pass a list of [CountryData] objects here
+  /// or a list of String names. If you pass a list of Strings
+  /// it will try to find countries by a provided names
+  ///
+  /// Notice: in case of Strings it is not guaranteed that all countries
+  /// will be present on the list
+  final List<Object>? phoneCountries;
 
   /// [locale] two-letter locale like "ru" or "en"
   final String locale;
@@ -400,8 +411,6 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
     return _preprocessor._selectedPhone;
   }
 
-
-
   Future _focusField() async {
     focusNode?.requestFocus();
   }
@@ -416,6 +425,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
           return const SizedBox.shrink();
         }
         return LiteCountrySelector(
+          countries: widget.phoneCountries,
           readOnly: widget.readOnly,
           locale: widget.locale,
           menuItemBuilder: widget.menuItemBuilder,
@@ -600,6 +610,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
               SizedBox(
                 key: _globalKey,
                 child: TextFormField(
+                  autofocus: widget.autofocus,
                   readOnly: widget.readOnly,
                   restorationId: widget.restorationId,
                   validator: widget.validators != null

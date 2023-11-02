@@ -137,6 +137,10 @@ class SignupFormPage extends StatelessWidget {
                       paddingTop: 20.0,
                       paddingBottom: 20.0,
                       initialValue: '+79517773344',
+                      phoneCountries: [
+                        CountryData.find('RU')!,
+                        CountryData.find('US')!,
+                      ],
                       // defaultCountry: 'russia',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       // phoneInputType: LitePhoneInputType.autodetectCode,
@@ -154,6 +158,7 @@ class SignupFormPage extends StatelessWidget {
                       paddingTop: 20.0,
                       paddingBottom: 20.0,
                       initialValue: '+79517773344',
+                      
                       // defaultCountry: 'russia',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       phoneInputType: LitePhoneInputType.autodetectCode,
