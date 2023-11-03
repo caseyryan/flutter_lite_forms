@@ -24,6 +24,13 @@ class _FormShorthand {
     );
   }
 
+  _TimerFieldShorthand get timer {
+    return _TimerFieldShorthand(
+      formName: formName,
+      name: fieldName,
+    );
+  }
+
   /// General field expects the exact data type
   /// which it stores
   _GeneralFieldShorthand get field {
@@ -40,6 +47,48 @@ class _FormShorthand {
       fieldName: fieldName,
     );
     return _PhoneFieldShorthand().._formField = formField;
+  }
+}
+
+class _TimerFieldShorthand {
+  _TimerFieldShorthand({
+    required this.name,
+    required this.formName,
+  });
+  final String name;
+  final String formName;
+
+  int get seconds {
+    return liteTimerController.getNumSecondsLeftByName(
+      groupName: formName,
+      timerName: name,
+    );
+  }
+
+  void start() {
+    liteTimerController.startTimerByName(
+      groupName: formName,
+      timerName: name,
+    );
+  }
+
+  bool get isActive {
+    return liteTimerController.getIsActiveState(
+      groupName: formName,
+      timerName: name,
+    );
+  }
+
+  void reset({
+    int? numSeconds,
+    bool forceStart = false,
+  }) {
+    liteTimerController.resetTimerByName(
+      groupName: formName,
+      timerName: name,
+      forceStart: forceStart,
+      numSeconds: numSeconds,
+    );
   }
 }
 
@@ -79,7 +128,6 @@ class _PhoneFieldShorthand {
           view: null,
           isInitialValue: true,
         );
-        
       }
     }
 

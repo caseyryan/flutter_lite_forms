@@ -4,7 +4,9 @@
 import 'package:example/profile_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:lite_forms/base_form_fields/lite_timeout/lite_timeout.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
+import 'package:lite_forms/controllers/lite_timer_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
 
 class SignupFormPage extends StatelessWidget {
@@ -158,7 +160,7 @@ class SignupFormPage extends StatelessWidget {
                       paddingTop: 20.0,
                       paddingBottom: 20.0,
                       initialValue: '+79517773344',
-                      
+
                       // defaultCountry: 'russia',
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       phoneInputType: LitePhoneInputType.autodetectCode,
@@ -167,6 +169,11 @@ class SignupFormPage extends StatelessWidget {
                       validators: [
                         LiteValidator.phone(),
                       ],
+                    ),
+                    LiteTimeout(
+                      name: 'timer',
+                      seconds: 15,
+                      autostart: false,
                     ),
                     // LiteDropSelector(
                     //   paddingTop: 20.0,
@@ -407,6 +414,28 @@ class SignupFormPage extends StatelessWidget {
                         form('signupForm.phone2').phone.set('+44 (999) 444 6677');
                       },
                       child: Text('Set Phone'),
+                    ),
+                    MaterialButton(
+                      onPressed: () async {
+                        liteTimerController.resetTimerByName(
+                          timerName: 'timer',
+                          groupName: formName,
+                          numSeconds: 40
+                        );
+                      },
+                      child: Text('Reset Timer'),
+                    ),
+                    MaterialButton(
+                      onPressed: () async {
+                        // liteTimerController.startTimerByName(
+                        //   timerName: 'timer',
+                        //   groupName: formName,
+                        // );
+                        final isActive = form('$formName.timer').timer.isActive;
+                        // print(isActive);
+                        form('$formName.timer').timer.start();
+                      },
+                      child: Text('Start Timer'),
                     ),
                     SizedBox(
                       height: 2000,

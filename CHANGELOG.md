@@ -1,3 +1,5 @@
+## 0.0.10
+* Added timeouts
 ## 0.0.9
 * Fixed text editing controller in phone input
 ## 0.0.8

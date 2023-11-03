@@ -1,5 +1,6 @@
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
+import 'package:lite_forms/controllers/lite_timer_controller.dart';
 import 'package:lite_state/lite_state.dart';
 
 import 'lite_forms_configuration.dart';
@@ -14,6 +15,7 @@ void initializeLiteForms({
 }) {
   initControllersLazy({
     LiteFormController: () => LiteFormController(),
+    LiteTimerController: () => LiteTimerController(),
 
     /// this controller is used as a helper to rebuild some parts of the UI
     /// related to the inners parts of the form fields

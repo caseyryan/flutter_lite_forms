@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
+import 'package:lite_forms/controllers/lite_timer_controller.dart';
 import 'package:lite_forms/interfaces/preprocessor.dart';
 import 'package:lite_forms/utils/exports.dart';
 import 'package:lite_forms/utils/lite_forms_configuration.dart';
