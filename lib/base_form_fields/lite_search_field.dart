@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
+import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
+import 'package:lite_state/lite_state.dart';
 
 enum SearchTriggerType {
   automatic,
@@ -72,8 +74,7 @@ class LiteSearchField extends StatefulWidget {
   State<LiteSearchField> createState() => _LiteSearchFieldState();
 }
 
-class _LiteSearchFieldState extends State<LiteSearchField>
-    with LiteSearchMixin {
+class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin {
   String? _hintText;
   String _searchValue = '';
 
@@ -108,41 +109,38 @@ class _LiteSearchFieldState extends State<LiteSearchField>
     widget.onSearch(_searchValue);
   }
 
-  Widget _buildClearIcon() {
-    if (_searchValue.isNotEmpty) {
-      return GestureDetector(
-        onTap: () {
-          textEditingController.clear();
-          _onSearch('');
-        },
-        child: Container(
-          color: Colors.transparent,
-          child: widget.settings.searchIcon ??
-              const Icon(
-                Icons.clear,
-              ),
-        ),
-      );
-    }
-    return const SizedBox.shrink();
-  }
-
   bool get _isManualSearch {
     return widget.settings.searchTriggerType == SearchTriggerType.manual;
   }
 
   Widget _buildIcon() {
-    if (!_isManualSearch) {
-      if (_searchValue.isNotEmpty) {
-        return const Icon(
-          Icons.clear_rounded,
-        );
-      }
-    }
-    return widget.settings.searchIcon ??
-        const Icon(
-          Icons.search,
-        );
+    return LiteState<LiteFormRebuildController>(
+      builder: (BuildContext c, LiteFormRebuildController controller) {
+        if (!_isManualSearch) {
+          if (textEditingController.text.isNotEmpty) {
+            return const Icon(
+              Icons.clear_rounded,
+            );
+          }
+        }
+        return widget.settings.searchIcon ??
+            const Icon(
+              Icons.search,
+            );
+      },
+    );
+  }
+
+  @override
+  Future onChanged(
+    String? value, {
+    bool triggerImmediately = false,
+  }) async {
+    super.onChanged(
+      value,
+      triggerImmediately: triggerImmediately,
+    );
+    liteFormRebuildController.rebuild();
   }
 
   @override

@@ -16,38 +16,40 @@ class ProfilePage extends StatelessWidget {
       body: LiteFormGroup(
         name: 'profileForm',
         autoDispose: true,
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 8.0,
-              ),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    const SizedBox(height: 20.0),
-                    LiteTextFormField(
-                      name: 'firstName',
-                    ),
-                    MaterialButton(
-                      onPressed: () async {
-                        /// Here we print the data of from the previous form
-                        /// It is possible because it had an autoDispose value set to false.
-                        final data = await getFormData(
-                          formName: 'signupForm',
-                        );
-                        if (kDebugMode) {
-                          print(data);
-                        }
-                      },
-                      child: Text('Print Signup Form'),
-                    ),
-                  ],
+        builder: (c, scrollController) {
+          return CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate(
+                    [
+                      const SizedBox(height: 20.0),
+                      LiteTextFormField(
+                        name: 'firstName',
+                      ),
+                      MaterialButton(
+                        onPressed: () async {
+                          /// Here we print the data of from the previous form
+                          /// It is possible because it had an autoDispose value set to false.
+                          final data = await getFormData(
+                            formName: 'signupForm',
+                          );
+                          if (kDebugMode) {
+                            print(data);
+                          }
+                        },
+                        child: Text('Print Signup Form'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        },
       ),
     );
   }

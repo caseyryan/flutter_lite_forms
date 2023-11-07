@@ -387,6 +387,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
       hintText: null,
       decoration: null,
       errorStyle: widget.errorStyle,
+      focusNode: widget.focusNode,
     );
     tryDeserializeInitialValueIfNecessary<bool>(
       initialValueDeserializer: widget.initialValueDeserializer,
@@ -412,61 +413,65 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
       },
     );
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: widget.paddingLeft,
-        right: widget.paddingRight,
-        top: widget.paddingTop,
-        bottom: widget.paddingBottom,
-      ),
-      child: LiteState<LiteFormRebuildController>(
-        builder: (BuildContext c, LiteFormRebuildController controller) {
-          final hasChild = widget.child != null || widget.text != null;
-          List<Widget>? children;
-
-          if (hasChild) {
-            if (widget.switchPosition == LiteSwitchPosition.right) {
-              children = [
-                _buildChild(),
-                _buildToggle(
-                  formName: group.name,
-                ),
-              ];
+    return Focus(
+      canRequestFocus: true,
+      focusNode: field.getOrCreateFocusNode(),
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: widget.paddingLeft,
+          right: widget.paddingRight,
+          top: widget.paddingTop,
+          bottom: widget.paddingBottom,
+        ),
+        child: LiteState<LiteFormRebuildController>(
+          builder: (BuildContext c, LiteFormRebuildController controller) {
+            final hasChild = widget.child != null || widget.text != null;
+            List<Widget>? children;
+    
+            if (hasChild) {
+              if (widget.switchPosition == LiteSwitchPosition.right) {
+                children = [
+                  _buildChild(),
+                  _buildToggle(
+                    formName: group.name,
+                  ),
+                ];
+              } else {
+                children = [
+                  _buildToggle(
+                    formName: group.name,
+                  ),
+                  _buildChild(),
+                ];
+              }
             } else {
               children = [
                 _buildToggle(
                   formName: group.name,
                 ),
-                _buildChild(),
               ];
             }
-          } else {
-            children = [
-              _buildToggle(
-                formName: group.name,
-              ),
-            ];
-          }
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: children,
-              ),
-              if (widget.useSmoothError)
-                LiteFormErrorLine(
-                  fieldName: widget.name,
-                  formName: group.name,
-                  errorStyle: errorStyle,
-                  paddingBottom: widget.smoothErrorPadding?.bottom,
-                  paddingTop: widget.smoothErrorPadding?.top,
-                  paddingLeft: widget.smoothErrorPadding?.left,
-                  paddingRight: widget.smoothErrorPadding?.right,
+    
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: children,
                 ),
-            ],
-          );
-        },
+                if (widget.useSmoothError)
+                  LiteFormErrorLine(
+                    fieldName: widget.name,
+                    formName: group.name,
+                    errorStyle: errorStyle,
+                    paddingBottom: widget.smoothErrorPadding?.bottom,
+                    paddingTop: widget.smoothErrorPadding?.top,
+                    paddingLeft: widget.smoothErrorPadding?.left,
+                    paddingRight: widget.smoothErrorPadding?.right,
+                  ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

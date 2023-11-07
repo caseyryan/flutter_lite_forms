@@ -15,6 +15,15 @@ class FormGroupField<T> {
   String? _formName;
   String get formName => _formName ?? '';
 
+  /// it is set and unset automatically
+  /// The context is required to be able to scroll to
+  /// the first invalid field
+  BuildContext? _context;
+
+  bool get hasContext {
+    return _context != null;
+  }
+
   bool _isMounted = false;
   bool get isMounted => _isMounted;
 
@@ -26,9 +35,13 @@ class FormGroupField<T> {
 
   void unmount() {
     _isMounted = false;
+    _context = null;
   }
 
-  void mount() {
+  void mount([
+    BuildContext? context,
+  ]) {
+    _context = context;
     _isMounted = true;
   }
 
@@ -64,13 +77,56 @@ class FormGroupField<T> {
   FocusNode? get focusNode => _focusNode;
   bool _canDisposeFocusNode = true;
 
+  void requestFocus() {
+    if (_focusNode != null) {
+      _focusNode!.requestFocus();
+    } else {
+      final ignoredName = name.toFormIgnoreName();
+      final ignoredMirrorField = liteFormController.tryGetField(
+        formName: formName,
+        fieldName: ignoredName,
+      );
+      ignoredMirrorField?.requestFocus();
+    }
+  }
+
+  void unfocus({
+    UnfocusDisposition disposition = UnfocusDisposition.scope,
+  }) {
+    _focusNode?.unfocus(
+      disposition: disposition,
+    );
+  }
+
+  bool get hasFocus {
+    if (!isMounted) {
+      return false;
+    }
+    return _focusNode?.hasFocus == true;
+  }
+
+  /// Sometimes it's necessary to know current field index
+  /// to be able to focus next one, in case a field might lose
+  /// focus for some time.
+  ///
+  /// e.g. [LiteDatePicker] uses this
+  int get focusIndex {
+    final allFields = liteFormController
+        .getAllFieldsOfForm(
+          formName: _formName!,
+          mountedOnly: true,
+        )
+        .toList();
+    return allFields.indexOf(this);
+  }
+
   FocusNode? getOrCreateFocusNode({
     FocusNode? focusNode,
   }) {
-    if (_textEditingController != null) {
+    if (_focusNode != null) {
       return _focusNode;
     }
-    if (focusNode != null) {
+    if (_focusNode != null) {
       _canDisposeFocusNode = false;
       _focusNode = focusNode;
     } else {
@@ -207,6 +263,10 @@ class FormGroupField<T> {
   String? _error;
   String? get error {
     return _error;
+  }
+
+  bool get hasError {
+    return _error?.isNotEmpty == true;
   }
 
   void _setError(String? error) {

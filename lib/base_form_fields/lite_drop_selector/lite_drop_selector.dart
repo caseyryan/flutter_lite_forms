@@ -15,9 +15,8 @@ import 'package:lite_forms/base_form_fields/mixins/search_query_mixin.dart';
 import 'package:lite_forms/constants.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
+import 'package:lite_forms/utils/exports.dart';
 import 'package:lite_forms/utils/swipe_detector.dart';
-import 'package:lite_forms/utils/value_serializer.dart';
-import 'package:lite_forms/utils/value_validator.dart';
 import 'package:lite_state/lite_state.dart';
 
 import 'lite_drop_selector_button.dart';
@@ -67,6 +66,7 @@ class LiteDropSelector extends StatefulWidget {
     this.textDirection,
     this.restorationId,
     this.textAlignVertical,
+    this.focusNode,
     this.textAlign = TextAlign.start,
     this.smoothErrorPadding = const EdgeInsets.only(
       top: 6.0,
@@ -86,6 +86,7 @@ class LiteDropSelector extends StatefulWidget {
   }
 
   final String name;
+  final FocusNode? focusNode;
   final bool sortBySelection;
   final bool readOnly;
 
@@ -213,6 +214,14 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
     }
   }
 
+  @override
+  Future onFocusChange() async {
+    // print('DROP SELECTOR FOCUS CHANGE');
+    if (field.hasFocus) {
+      await _onTap();
+    }
+  }
+
   Future _onTap() async {
     if (widget.readOnly) {
       return;
@@ -324,8 +333,8 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       label: widget.label,
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
+      focusNode: widget.focusNode,
     );
-    
 
     tryDeserializeInitialValueIfNecessary(
       rawInitialValue: preparedInitialValue,
@@ -371,108 +380,120 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       }
     });
 
+    
+
+    final node = field.getOrCreateFocusNode(
+      focusNode: widget.focusNode,
+    );
+
     if (widget.selectorViewBuilder != null) {
-      return Padding(
-        padding: EdgeInsets.only(
-          top: widget.paddingTop,
-          bottom: widget.paddingBottom,
-          left: widget.paddingLeft,
-          right: widget.paddingRight,
-        ),
-        child: GestureDetector(
-          onTap: _onTap,
-          onLongPress: _onTap,
-          child: SizedBox(
-            key: _globalKey,
-            child: widget.selectorViewBuilder!(
-              context,
-              _selectedOptions,
+      return Focus(
+        focusNode: node,
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: widget.paddingTop,
+            bottom: widget.paddingBottom,
+            left: widget.paddingLeft,
+            right: widget.paddingRight,
+          ),
+          child: GestureDetector(
+            onTap: _onTap,
+            onLongPress: _onTap,
+            child: SizedBox(
+              key: _globalKey,
+              child: widget.selectorViewBuilder!(
+                context,
+                _selectedOptions,
+              ),
             ),
           ),
         ),
       );
     }
 
-    return Container(
-      color: Colors.transparent,
-      child: Padding(
-        padding: EdgeInsets.only(
-          top: widget.paddingTop,
-          bottom: widget.paddingBottom,
-          left: widget.paddingLeft,
-          right: widget.paddingRight,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: _onTap,
-                  onLongPress: _onTap,
-                  child: Container(
-                    color: Colors.transparent,
-                    child: IgnorePointer(
-                      child: TextFormField(
-                        key: _globalKey,
-                        restorationId: widget.restorationId,
-                        validator: widget.validators != null
-                            ? (value) {
-                                return group.translationBuilder(field.error);
-                              }
-                            : null,
-                        autovalidateMode: null,
-                        controller: textEditingController,
-                        decoration: _useErrorDecoration
-                            ? decoration
-                            : decoration.copyWith(
-                                errorStyle: const TextStyle(
-                                  fontSize: .01,
-                                  color: Colors.transparent,
+    return Focus(
+      focusNode: node,
+      child: Container(
+        color: Colors.transparent,
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: widget.paddingTop,
+            bottom: widget.paddingBottom,
+            left: widget.paddingLeft,
+            right: widget.paddingRight,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: _onTap,
+                    onLongPress: _onTap,
+                    child: Container(
+                      color: Colors.transparent,
+                      child: IgnorePointer(
+                        child: TextFormField(
+                          key: _globalKey,
+                          restorationId: widget.restorationId,
+                          validator: widget.validators != null
+                              ? (value) {
+                                  return group.translationBuilder(field.error);
+                                }
+                              : null,
+                          autovalidateMode: null,
+                          controller: textEditingController,
+                          decoration: _useErrorDecoration
+                              ? decoration
+                              : decoration.copyWith(
+                                  errorStyle: const TextStyle(
+                                    fontSize: .01,
+                                    color: Colors.transparent,
+                                  ),
                                 ),
-                              ),
-                        strutStyle: widget.strutStyle,
-                        style:
-                            liteFormController.config?.defaultTextStyle ?? widget.style,
-                        textAlign: widget.textAlign,
-                        textAlignVertical: widget.textAlignVertical,
-                        textCapitalization: widget.textCapitalization,
-                        textDirection: widget.textDirection,
+                          strutStyle: widget.strutStyle,
+                          style:
+                              liteFormController.config?.defaultTextStyle ?? widget.style,
+                          textAlign: widget.textAlign,
+                          textAlignVertical: widget.textAlignVertical,
+                          textCapitalization: widget.textCapitalization,
+                          textDirection: widget.textDirection,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                LiteState<LiteFormRebuildController>(
-                  builder: (BuildContext c, LiteFormRebuildController controller) {
-                    return LiteDropSelectorMultipleSheet(
-                      items: _selectedOptions,
-                      paddingTop: widget.multiselectorSpacing,
-                      settings: widget.settings,
-                      onRemove: (LiteDropSelectorItem item) {
-                        if (widget.readOnly) {
-                          return;
-                        }
-                        item.isSelected = false;
-                        _selectedOptions.remove(item);
-                        _updateList(_selectedOptions);
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
-            if (widget.useSmoothError)
-              LiteFormErrorLine(
-                fieldName: widget.name,
-                formName: group.name,
-                errorStyle: decoration.errorStyle,
-                paddingBottom: widget.smoothErrorPadding?.bottom,
-                paddingTop: widget.smoothErrorPadding?.top,
-                paddingLeft: widget.smoothErrorPadding?.left,
-                paddingRight: widget.smoothErrorPadding?.right,
+                  LiteState<LiteFormRebuildController>(
+                    builder: (BuildContext c, LiteFormRebuildController controller) {
+                      return LiteDropSelectorMultipleSheet(
+                        items: _selectedOptions,
+                        paddingTop: widget.multiselectorSpacing,
+                        settings: widget.settings,
+                        onRemove: (LiteDropSelectorItem item) {
+                          if (widget.readOnly) {
+                            return;
+                          }
+                          item.isSelected = false;
+                          _selectedOptions.remove(item);
+                          _updateList(_selectedOptions);
+                        },
+                      );
+                    },
+                  ),
+                ],
               ),
-          ],
+              if (widget.useSmoothError)
+                LiteFormErrorLine(
+                  fieldName: widget.name,
+                  formName: group.name,
+                  errorStyle: decoration.errorStyle,
+                  paddingBottom: widget.smoothErrorPadding?.bottom,
+                  paddingTop: widget.smoothErrorPadding?.top,
+                  paddingLeft: widget.smoothErrorPadding?.left,
+                  paddingRight: widget.smoothErrorPadding?.right,
+                ),
+            ],
+          ),
         ),
       ),
     );

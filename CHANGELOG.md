@@ -1,3 +1,5 @@
+## 0.0.11
+* Focus field
 ## 0.0.10
 * Added timeouts
 ## 0.0.9

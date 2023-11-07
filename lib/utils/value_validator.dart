@@ -48,6 +48,41 @@ abstract class LiteValidator {
       errorText: errorText,
     );
   }
+
+  static LiteValidator alwaysComplaining() {
+    return AlwaysComplainingTestValidator();
+  }
+}
+
+/// This validator can be used if you want to test errors in your form
+/// I will always return an error
+class AlwaysComplainingTestValidator extends LiteValidator {
+
+  static int _index = 0;
+
+  static const List<String> _reasons = [
+    'Something is wrong with this field',
+    'I don\'t like this',
+    'Invalid value',
+    'I still don\'t like this',
+    'Try another one',
+    'I\'m afraid this won\'t do',
+    'Are you kidding?',
+    'Nah, this one is not good',
+  ];
+
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) {
+    final error = _reasons[_index];
+    _index ++;
+    if (_index >= _reasons.length) {
+      _index = 0;
+    }
+    return error;
+  }
 }
 
 class NonValidatingValidator extends LiteValidator {

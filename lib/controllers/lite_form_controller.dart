@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/controllers/lite_timer_controller.dart';
@@ -126,18 +127,30 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     }
   }
 
+  /// [mountedOnly] if true, this will
+  /// return only the fields that are
+  /// currently mounted into a widget tree
   Iterable<FormGroupField> getAllFieldsOfForm({
     required String formName,
+    bool mountedOnly = false,
+    bool includeIgnored = false,
   }) {
     final list = _formGroups[formName]
             ?._fields
             .values
             .where(
-              (f) => !f.name.isIgnoredInForm(),
+              (f) {
+                if (includeIgnored) {
+                  return true;
+                }
+                return !f.name.isIgnoredInForm();
+              },
             )
             .toList() ??
         <FormGroupField>[];
-
+    if (mountedOnly) {
+      return list.where((f) => f.isMounted).toList();
+    }
     return list;
   }
 

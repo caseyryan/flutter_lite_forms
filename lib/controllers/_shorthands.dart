@@ -16,11 +16,81 @@ class _FormShorthand {
     required this.fieldName,
   });
 
+  /// Just requests a focus on a field next to
+  /// the current focused one. If non is focused
+  /// it will request a focus on the first field
+  void focusNextField([
+    int? startFromIndex,
+  ]) {
+    final allFields = liteFormController
+        .getAllFieldsOfForm(
+          formName: formName,
+          mountedOnly: true,
+          includeIgnored: true,
+        )
+        .toList();
+    if (allFields.isEmpty) {
+      return;
+    }
+    int index = startFromIndex ??
+        allFields.indexWhere(
+          (e) => e.hasFocus,
+        );
+    if (index < 0) {
+      allFields[0].requestFocus();
+    } else {
+      index++;
+      if (index >= allFields.length) {
+        index = 0;
+      }
+      final field = allFields[index];
+      field.requestFocus();
+    }
+  }
+
+  void unfocusAllFields({
+    UnfocusDisposition disposition = UnfocusDisposition.scope,
+  }) {
+    final allFields = liteFormController.getAllFieldsOfForm(
+      formName: formName,
+      mountedOnly: true,
+    );
+    for (var field in allFields) {
+      field.unfocus(disposition: disposition);
+    }
+  }
+
+  void focus() {
+    liteFormController
+        .tryGetField(
+          formName: formName,
+          fieldName: fieldName,
+        )
+        ?.requestFocus();
+  }
+
+  void unfocus() {
+    liteFormController
+        .tryGetField(
+          formName: formName,
+          fieldName: fieldName,
+        )
+        ?.unfocus(
+          disposition: UnfocusDisposition.scope,
+        );
+  }
+
   factory _FormShorthand.fromPath(String path) {
     final split = path.split('.');
+    if (split.length == 2) {
+      return _FormShorthand._(
+        formName: split[0],
+        fieldName: split[1],
+      );
+    }
     return _FormShorthand._(
-      formName: split[0],
-      fieldName: split[1],
+      formName: path,
+      fieldName: '',
     );
   }
 

@@ -107,6 +107,7 @@ class LitePhoneInputField extends StatefulWidget {
     this.onChanged,
     this.countrySelectorSettings,
     this.menuItemBuilder,
+    this.onFieldSubmitted,
     this.textAlign = TextAlign.start,
     this.smoothErrorPadding = const EdgeInsets.only(
       top: 6.0,
@@ -151,6 +152,7 @@ class LitePhoneInputField extends StatefulWidget {
   final TextStyle? style;
   final TextStyle? errorStyle;
   final Object? initialValue;
+  final ValueChanged<String>? onFieldSubmitted;
 
   /// [leadingWidth] the width of the drop selector for a country code
   /// it makes sense only if [phoneInputType] == [LitePhoneInputType.manualCode]
@@ -412,7 +414,11 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
   }
 
   Future _focusField() async {
-    focusNode?.requestFocus();
+    field
+        .getOrCreateFocusNode(
+          focusNode: widget.focusNode,
+        )
+        ?.requestFocus();
   }
 
   Widget _buildCountryDropSelector() {
@@ -557,6 +563,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
       label: widget.label,
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
+      focusNode: widget.focusNode,
     );
 
     tryDeserializeInitialValueIfNecessary(
@@ -620,8 +627,19 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
                           return group.translationBuilder(field.error);
                         }
                       : null,
+
+                  
                   autovalidateMode: null,
-                  focusNode: focusNode,
+                  focusNode: field.getOrCreateFocusNode(
+                    focusNode: widget.focusNode,
+                  ),
+                  onFieldSubmitted: (value) {
+                    if (widget.onFieldSubmitted == null) {
+                      form(group.name).focusNextField();
+                    } else {
+                      widget.onFieldSubmitted!.call(value);
+                    }
+                  },
                   controller: textEditingController,
                   decoration: _useErrorDecoration
                       ? newDecoration

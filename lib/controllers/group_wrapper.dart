@@ -55,9 +55,6 @@ class _FormGroupWrapper {
     required AutovalidateMode? autovalidateMode,
     required InputDecoration? decoration,
   }) {
-    // if (kDebugMode) {
-    // print('TRY REGISTER FIELD: $name');
-    // }
     if (_fields[name] == null) {
       _fields[name] = FormGroupField<T>(
         name: name,
@@ -81,20 +78,6 @@ class _FormGroupWrapper {
     _fields.remove(fieldName);
   }
 
-  // void unregisterFieldIfOutdated({
-  //   required FormGroupField field,
-  // }) {
-  //   if (field._isOutdated() == true) {
-  //     unregisterField(fieldName: field.name);
-  //   }
-  // }
-
-  // void unregisterAllOutdatedFields() {
-  //   final tempFields = [..._fields.values];
-  //   for (var field in tempFields) {
-  //     unregisterFieldIfOutdated(field: field);
-  //   }
-  // }
 
   FormGroupField? tryFindField(String fieldName) {
     return _fields[fieldName];
@@ -137,10 +120,68 @@ class _FormGroupWrapper {
     final result = _formState?.validate();
     for (var field in _fields.values) {
       if (field._error?.isNotEmpty == true) {
+        tryScrollFormToField(field: field);
         return false;
       }
     }
     return result ?? true;
+  }
+
+  FormGroupField? findFirstInvalidField() {
+    return _fields.values.firstWhereOrNull(
+      (field) => field.hasError,
+    );
+  }
+
+  Size get screenSize {
+    var view = WidgetsBinding.instance.platformDispatcher.views.first;
+    return view.physicalSize / view.devicePixelRatio;
+  }
+
+  double get screenWidth => screenSize.width;
+
+  double get screenHeight => screenSize.height;
+
+  /// Just to make it more understandable
+  Future scrollToFirstInvalidField([
+    Duration? duration,
+  ]) async {
+    return tryScrollFormToField(
+      duration: duration,
+    );
+  }
+
+  /// Scrolls the form to the field if it is mounted
+  /// [field] if null, it will try to find the first field with an error
+  /// [duration] scroll animation duration
+  Future tryScrollFormToField({
+    FormGroupField? field,
+    Duration? duration,
+  }) async {
+    field ??= findFirstInvalidField();
+    if (field?.hasContext == true) {
+      final scrollController = LiteFormGroup.of(field!._context!)?.scrollController;
+      if (scrollController?.hasClients == true) {
+        final renderObject = field._context!.findRenderObject();
+        if (renderObject is RenderBox) {
+          final fieldPositionY = renderObject.getTransformTo(null).getTranslation().y;
+          // final fieldHeight = renderObject.size.height;
+          var curScrollPosition = scrollController!.position.pixels;
+          var maxScrollExtent = scrollController.position.maxScrollExtent;
+
+          double toYPos = screenHeight * .45;
+          final scrollBy = toYPos - fieldPositionY;
+          if (scrollBy != 0) {
+            double offset = (curScrollPosition - scrollBy).clamp(0.0, maxScrollExtent);
+            await scrollController.animateTo(
+              offset,
+              duration: duration ?? kThemeAnimationDuration,
+              curve: Curves.linear,
+            );
+          }
+        }
+      }
+    }
   }
 
   void clearDependencies() {

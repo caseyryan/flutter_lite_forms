@@ -59,6 +59,7 @@ class LiteFilePicker extends StatefulWidget {
     this.requestFullMetadata = false,
     this.allowVideo = true,
     this.allowImages = true,
+    this.focusNode,
     this.sources = const [
       FileSource.camera,
       FileSource.gallery,
@@ -83,6 +84,7 @@ class LiteFilePicker extends StatefulWidget {
         super(key: key ?? Key(name));
 
   final String name;
+  final FocusNode? focusNode;
   final double menuButtonHeight;
 
   /// [allowedExtensions] files extensions accepted by file picker
@@ -194,6 +196,7 @@ class _LiteFilePickerState extends State<LiteFilePicker>
             constraints: widget.constraints,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Flexible(
                   child: SizedBox(
@@ -221,7 +224,31 @@ class _LiteFilePickerState extends State<LiteFilePicker>
       );
     }
 
-    return child;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Flexible(
+          child: SizedBox(
+            key: _sizeKey,
+            child: child,
+          ),
+        ),
+        if (_widgetWidth > 0.0)
+          SizedBox(
+            width: _widgetWidth,
+            child: LiteFormErrorLine(
+              fieldName: widget.name,
+              formName: group.name,
+              errorStyle: decoration.errorStyle,
+              paddingBottom: widget.smoothErrorPadding?.bottom,
+              paddingTop: widget.smoothErrorPadding?.top,
+              paddingLeft: widget.smoothErrorPadding?.left,
+              paddingRight: widget.smoothErrorPadding?.right,
+            ),
+          ),
+      ],
+    );
   }
 
   List<FileSource>? _supportedSources;
@@ -583,7 +610,7 @@ class _LiteFilePickerState extends State<LiteFilePicker>
     );
     return temp;
   }
-
+  
   @override
   Widget build(BuildContext context) {
     initializeFormField(
@@ -596,6 +623,8 @@ class _LiteFilePickerState extends State<LiteFilePicker>
       label: widget.label,
       decoration: null,
       errorStyle: widget.errorStyle,
+      focusNode: widget.focusNode,
+      addFocusNodeListener: false,
     );
 
     tryDeserializeInitialValueIfNecessary(
@@ -629,7 +658,8 @@ class _LiteFilePickerState extends State<LiteFilePicker>
             builder: (BuildContext c, LiteFormRebuildController controller) {
               return LiteDropSelector(
                 dropSelectorType: widget.dropSelectorType,
-                dropSelectorActionType: LiteDropSelectorActionType.simpleWithNoSelection,
+                dropSelectorActionType:
+                    LiteDropSelectorActionType.simpleWithNoSelection,
                 settings: LiteDropSelectorSettings(
                   buttonHeight: widget.menuButtonHeight,
                 ),

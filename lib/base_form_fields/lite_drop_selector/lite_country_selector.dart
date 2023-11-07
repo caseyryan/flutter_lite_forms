@@ -40,6 +40,7 @@ class LiteCountrySelector extends StatefulWidget {
     this.style,
     this.strutStyle,
     this.textDirection,
+    this.focusNode,
     this.restorationId,
     this.textAlignVertical,
     this.textAlign = TextAlign.start,
@@ -55,6 +56,7 @@ class LiteCountrySelector extends StatefulWidget {
 
   final String name;
   final bool readOnly;
+  final FocusNode? focusNode;
 
   /// [locale] two-letter locale like "ru" or "en"
   final String locale;
@@ -228,6 +230,7 @@ class _LiteCountrySelectorState extends State<LiteCountrySelector> with FormFiel
       label: widget.label,
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
+      focusNode: widget.focusNode,
     );
 
     List<LiteDropSelectorItem> items = [];

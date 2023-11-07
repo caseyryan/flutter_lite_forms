@@ -42,6 +42,7 @@ class LiteDatePicker extends StatefulWidget {
     this.style,
     this.strutStyle,
     this.textDirection,
+    this.focusNode,
     this.restorationId,
     this.textAlignVertical,
     this.use24HourFormat = true,
@@ -94,6 +95,7 @@ class LiteDatePicker extends StatefulWidget {
   final TextAlign textAlign;
   final TextAlignVertical? textAlignVertical;
   final ValueChanged<DateTime?>? onChanged;
+  final FocusNode? focusNode;
 
   /// initial mode for a material picker. Makes sense only if
   /// [pickerType] is [LiteDatePickerType.material]
@@ -454,6 +456,31 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
     );
   }
 
+  Future _onTap() async {
+    if (widget.readOnly) {
+      return;
+    }
+    final dateTime = await _onShowPickerPressed(
+      context: context,
+    );
+    liteFormController.onValueChanged(
+      formName: group.name,
+      fieldName: widget.name,
+      value: dateTime,
+      view: dateTime != null ? _dateFormat.format(dateTime) : null,
+    );
+    widget.onChanged?.call(dateTime);
+  }
+
+  @override
+  Future onFocusChange() async {
+    if (field.hasFocus) {
+      // final focusIndex = field.focusIndex;
+      await _onTap();
+      // form(group.name).focusNextField(focusIndex);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     initializeFormField<DateTime>(
@@ -466,9 +493,9 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
       hintText: widget.hintText,
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
+      focusNode: widget.focusNode,
     );
 
-    final dateFormat = _dateFormat;
     tryDeserializeInitialValueIfNecessary<DateTime>(
       initialValueDeserializer: widget.initialValueDeserializer,
       rawInitialValue: widget.initialValue,
@@ -482,78 +509,69 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
             formName: group.name,
             fieldName: widget.name,
             value: initialValue,
-            view: dateFormat.format(initialValue),
+            view: _dateFormat.format(initialValue),
             isInitialValue: true,
           );
         },
       );
     }
 
-    return GestureDetector(
-      onTap: () async {
-        if (widget.readOnly) {
-          return;
-        }
-        final dateTime = await _onShowPickerPressed(
-          context: context,
-        );
-        liteFormController.onValueChanged(
-          formName: group.name,
-          fieldName: widget.name,
-          value: dateTime,
-          view: dateTime != null ? dateFormat.format(dateTime) : null,
-        );
-        widget.onChanged?.call(dateTime);
-      },
-      child: Container(
-        color: Colors.transparent,
-        child: IgnorePointer(
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: widget.paddingTop,
-              bottom: widget.paddingBottom,
-              left: widget.paddingLeft,
-              right: widget.paddingRight,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextFormField(
-                  restorationId: widget.restorationId,
-                  validator: widget.validators != null
-                      ? (value) {
-                          return group.translationBuilder(field.error);
-                        }
-                      : null,
-                  autovalidateMode: null,
-                  controller: textEditingController,
-                  decoration: _useErrorDecoration
-                      ? decoration
-                      : decoration.copyWith(
-                          errorStyle: const TextStyle(
-                            fontSize: .01,
-                            color: Colors.transparent,
+    return Focus(
+      focusNode: field.getOrCreateFocusNode(
+        focusNode: widget.focusNode,
+      ),
+      child: GestureDetector(
+        onTap: _onTap,
+        child: Container(
+          color: Colors.transparent,
+          child: IgnorePointer(
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: widget.paddingTop,
+                bottom: widget.paddingBottom,
+                left: widget.paddingLeft,
+                right: widget.paddingRight,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFormField(
+                    restorationId: widget.restorationId,
+                    validator: widget.validators != null
+                        ? (value) {
+                            return group.translationBuilder(field.error);
+                          }
+                        : null,
+                    autovalidateMode: null,
+                    controller: textEditingController,
+                    decoration: _useErrorDecoration
+                        ? decoration
+                        : decoration.copyWith(
+                            errorStyle: const TextStyle(
+                              fontSize: .01,
+                              color: Colors.transparent,
+                            ),
                           ),
-                        ),
-                  strutStyle: widget.strutStyle,
-                  style: liteFormController.config?.defaultTextStyle ?? widget.style,
-                  textAlign: widget.textAlign,
-                  textAlignVertical: widget.textAlignVertical,
-                  textCapitalization: widget.textCapitalization,
-                  textDirection: widget.textDirection,
-                  textInputAction: widget.textInputAction,
-                ),
-                if (widget.useSmoothError)
-                  LiteFormErrorLine(
-                    fieldName: widget.name,
-                    formName: group.name,
-                    errorStyle: decoration.errorStyle,
-                    paddingBottom: widget.smoothErrorPadding?.bottom,
-                    paddingTop: widget.smoothErrorPadding?.top,
-                    paddingLeft: widget.smoothErrorPadding?.left,
-                    paddingRight: widget.smoothErrorPadding?.right,
+                    strutStyle: widget.strutStyle,
+                    style: liteFormController.config?.defaultTextStyle ?? widget.style,
+                    textAlign: widget.textAlign,
+                    textAlignVertical: widget.textAlignVertical,
+                    textCapitalization: widget.textCapitalization,
+                    textDirection: widget.textDirection,
+                    textInputAction: widget.textInputAction,
                   ),
-              ],
+                  if (widget.useSmoothError)
+                    LiteFormErrorLine(
+                      fieldName: widget.name,
+                      formName: group.name,
+                      errorStyle: decoration.errorStyle,
+                      paddingBottom: widget.smoothErrorPadding?.bottom,
+                      paddingTop: widget.smoothErrorPadding?.top,
+                      paddingLeft: widget.smoothErrorPadding?.left,
+                      paddingRight: widget.smoothErrorPadding?.right,
+                    ),
+                ],
+              ),
             ),
           ),
         ),

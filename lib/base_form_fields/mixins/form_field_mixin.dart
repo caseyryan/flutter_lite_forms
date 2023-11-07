@@ -33,8 +33,8 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     return field.getOrCreateTextEditingController();
   }
 
-  FocusNode? get focusNode {
-    return field.getOrCreateFocusNode();
+  void onFocusChange() {
+    print('FOCUS CHANGE ${field.name}');
   }
 
   @override
@@ -69,7 +69,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
 
   void _reactivate() {
     if (_isInitialized) {
-      field.mount();
+      field.mount(context);
     }
   }
 
@@ -78,6 +78,9 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     super.dispose();
     if (_isInitialized) {
       field.unmount();
+      if (field.focusNode != null) {
+        field.focusNode?.removeListener(onFocusChange);
+      }
     }
   }
 
@@ -127,6 +130,11 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     required String? hintText,
     required InputDecoration? decoration,
     required TextStyle? errorStyle,
+    required FocusNode? focusNode,
+
+    /// [addFocusNodeListener] must be false your field contains more basic form fields inside
+    /// to avoid focus interception. E.g. [LiteFilePicker]
+    bool addFocusNodeListener = true,
   }) {
     assert(
       widget.key != null,
@@ -202,10 +210,27 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
       );
     } else {
       _reactivate();
-      // if (!_fieldName.isIgnoredInForm()) {
-      //   if (group.autoRemoveUnregisteredFields) {}
-      // }
     }
+
+    if (addFocusNodeListener) {
+      /// this is required to be able to iterate through form
+      /// focus nodes
+      final node = field.getOrCreateFocusNode(
+        focusNode: focusNode,
+      );
+      node?.removeListener(_updateFocus);
+      node?.addListener(_updateFocus);
+    }
+  }
+
+  // int _lastFocusChangeMillis = 0;
+  void _updateFocus() {
+    // print('UPDATE FOCUS');
+    if (field.focusNode == null) {
+      return;
+    }
+    
+    onFocusChange();
   }
 
   TextStyle get errorStyle {

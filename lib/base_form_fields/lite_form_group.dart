@@ -21,7 +21,14 @@ String? defaultTranslationBuilder(String? value) {
   return value;
 }
 
+typedef LiteFormBuilder = Widget Function(
+  BuildContext context,
+  ScrollController scrollController,
+);
+
 class LiteFormGroup extends InheritedWidget {
+  final ScrollController scrollController = ScrollController();
+
   /// Wrap your form with this group. Inside you can use any
   /// LiteForm fields. Here's the list of basic LiteFormFields ->
   ///
@@ -38,7 +45,7 @@ class LiteFormGroup extends InheritedWidget {
     this.autoRemoveUnregisteredFields = true,
     this.allowUnfocusOnTapOutside,
     this.translationBuilder = defaultTranslationBuilder,
-    required Widget child,
+    required LiteFormBuilder builder,
   }) : super(
           child: _LiteGroupWrapper(
             name: name,
@@ -59,7 +66,10 @@ class LiteFormGroup extends InheritedWidget {
                   autoRemoveUnregisteredFields: autoRemoveUnregisteredFields,
                 );
 
-                return child;
+                return builder(
+                  c,
+                  LiteFormGroup.of(c)!.scrollController,
+                );
               },
             ),
           ),

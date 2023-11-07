@@ -247,6 +247,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
       label: widget.label,
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
+      focusNode: widget.focusNode,
     );
 
     tryDeserializeInitialValueIfNecessary<String>(
@@ -309,7 +310,9 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
             enableSuggestions: widget.enableSuggestions,
             enabled: widget.enabled,
             expands: widget.expands,
-            focusNode: widget.focusNode,
+            focusNode: field.getOrCreateFocusNode(
+              focusNode: widget.focusNode,
+            ),
             inputFormatters: widget.inputFormatters,
             keyboardAppearance: widget.keyboardAppearance,
             keyboardType: widget.keyboardType,
@@ -330,7 +333,13 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
               widget.onChanged?.call(value);
             },
             onEditingComplete: widget.onEditingComplete,
-            onFieldSubmitted: widget.onFieldSubmitted,
+            onFieldSubmitted: (value) {
+              if (widget.onFieldSubmitted == null) {
+                form(group.name).focusNextField();
+              } else {
+                widget.onFieldSubmitted!.call(value);
+              }
+            },
             onTap: _getTapMethod(),
             onTapOutside: widget.onTapOutside,
             scrollPadding: widget.scrollPadding,
