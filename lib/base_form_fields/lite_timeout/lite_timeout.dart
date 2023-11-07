@@ -3,6 +3,9 @@ import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_timer_controller.dart';
 import 'package:lite_forms/intl_local/lib/intl.dart';
 import 'package:lite_forms/lite_forms.dart';
+import 'package:lite_forms/utils/on_post_frame.dart';
+
+typedef TimeoutUpdate = void Function(int secondsLeft);
 
 class LiteTimeout extends StatefulWidget {
   LiteTimeout({
@@ -19,9 +22,13 @@ class LiteTimeout extends StatefulWidget {
     this.paddingLeft = 0.0,
     this.paddingRight = 0.0,
     this.seconds = 10,
+    this.onTimeoutUpdate,
+    this.onComplete,
   }) : super(key: key ?? Key(name));
 
   final String name;
+  final TimeoutUpdate? onTimeoutUpdate;
+  final VoidCallback? onComplete;
 
   /// [autostart] whether the timer must start immediately or not
   /// if you pass [false], then the timer has to be started manually
@@ -65,6 +72,11 @@ class _LiteTimeoutState extends State<LiteTimeout> {
       return widget.notStartedText;
     }
     final date = DateTime(1, 1, 1, 0, 0, _numSecondsLeft);
+    if (widget.onTimeoutUpdate != null) {
+      onPostFrame(() {
+        widget.onTimeoutUpdate!(_numSecondsLeft);
+      });
+    }
     return '${widget.startedText} ${_dateFormat.format(date)}';
   }
 
@@ -94,6 +106,11 @@ class _LiteTimeoutState extends State<LiteTimeout> {
             liteFormController.config?.defaultTextStyle ??
             Theme.of(context).textTheme.bodyMedium;
         if (_numSecondsLeft <= 0) {
+          if (widget.onComplete != null) {
+            onPostFrame(() {
+              widget.onComplete!.call();
+            });
+          }
           controller.resetTimer(
             timerData: _timerData!,
           );

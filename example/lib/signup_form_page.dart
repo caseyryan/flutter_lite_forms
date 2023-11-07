@@ -215,6 +215,9 @@ class SignupFormPage extends StatelessWidget {
                         name: 'timer',
                         seconds: 15,
                         autostart: false,
+                        onTimeoutUpdate: (secondsLeft) {
+                          print('secondsLeft $secondsLeft');
+                        },
                       ),
                       // LiteDropSelector(
                       //   paddingTop: 20.0,
@@ -416,9 +419,9 @@ class SignupFormPage extends StatelessWidget {
                         },
                         child: Text('Next Focus'),
                       ),
-                      const SizedBox(
-                        height: 1500,
-                      ),
+                      // const SizedBox(
+                      //   height: 1500,
+                      // ),
                       SizedBox(
                         height: 20.0,
                       ),

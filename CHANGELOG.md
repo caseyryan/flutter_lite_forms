@@ -1,3 +1,5 @@
+## 0.0.12
+* Timeout callbacks
 ## 0.0.11
 * Focus field
 ## 0.0.10
