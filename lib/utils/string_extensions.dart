@@ -25,7 +25,7 @@ extension StringExtensions on String {
 
   String firstToUpperCase() {
     if (isEmpty) return this;
-    var split = toLowerCase().split('');
+    var split = this.split('');
     split[0] = split[0].toUpperCase();
     return split.join();
   }
@@ -51,7 +51,7 @@ extension StringExtensions on String {
 
   String firstToLowerCase() {
     if (isEmpty) return this;
-    var split = toLowerCase().split('');
+    var split = this.split('');
     split[0] = split[0].toLowerCase();
     return split.join();
   }

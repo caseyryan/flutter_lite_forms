@@ -103,6 +103,7 @@ class LiteFormGroup extends InheritedWidget {
   /// on tap outside. null by default, which equivalent to true
   /// You can also set this globally via a config
   /// value passed into a [initializeLiteForms] function,
+  /// [true] by default
   final bool? allowUnfocusOnTapOutside;
 
   @override

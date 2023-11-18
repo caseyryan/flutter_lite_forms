@@ -1,3 +1,5 @@
+## 0.0.13
+* Fixed first to upper / lower case methods
 ## 0.0.12
 * Timeout callbacks
 ## 0.0.11
