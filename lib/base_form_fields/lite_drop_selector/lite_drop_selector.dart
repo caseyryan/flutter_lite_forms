@@ -55,6 +55,7 @@ class LiteDropSelector extends StatefulWidget {
     this.hintText,
     this.label,
     this.decoration,
+    this.width,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
@@ -89,6 +90,7 @@ class LiteDropSelector extends StatefulWidget {
   final FocusNode? focusNode;
   final bool sortBySelection;
   final bool readOnly;
+  final double? width;
 
   /// [selectorViewBuilder] allows you to build a custom view for
   /// this drop selector. You might want to display something else instead
@@ -176,7 +178,8 @@ class LiteDropSelector extends StatefulWidget {
   State<LiteDropSelector> createState() => _LiteDropSelectorState();
 }
 
-class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin {
+class _LiteDropSelectorState extends State<LiteDropSelector>
+    with FormFieldMixin {
   final _globalKey = GlobalKey<State<StatefulWidget>>();
 
   bool get _useErrorDecoration {
@@ -296,6 +299,13 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       } else if (preparedInitialValue is List) {
         preparedInitialValue = preparedInitialValue
             .map((e) {
+              final byPayload = widget.items.firstWhereOrNull(
+                (i) => i is LiteDropSelectorItem && i.payload == e,
+              );
+              if (byPayload != null) {
+                return byPayload;
+              }
+
               if (e is LiteDropSelectorItem) {
                 return e;
               } else if (e is String) {
@@ -380,8 +390,6 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       }
     });
 
-    
-
     final node = field.getOrCreateFocusNode(
       focusNode: widget.focusNode,
     );
@@ -414,6 +422,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
     return Focus(
       focusNode: node,
       child: Container(
+        width: widget.width,
         color: Colors.transparent,
         child: Padding(
           padding: EdgeInsets.only(
@@ -453,8 +462,8 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
                                   ),
                                 ),
                           strutStyle: widget.strutStyle,
-                          style:
-                              liteFormController.config?.defaultTextStyle ?? widget.style,
+                          style: liteFormController.config?.defaultTextStyle ??
+                              widget.style,
                           textAlign: widget.textAlign,
                           textAlignVertical: widget.textAlignVertical,
                           textCapitalization: widget.textCapitalization,
@@ -464,7 +473,8 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
                     ),
                   ),
                   LiteState<LiteFormRebuildController>(
-                    builder: (BuildContext c, LiteFormRebuildController controller) {
+                    builder:
+                        (BuildContext c, LiteFormRebuildController controller) {
                       return LiteDropSelectorMultipleSheet(
                         items: _selectedOptions,
                         paddingTop: widget.multiselectorSpacing,

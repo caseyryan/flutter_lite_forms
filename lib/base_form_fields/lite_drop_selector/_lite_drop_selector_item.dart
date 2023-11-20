@@ -36,7 +36,8 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
   final double? selectedBorderWidth;
   final String title;
   final T payload;
-  /// [isDestructive] 
+
+  /// [isDestructive]
   final bool isDestructive;
   bool _isSelected;
 

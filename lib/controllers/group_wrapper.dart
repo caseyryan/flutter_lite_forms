@@ -78,7 +78,6 @@ class _FormGroupWrapper {
     _fields.remove(fieldName);
   }
 
-
   FormGroupField? tryFindField(String fieldName) {
     return _fields[fieldName];
   }
@@ -160,11 +159,13 @@ class _FormGroupWrapper {
   }) async {
     field ??= findFirstInvalidField();
     if (field?.hasContext == true) {
-      final scrollController = LiteFormGroup.of(field!._context!)?.scrollController;
+      final scrollController =
+          LiteFormGroup.of(field!._context!)?.scrollController;
       if (scrollController?.hasClients == true) {
         final renderObject = field._context!.findRenderObject();
         if (renderObject is RenderBox) {
-          final fieldPositionY = renderObject.getTransformTo(null).getTranslation().y;
+          final fieldPositionY =
+              renderObject.getTransformTo(null).getTranslation().y;
           // final fieldHeight = renderObject.size.height;
           var curScrollPosition = scrollController!.position.pixels;
           var maxScrollExtent = scrollController.position.maxScrollExtent;
@@ -172,7 +173,8 @@ class _FormGroupWrapper {
           double toYPos = screenHeight * .45;
           final scrollBy = toYPos - fieldPositionY;
           if (scrollBy != 0) {
-            double offset = (curScrollPosition - scrollBy).clamp(0.0, maxScrollExtent);
+            double offset =
+                (curScrollPosition - scrollBy).clamp(0.0, maxScrollExtent);
             await scrollController.animateTo(
               offset,
               duration: duration ?? kThemeAnimationDuration,

@@ -201,7 +201,8 @@ class CountryPreprocessor implements IPreprocessor {
   String? get view => null;
 }
 
-class _LiteCountrySelectorState extends State<LiteCountrySelector> with FormFieldMixin {
+class _LiteCountrySelectorState extends State<LiteCountrySelector>
+    with FormFieldMixin {
   Widget _iconBuilder(
     BuildContext context,
     LiteDropSelectorItem item,

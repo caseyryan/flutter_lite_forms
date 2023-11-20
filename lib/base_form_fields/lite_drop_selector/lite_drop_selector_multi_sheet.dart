@@ -122,16 +122,20 @@ class LiteDropSelectorChip extends StatelessWidget {
   BorderRadius get _borderRadius {
     return BorderRadius.only(
       topLeft: Radius.circular(
-        formConfig?.dropSelectorSettings.chipTopLeftRadius ?? kDefaultChipRadius,
+        formConfig?.dropSelectorSettings.chipTopLeftRadius ??
+            kDefaultChipRadius,
       ),
       topRight: Radius.circular(
-        formConfig?.dropSelectorSettings.chipTopRightRadius ?? kDefaultChipRadius,
+        formConfig?.dropSelectorSettings.chipTopRightRadius ??
+            kDefaultChipRadius,
       ),
       bottomLeft: Radius.circular(
-        formConfig?.dropSelectorSettings.chipBottomLeftRadius ?? kDefaultChipRadius,
+        formConfig?.dropSelectorSettings.chipBottomLeftRadius ??
+            kDefaultChipRadius,
       ),
       bottomRight: Radius.circular(
-        formConfig?.dropSelectorSettings.chipBottomRightRadius ?? kDefaultChipRadius,
+        formConfig?.dropSelectorSettings.chipBottomRightRadius ??
+            kDefaultChipRadius,
       ),
     );
   }
@@ -194,7 +198,8 @@ class LiteDropSelectorChip extends StatelessWidget {
                 width: 20.0,
                 height: 20.0,
                 decoration: BoxDecoration(
-                  color: _settings?.chipCloseButtonColor ?? Theme.of(context).cardColor,
+                  color: _settings?.chipCloseButtonColor ??
+                      Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: Center(
@@ -213,7 +218,8 @@ class LiteDropSelectorChip extends StatelessWidget {
             ),
             Text(
               item.title,
-              style: _getTextStyle(context)?.copyWith(color: Theme.of(context).cardColor),
+              style: _getTextStyle(context)
+                  ?.copyWith(color: Theme.of(context).cardColor),
             ),
           ],
         ),

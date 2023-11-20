@@ -26,8 +26,8 @@ class Binary extends Tile {
     partition(0, _children!.length, node.value, left, top, right, bottom);
   }
 
-  partition(
-      int i, int j, num? value, double left, double top, double right, double bottom) {
+  partition(int i, int j, num? value, double left, double top, double right,
+      double bottom) {
     if (i >= j - 1) {
       var node = _children![i];
       node.left = left;

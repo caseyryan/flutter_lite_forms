@@ -30,12 +30,10 @@ class LiteSerializers {
   static int toInt(Object? value) {
     return toDouble(value).toInt();
   }
-  
+
   static FutureOr<Object?> filesToMapList(Object? value) async {
     if (value is LiteFile) {
-      
       return await value.toMap();
-      
     } else if (value is List) {
       final tempList = <Map>[];
       for (var file in value) {

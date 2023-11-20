@@ -442,7 +442,8 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
           onChanged: (value) {
             setState(() {
               _selectedCountry = (value as List).first.payload as CountryData;
-              final phoneCountryData = PhoneCodes.getPhoneCountryDataByCountryCode(
+              final phoneCountryData =
+                  PhoneCodes.getPhoneCountryDataByCountryCode(
                 _selectedCountry!.isoCode,
               );
               _selectedPhone?.countryData = _selectedCountry;
@@ -469,8 +470,8 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
             List<LiteDropSelectorItem> selectedItems,
           ) {
             final countyData = selectedItems.first.payload as CountryData;
-            final padding =
-                (decoration.contentPadding as EdgeInsets?)?.left ?? kDefaultPadding;
+            final padding = (decoration.contentPadding as EdgeInsets?)?.left ??
+                kDefaultPadding;
             return Padding(
               padding: EdgeInsets.only(
                 right: padding,
@@ -627,8 +628,6 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
                           return group.translationBuilder(field.error);
                         }
                       : null,
-
-                  
                   autovalidateMode: null,
                   focusNode: field.getOrCreateFocusNode(
                     focusNode: widget.focusNode,
@@ -655,7 +654,8 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
                       defaultCountryCode: _preprocessor._countryCode,
                       allowEndlessPhone: widget.allowEndlessPhone,
                       onCountrySelected: (value) {
-                        if (value is PhoneCountryData && _selectedCountry == null) {}
+                        if (value is PhoneCountryData &&
+                            _selectedCountry == null) {}
                       },
                     ),
                   ],

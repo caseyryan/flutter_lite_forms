@@ -90,7 +90,9 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
         ? BoxDecoration(
             border: Border.fromBorderSide(
               BorderSide(
-                color: widget.data.isSelected ? _selectedBorderColor : Colors.transparent,
+                color: widget.data.isSelected
+                    ? _selectedBorderColor
+                    : Colors.transparent,
                 width: widget.data.selectedBorderWidth ?? _selectedBorderWidth,
               ),
             ),

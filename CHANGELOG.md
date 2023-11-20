@@ -1,3 +1,5 @@
+## 0.0.14
+* LiteDropSelector not can find default values by payload
 ## 0.0.13
 * Fixed first to upper / lower case methods
 ## 0.0.12

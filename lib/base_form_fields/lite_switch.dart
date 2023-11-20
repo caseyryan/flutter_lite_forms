@@ -427,7 +427,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
           builder: (BuildContext c, LiteFormRebuildController controller) {
             final hasChild = widget.child != null || widget.text != null;
             List<Widget>? children;
-    
+
             if (hasChild) {
               if (widget.switchPosition == LiteSwitchPosition.right) {
                 children = [
@@ -451,7 +451,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
                 ),
               ];
             }
-    
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

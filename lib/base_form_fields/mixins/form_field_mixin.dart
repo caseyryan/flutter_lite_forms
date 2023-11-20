@@ -167,9 +167,13 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     final bool isError = this._decoration!.errorText != null;
     InputBorder? border;
     if (!this._decoration!.enabled) {
-      border = isError ? this._decoration!.errorBorder : this._decoration!.disabledBorder;
+      border = isError
+          ? this._decoration!.errorBorder
+          : this._decoration!.disabledBorder;
     } else {
-      border = isError ? this._decoration!.errorBorder : this._decoration!.enabledBorder;
+      border = isError
+          ? this._decoration!.errorBorder
+          : this._decoration!.enabledBorder;
     }
     if (this._decoration!.isCollapsed) {
       contentPadding = decorationContentPadding ?? EdgeInsets.zero;
@@ -229,7 +233,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     if (field.focusNode == null) {
       return;
     }
-    
+
     onFocusChange();
   }
 

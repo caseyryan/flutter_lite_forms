@@ -135,18 +135,14 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     bool mountedOnly = false,
     bool includeIgnored = false,
   }) {
-    final list = _formGroups[formName]
-            ?._fields
-            .values
-            .where(
-              (f) {
-                if (includeIgnored) {
-                  return true;
-                }
-                return !f.name.isIgnoredInForm();
-              },
-            )
-            .toList() ??
+    final list = _formGroups[formName]?._fields.values.where(
+          (f) {
+            if (includeIgnored) {
+              return true;
+            }
+            return !f.name.isIgnoredInForm();
+          },
+        ).toList() ??
         <FormGroupField>[];
     if (mountedOnly) {
       return list.where((f) => f.isMounted).toList();

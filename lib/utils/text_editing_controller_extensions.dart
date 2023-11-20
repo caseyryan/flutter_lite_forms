@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 
 extension TextEditingControllerExtension on TextEditingController {
-
   void safeSetText(String value) {
     if (WidgetsBinding.instance.hasScheduledFrame) {
       WidgetsBinding.instance.ensureVisualUpdate();
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) { 
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         text = value;
       });
-    }
-    else {
+    } else {
       text = value;
     }
   }
@@ -17,7 +15,6 @@ extension TextEditingControllerExtension on TextEditingController {
   Future _delay(int millis) async {
     return Future.delayed(Duration(milliseconds: millis));
   }
-
 
   Future setSelectionToEnd([
     FocusNode? focusNode,
@@ -54,6 +51,4 @@ extension TextEditingControllerExtension on TextEditingController {
     );
     focusNode?.requestFocus();
   }
-
-
 }

@@ -131,7 +131,8 @@ class _LiteGroupWrapper extends StatefulWidget {
   State<_LiteGroupWrapper> createState() => __LiteGroupWrapperState();
 }
 
-class __LiteGroupWrapperState extends State<_LiteGroupWrapper> with PostFrameMixin {
+class __LiteGroupWrapperState extends State<_LiteGroupWrapper>
+    with PostFrameMixin {
   final _formKey = GlobalKey<FormState>();
 
   @override

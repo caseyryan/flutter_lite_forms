@@ -8,7 +8,6 @@ class CountryData with SearchQueryMixin {
   final String phoneCode;
   final Map<String, String> localizedNames;
 
-
   /// Tries to search a country by a name, iso code or a three letter code
   static CountryData? find(String any) {
     return tryFindCountries(any).first;

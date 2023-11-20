@@ -455,16 +455,21 @@ class PasswordSettings {
       passwordsMatch: passwordsMatch,
       group: group,
     );
-    if (firstFieldValue?.isNotEmpty != true && secondaryFieldValue?.isNotEmpty != true) {
+    if (firstFieldValue?.isNotEmpty != true &&
+        secondaryFieldValue?.isNotEmpty != true) {
       passwordsMatch = null;
     }
-    final digitsOk = requirements!.minDigits < 1 ? null : requirements!._digitsOk;
-    final upperCaseOk =
-        requirements!.minUpperCaseLetters < 1 ? null : requirements!._upperCaseOk;
-    final lowerCaseOk =
-        requirements!.minLowerCaseLetters < 1 ? null : requirements!._lowerCaseOk;
-    final specialCharsOk =
-        requirements!.minSpecialChars < 1 ? null : requirements!._specialCharsOk;
+    final digitsOk =
+        requirements!.minDigits < 1 ? null : requirements!._digitsOk;
+    final upperCaseOk = requirements!.minUpperCaseLetters < 1
+        ? null
+        : requirements!._upperCaseOk;
+    final lowerCaseOk = requirements!.minLowerCaseLetters < 1
+        ? null
+        : requirements!._lowerCaseOk;
+    final specialCharsOk = requirements!.minSpecialChars < 1
+        ? null
+        : requirements!._specialCharsOk;
 
     return checkerBuilder?.call(
           digitsOk,
@@ -598,7 +603,8 @@ class PasswordRequirements {
     if (minLowerCaseLetters < 1) {
       return true;
     }
-    return _lowerCaseLettersRegex!.allMatches(value).length >= minLowerCaseLetters;
+    return _lowerCaseLettersRegex!.allMatches(value).length >=
+        minLowerCaseLetters;
   }
 
   bool _isUpperCaseOk(
@@ -607,7 +613,8 @@ class PasswordRequirements {
     if (minUpperCaseLetters < 1) {
       return true;
     }
-    return _upperCaseLettersRegex!.allMatches(value).length >= minUpperCaseLetters;
+    return _upperCaseLettersRegex!.allMatches(value).length >=
+        minUpperCaseLetters;
   }
 
   bool _isSpecialCharsOk(
@@ -753,7 +760,8 @@ class _PasswordRequirementLine extends StatefulWidget {
   final TextStyle? baseTextStyle;
 
   @override
-  State<_PasswordRequirementLine> createState() => __PasswordRequirementLineState();
+  State<_PasswordRequirementLine> createState() =>
+      __PasswordRequirementLineState();
 }
 
 class __PasswordRequirementLineState extends State<_PasswordRequirementLine> {

@@ -610,7 +610,7 @@ class _LiteFilePickerState extends State<LiteFilePicker>
     );
     return temp;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     initializeFormField(
@@ -695,7 +695,8 @@ class _LiteFilePickerState extends State<LiteFilePicker>
                             } else {
                               final result = await _picker.pickVideo(
                                 source: payload.toImageSource()!,
-                                preferredCameraDevice: widget.preferredCameraDevice,
+                                preferredCameraDevice:
+                                    widget.preferredCameraDevice,
                               );
                               if (result != null) {
                                 xFiles = [result];
@@ -707,7 +708,8 @@ class _LiteFilePickerState extends State<LiteFilePicker>
                             if (payload == FileSource.camera) {
                               final result = await _picker.pickVideo(
                                 source: payload.toImageSource()!,
-                                preferredCameraDevice: widget.preferredCameraDevice,
+                                preferredCameraDevice:
+                                    widget.preferredCameraDevice,
                               );
                               if (result != null) {
                                 xFiles = [result];

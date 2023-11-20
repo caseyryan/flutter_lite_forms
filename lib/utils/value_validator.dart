@@ -57,7 +57,6 @@ abstract class LiteValidator {
 /// This validator can be used if you want to test errors in your form
 /// I will always return an error
 class AlwaysComplainingTestValidator extends LiteValidator {
-
   static int _index = 0;
 
   static const List<String> _reasons = [
@@ -77,7 +76,7 @@ class AlwaysComplainingTestValidator extends LiteValidator {
     String? fieldName,
   }) {
     final error = _reasons[_index];
-    _index ++;
+    _index++;
     if (_index >= _reasons.length) {
       _index = 0;
     }
@@ -199,7 +198,9 @@ class FileSize {
   FileSize({
     this.megaBytes = 5,
     this.kiloBytes = 0,
-  }) : assert(megaBytes >= 0 && kiloBytes >= 0 && (kiloBytes > 0 || megaBytes > 0));
+  }) : assert(megaBytes >= 0 &&
+            kiloBytes >= 0 &&
+            (kiloBytes > 0 || megaBytes > 0));
 
   int get totalKilobytes {
     return megaBytes * 1024 + kiloBytes;

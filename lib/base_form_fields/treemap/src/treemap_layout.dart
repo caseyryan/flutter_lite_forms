@@ -5,7 +5,6 @@ import 'tiles/tile.dart';
 import 'treemap.dart';
 import 'treenode.dart';
 
-
 class TreeMapLayout extends StatelessWidget {
   final List<TreeNode> children;
   final Tile tile;

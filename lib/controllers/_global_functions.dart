@@ -2,8 +2,6 @@
 
 part of 'lite_form_controller.dart';
 
-
-
 bool get isDarkTheme {
   return liteFormController._brightness == Brightness.dark;
 }

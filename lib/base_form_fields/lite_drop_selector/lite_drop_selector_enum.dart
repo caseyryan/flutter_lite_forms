@@ -17,7 +17,8 @@ enum LiteDropSelectorActionType {
   singleSelect,
   multiselect,
   simple,
-  /// The same as simple but it will not highlight the 
+
+  /// The same as simple but it will not highlight the
   /// selected button. Might be useful for action sheets
   simpleWithNoSelection,
 }

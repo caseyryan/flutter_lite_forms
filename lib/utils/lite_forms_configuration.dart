@@ -67,7 +67,7 @@ class LiteFormsConfiguration {
   ) {
     return _vanila(context);
   }
-  
+
   factory LiteFormsConfiguration.thinFields(
     BuildContext context,
   ) {

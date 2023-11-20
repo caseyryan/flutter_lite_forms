@@ -74,7 +74,8 @@ class LiteSearchField extends StatefulWidget {
   State<LiteSearchField> createState() => _LiteSearchFieldState();
 }
 
-class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin {
+class _LiteSearchFieldState extends State<LiteSearchField>
+    with LiteSearchMixin {
   String? _hintText;
   String _searchValue = '';
 

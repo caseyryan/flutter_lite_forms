@@ -10,9 +10,10 @@ extension StringExtensions on String {
   Future copyToClipBoard() async {
     await Clipboard.setData(ClipboardData(text: this));
   }
-  /// this is a utility method. Call it on a [FormGroupField]'s name 
-  /// value, to exclude this form field value from a form. 
-  /// This might be necessary sometimes, for example if you 
+
+  /// this is a utility method. Call it on a [FormGroupField]'s name
+  /// value, to exclude this form field value from a form.
+  /// This might be necessary sometimes, for example if you
   /// want to combine a few form fields in one (e.g. a [LitePhoneInputField])
   /// but you want only one of them in a form
   String toFormIgnoreName() {

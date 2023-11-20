@@ -219,121 +219,94 @@ class SignupFormPage extends StatelessWidget {
                           print('secondsLeft $secondsLeft');
                         },
                       ),
-                      // LiteDropSelector(
-                      //   paddingTop: 20.0,
-                      //   readOnly: false,
-                      //   name: 'classes',
-                      //   initialValue: [
-                      //     // 'Airplane Mode',
-                      //     'ActivateIntent',
-                      //   ],
+                      LiteDropSelector(
+                        paddingTop: 20.0,
+                        readOnly: false,
+                        name: 'classes',
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        dropSelectorType: LiteDropSelectorViewType.menu,
+                        // dropSelectorType: LiteDropSelectorViewType.bottomsheet,
+                        // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
+                        // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
+                        dropSelectorActionType:
+                            LiteDropSelectorActionType.multiselect,
+                        settings: LiteDropSelectorSettings(
+                          bottomLeftRadius: 10.0,
+                          bottomRightRadius: 10.0,
+                          topLeftRadius: 10.0,
+                          topRightRadius: 10.0,
+                          sheetPadding: EdgeInsets.all(12.0),
+                          // chipBuilder: (item, removeItem) {
+                          //   return GestureDetector(
+                          //     onTap: () {
+                          //       removeItem(item);
+                          //     },
+                          //     child: Container(
+                          //       width: 40.0,
+                          //       height: 20.0,
+                          //       color: Colors.red,
+                          //     ),
+                          //   );
+                          // },
+                          menuSearchConfiguration: MenuSearchConfiguration(
+                            searchFieldVisibility: SearchFieldVisibility.always,
+                          ),
+                        ),
+                        initialValue: ['airplane mode'],
+                        items: [
+                          LiteDropSelectorItem(
+                            title: 'Airplane Mode',
+                            payload: 'airplane mode',
+                            iconBuilder: (context, item, isSelected) {
+                              if (isSelected) {
+                                return Icon(
+                                  Icons.airplanemode_active,
+                                  color: Colors.green,
+                                );
+                              }
+                              return Icon(
+                                Icons.airplanemode_inactive,
+                                color: Colors.red,
+                              );
+                            },
+                          ),
+                          LiteDropSelectorItem(
+                            title: 'Notifications',
+                            payload: 'notifications',
+                            iconBuilder: (context, item, isSelected) {
+                              if (isSelected) {
+                                return Icon(
+                                  Icons.notifications_active,
+                                  color: Colors.lightGreen,
+                                );
+                              }
+                              return Icon(
+                                Icons.notifications_off,
+                                color: Colors.orange,
+                              );
+                            },
+                          ),
+                        ],
 
-                      //   autovalidateMode: AutovalidateMode.onUserInteraction,
-                      //   dropSelectorType: LiteDropSelectorViewType.menu,
-                      //   // dropSelectorType: LiteDropSelectorViewType.bottomsheet,
-                      //   // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
-                      //   // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
-                      //   dropSelectorActionType: LiteDropSelectorActionType.multiselect,
-                      //   settings: LiteDropSelectorSettings(
-                      //     bottomLeftRadius: 10.0,
-                      //     bottomRightRadius: 10.0,
-                      //     topLeftRadius: 10.0,
-                      //     topRightRadius: 10.0,
-                      //     sheetPadding: EdgeInsets.all(12.0),
-                      //     // chipBuilder: (item, removeItem) {
-                      //     //   return GestureDetector(
-                      //     //     onTap: () {
-                      //     //       removeItem(item);
-                      //     //     },
-                      //     //     child: Container(
-                      //     //       width: 40.0,
-                      //     //       height: 20.0,
-                      //     //       color: Colors.red,
-                      //     //     ),
-                      //     //   );
-                      //     // },
-                      //     menuSearchConfiguration: MenuSearchConfiguration(
-                      //       searchFieldVisibility: SearchFieldVisibility.always,
-                      //     ),
-                      //   ),
-                      //   // items: [
-                      //   //   LiteDropSelectorItem(
-                      //   //     title: 'Airplane Mode',
-                      //   //     payload: 'airplane mode',
-                      //   //     iconBuilder: (context, item, isSelected) {
-                      //   //       if (isSelected) {
-                      //   //         return Icon(
-                      //   //           Icons.airplanemode_active,
-                      //   //           color: Colors.green,
-                      //   //         );
-                      //   //       }
-                      //   //       return Icon(
-                      //   //         Icons.airplanemode_inactive,
-                      //   //         color: Colors.red,
-                      //   //       );
-                      //   //     },
-                      //   //   ),
-                      //   //   LiteDropSelectorItem(
-                      //   //     title: 'Notifications',
-                      //   //     payload: 'notifications',
-                      //   //     iconBuilder: (context, item, isSelected) {
-                      //   //       if (isSelected) {
-                      //   //         return Icon(
-                      //   //           Icons.notifications_active,
-                      //   //           color: Colors.lightGreen,
-                      //   //         );
-                      //   //       }
-                      //   //       return Icon(
-                      //   //         Icons.notifications_off,
-                      //   //         color: Colors.orange,
-                      //   //       );
-                      //   //     },
-                      //   //   ),
-                      //   // ],
-
-                      //   items: [
-                      //     'ActivateIntent',
-                      //     'Align',
-                      //     'Alignment',
-                      //     'AlignmentDirectional',
-                      //     'AlignmentGeometry',
-                      //     'AlignmentGeometryTween',
-                      //     'AlignmentTween',
-                      //     'AlignTransition',
-                      //     'AlwaysScrollableScrollPhysics',
-                      //     'AlwaysStoppedAnimation',
-                      //     'AndroidView',
-                      //     'AndroidViewSurface',
-                      //     'Animatable',
-                      //     'AnimatedAlign',
-                      //     // 'AnimatedBuilder',
-                      //     // 'AnimatedContainer',
-                      //     // 'AnimatedCrossFade',
-                      //     // 'AnimatedDefaultTextStyle',
-                      //     // 'AnimatedFractionallySizedBox',
-                      //     // 'AnimatedGrid',
-                      //     // 'AnimatedGridState',
-                      //   ],
-
-                      //   serializer: (value) {
-                      //     if (value is List) {
-                      //       return value.map(
-                      //         (e) {
-                      //           if (e is LiteDropSelectorItem) {
-                      //             return e.title;
-                      //           } else if (e is String) {
-                      //             return e;
-                      //           }
-                      //           return null;
-                      //         },
-                      //       ).toList();
-                      //     }
-                      //     return value;
-                      //   },
-                      //   initialValueDeserializer: (value) {
-                      //     return value;
-                      //   },
-                      // ),
+                        serializer: (value) {
+                          if (value is List) {
+                            return value.map(
+                              (e) {
+                                if (e is LiteDropSelectorItem) {
+                                  return e.title;
+                                } else if (e is String) {
+                                  return e;
+                                }
+                                return null;
+                              },
+                            ).toList();
+                          }
+                          return value;
+                        },
+                        initialValueDeserializer: (value) {
+                          return value;
+                        },
+                      ),
                       // const SizedBox(height: 20.0),
                       // LitePasswordField(
                       //   paddingTop: 20.0,
@@ -427,13 +400,16 @@ class SignupFormPage extends StatelessWidget {
                       ),
                       MaterialButton(
                         onPressed: () async {
-                          final value = await form('signupForm.phone').field.get(true);
+                          final value =
+                              await form('signupForm.phone').field.get(true);
                           // print(value);
                           // form('signupForm.phone').phone.set(
                           //       '(999) 444 6677',
                           //       country: CountryData.find('GB'),
                           //     );
-                          form('signupForm.phone2').phone.set('+44 (999) 444 6677');
+                          form('signupForm.phone2')
+                              .phone
+                              .set('+44 (999) 444 6677');
                         },
                         child: Text('Set Phone'),
                       ),
@@ -441,7 +417,9 @@ class SignupFormPage extends StatelessWidget {
                       MaterialButton(
                         onPressed: () async {
                           liteTimerController.resetTimerByName(
-                              timerName: 'timer', groupName: formName, numSeconds: 40);
+                              timerName: 'timer',
+                              groupName: formName,
+                              numSeconds: 40);
                         },
                         child: Text('Reset Timer'),
                       ),
