@@ -100,7 +100,7 @@ class LiteFormsConfiguration {
 
 class LiteFormsTheme {
   const LiteFormsTheme({
-    this.defaultTextStyle,
+    required this.defaultTextStyle,
     this.inputDecoration,
     this.shadowColor,
     this.dropSelectorChipColor,
@@ -108,7 +108,7 @@ class LiteFormsTheme {
     this.destructiveColor,
   });
 
-  final TextStyle? defaultTextStyle;
+  final TextStyle defaultTextStyle;
   final Color? destructiveColor;
   final InputDecoration? inputDecoration;
   final BoxDecoration? filePickerDecoration;

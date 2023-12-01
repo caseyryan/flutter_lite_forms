@@ -1,10 +1,10 @@
 name: lite_forms
 description: This packages dramatically simplifies working with forms still letting you use standard flutter decorations.
-version: 0.0.14
+version: 0.0.15
 homepage: https://github.com/caseyryan/flutter_lite_forms
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
+  sdk: '>=2.19.6 <4.0.0'
   flutter: ">=1.17.0"
 
 dependencies:

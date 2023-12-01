@@ -351,7 +351,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField>
             smartQuotesType: widget.smartQuotesType,
             showCursor: widget.showCursor,
             strutStyle: widget.strutStyle,
-            style: liteFormController.config?.defaultTextStyle ?? widget.style,
+            style: widget.style ?? liteFormController.config?.defaultTextStyle,
             textAlign: widget.textAlign,
             textAlignVertical: widget.textAlignVertical,
             textCapitalization: widget.textCapitalization,

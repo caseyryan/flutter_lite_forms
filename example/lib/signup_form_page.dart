@@ -230,12 +230,19 @@ class SignupFormPage extends StatelessWidget {
                         // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
                         dropSelectorActionType:
                             LiteDropSelectorActionType.multiselect,
+                        menuItemBuilder: (index, item, isLast) {
+                          return Container(
+                            width: double.infinity,
+                            height: 60.0,
+                          );
+                        },
                         settings: LiteDropSelectorSettings(
                           bottomLeftRadius: 10.0,
                           bottomRightRadius: 10.0,
                           topLeftRadius: 10.0,
                           topRightRadius: 10.0,
                           sheetPadding: EdgeInsets.all(12.0),
+
                           // chipBuilder: (item, removeItem) {
                           //   return GestureDetector(
                           //     onTap: () {
@@ -252,7 +259,29 @@ class SignupFormPage extends StatelessWidget {
                             searchFieldVisibility: SearchFieldVisibility.always,
                           ),
                         ),
+                        selectorViewBuilder: (
+                          context,
+                          selectedItems,
+                          String? error,
+                        ) {
+                          print('ERROR: $error');
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 60.0,
+                                height: 60.0,
+                                color: Colors.red,
+                              ),
+                            ],
+                          );
+                        },
                         initialValue: ['airplane mode'],
+                        validators: [
+                          LiteValidator.alwaysComplaining(
+                            delayMilliseconds: 2000,
+                          ),
+                        ],
                         items: [
                           LiteDropSelectorItem(
                             title: 'Airplane Mode',
@@ -395,9 +424,12 @@ class SignupFormPage extends StatelessWidget {
                       // const SizedBox(
                       //   height: 1500,
                       // ),
-                      SizedBox(
-                        height: 20.0,
+                      SizedBox(height: 20.0),
+                      LiteTextFormField(
+                        name: 'multiline',
+                        maxLines: 4,
                       ),
+                      SizedBox(height: 20.0),
                       MaterialButton(
                         onPressed: () async {
                           final value =

@@ -87,7 +87,7 @@ class LiteDropSelectorSettings {
     this.buttonHeight,
     this.menuSearchConfiguration = const MenuSearchConfiguration(),
     this.veilColor,
-    this.minMenuWidth,
+    this.maxMenuWidth,
     this.maxVeilOpacity = .04,
     this.withScrollBar = true,
     this.sheetPadding = const EdgeInsets.all(
@@ -108,7 +108,7 @@ class LiteDropSelectorSettings {
   final double? topRightRadius;
   final double? bottomLeftRadius;
   final double? bottomRightRadius;
-  final double? minMenuWidth;
+  final double? maxMenuWidth;
 
   final double chipTopLeftRadius;
   final double chipTopRightRadius;
@@ -274,7 +274,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
       if (!_isSimple || _hasSearchField) {
         _menuWidth = max(
           _menuWidth,
-          _minMenuWidth - _totalHorizontalPadding,
+          _maxMenuWidth - _totalHorizontalPadding,
         );
       }
       for (var d in widget.args.items) {
@@ -283,8 +283,8 @@ class _DropSelectorViewState extends State<DropSelectorView>
     });
   }
 
-  double get _minMenuWidth {
-    return _settings.minMenuWidth ?? kMinDropSelectorWidth;
+  double get _maxMenuWidth {
+    return _settings.maxMenuWidth ?? kMaxDropSelectorWidth;
   }
 
   @override
@@ -528,10 +528,18 @@ class _DropSelectorViewState extends State<DropSelectorView>
     final isLast = index == items.length - 1;
     Widget button;
     if (widget.args.menuItemBuilder != null) {
-      button = widget.args.menuItemBuilder!(
-        index,
-        item,
-        isLast,
+      button = ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: _isBottomSheet
+              ? MediaQuery.of(context).size.width
+              : _maxMenuWidth,
+          maxHeight: _viewportHeight,
+        ),
+        child: widget.args.menuItemBuilder!(
+          index,
+          item,
+          isLast,
+        ),
       );
     } else {
       button = Padding(
@@ -571,7 +579,7 @@ class _DropSelectorViewState extends State<DropSelectorView>
       Flexible(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: _isBottomSheet ? double.infinity : _minMenuWidth,
+            maxWidth: _isBottomSheet ? double.infinity : _maxMenuWidth,
             maxHeight: _viewportHeight,
           ),
           child: Scrollbar(

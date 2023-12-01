@@ -463,11 +463,12 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
                 menuSearchConfiguration: MenuSearchConfiguration(
                   autofocusSearchField: true,
                 ),
-                minMenuWidth: 330.0,
+                maxMenuWidth: 330.0,
               ),
           selectorViewBuilder: (
             context,
             List<LiteDropSelectorItem> selectedItems,
+            String? error
           ) {
             final countyData = selectedItems.first.payload as CountryData;
             final padding = (decoration.contentPadding as EdgeInsets?)?.left ??

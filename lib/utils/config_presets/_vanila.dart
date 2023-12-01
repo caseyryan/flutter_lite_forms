@@ -39,6 +39,10 @@ LiteFormsConfiguration _vanila(BuildContext context) {
       backgroundOpacity: .95,
     ),
     lightTheme: LiteFormsTheme(
+      defaultTextStyle: const TextStyle(
+        fontSize: 15.0,
+        color: Color.fromARGB(255, 32, 32, 32),
+      ),
       destructiveColor: Colors.red,
       filePickerDecoration: const BoxDecoration(
         borderRadius: borderRadius,
@@ -50,6 +54,13 @@ LiteFormsConfiguration _vanila(BuildContext context) {
       ),
       inputDecoration: InputDecoration(
         filled: false,
+        isDense: false,
+        contentPadding: const EdgeInsets.only(
+          left: 12.0,
+          right: 12.0,
+          top: 4.0,
+          bottom: 4.0,
+        ),
         errorStyle: const TextStyle(
           fontSize: 16.0,
           color: Colors.red,
@@ -69,9 +80,20 @@ LiteFormsConfiguration _vanila(BuildContext context) {
       ),
     ),
     darkTheme: LiteFormsTheme(
+      defaultTextStyle: const TextStyle(
+        fontSize: 15.0,
+        color: Color.fromARGB(255, 248, 248, 248),
+      ),
       destructiveColor: Colors.redAccent,
       inputDecoration: InputDecoration(
         filled: false,
+        isDense: false,
+        contentPadding: const EdgeInsets.only(
+          left: 12.0,
+          right: 12.0,
+          top: 4.0,
+          bottom: 4.0,
+        ),
         errorStyle: const TextStyle(
           fontSize: 16.0,
           color: Colors.redAccent,

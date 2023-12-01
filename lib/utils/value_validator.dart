@@ -49,8 +49,12 @@ abstract class LiteValidator {
     );
   }
 
-  static LiteValidator alwaysComplaining() {
-    return AlwaysComplainingTestValidator();
+  static LiteValidator alwaysComplaining({
+    int delayMilliseconds = 0,
+  }) {
+    return AlwaysComplainingTestValidator(
+      delayMilliseconds: delayMilliseconds,
+    );
   }
 }
 
@@ -58,23 +62,34 @@ abstract class LiteValidator {
 /// I will always return an error
 class AlwaysComplainingTestValidator extends LiteValidator {
   static int _index = 0;
+  AlwaysComplainingTestValidator({
+    this.delayMilliseconds = 0,
+  });
+
+  /// [delayMilliseconds] if value is greater than zero
+  /// the validator 
+  /// will be asynchronous
+  final int delayMilliseconds;
 
   static const List<String> _reasons = [
-    'Something is wrong with this field',
-    'I don\'t like this',
-    'Invalid value',
-    'I still don\'t like this',
-    'Try another one',
-    'I\'m afraid this won\'t do',
-    'Are you kidding?',
-    'Nah, this one is not good',
+    '[TEST] Something is wrong with this field',
+    '[TEST] I don\'t like this',
+    '[TEST] Invalid value',
+    '[TEST] I still don\'t like this',
+    '[TEST] Try another one',
+    '[TEST] I\'m afraid this won\'t do',
+    '[TEST] Are you kidding?',
+    '[TEST] Nah, this one is not good',
   ];
 
   @override
   FutureOr<String?> validate(
     Object? value, {
     String? fieldName,
-  }) {
+  }) async {
+    if (delayMilliseconds > 0) {
+      await Future.delayed(Duration(milliseconds: delayMilliseconds));
+    }
     final error = _reasons[_index];
     _index++;
     if (_index >= _reasons.length) {

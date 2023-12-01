@@ -29,9 +29,13 @@ part 'lite_drop_selector_route.dart';
 typedef DropSelectorItemBuilder = Widget Function(
   LiteDropSelectorItem item,
 );
+
+/// [selectedItems] a list of items that are currently selected
+/// [error] a text of an error from validator or `null`
 typedef LiteDropSelectorViewBuilder = Widget Function(
   BuildContext context,
   List<LiteDropSelectorItem> selectedItems,
+  String? error,
 );
 
 class LiteDropSelector extends StatefulWidget {
@@ -395,6 +399,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
     );
 
     if (widget.selectorViewBuilder != null) {
+      final errorText = group.translationBuilder(field.error);
       return Focus(
         focusNode: node,
         child: Padding(
@@ -412,6 +417,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
               child: widget.selectorViewBuilder!(
                 context,
                 _selectedOptions,
+                errorText,
               ),
             ),
           ),

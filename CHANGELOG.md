@@ -1,3 +1,7 @@
+## 0.0.15
+* validators and a serializer or a field are now updated dynamically
+* Fixed error line on LiteDropSelector if a custom builder is used
+* Flutter constraints updated
 ## 0.0.14
 * LiteDropSelector not can find default values by payload
 ## 0.0.13

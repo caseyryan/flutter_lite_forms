@@ -196,7 +196,7 @@ class _LiteSearchFieldState extends State<LiteSearchField>
       ),
       child: TextFormField(
         readOnly: widget.readOnly,
-        style: widget.style,
+        style: widget.style ?? liteFormController.config?.defaultTextStyle,
         focusNode: widget.focusNode,
         autofocus: widget.autofocus,
         onFieldSubmitted: (value) {

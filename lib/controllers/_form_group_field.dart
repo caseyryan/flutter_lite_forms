@@ -11,6 +11,14 @@ class FormGroupField<T> {
   InputDecoration? _decoration;
   _FormGroupWrapper? _parent;
 
+  void updateValidatorsAndSerializer({
+    required List<LiteValidator>? validators,
+    required LiteFormValueSerializer? serializer,
+  }) {
+    _serializer = serializer;
+    _validators = validators;
+  }
+
   IPreprocessor? preprocessor;
   String? _formName;
   String get formName => _formName ?? '';

@@ -36,6 +36,10 @@ LiteFormsConfiguration _thinFields(
       backgroundOpacity: .95,
     ),
     lightTheme: LiteFormsTheme(
+      defaultTextStyle: const TextStyle(
+        fontSize: 15.0,
+        color: Color.fromARGB(255, 32, 32, 32),
+      ),
       destructiveColor: Colors.red,
       filePickerDecoration: const BoxDecoration(
         borderRadius: borderRadius,
@@ -70,6 +74,10 @@ LiteFormsConfiguration _thinFields(
       ),
     ),
     darkTheme: LiteFormsTheme(
+      defaultTextStyle: const TextStyle(
+        fontSize: 15.0,
+        color: Color.fromARGB(255, 248, 248, 248),
+      ),
       destructiveColor: Colors.redAccent,
       inputDecoration: InputDecoration(
         contentPadding: const EdgeInsets.only(

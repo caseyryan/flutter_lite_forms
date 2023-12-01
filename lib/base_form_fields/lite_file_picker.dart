@@ -664,7 +664,7 @@ class _LiteFilePickerState extends State<LiteFilePicker>
                   buttonHeight: widget.menuButtonHeight,
                 ),
                 validators: widget.validators,
-                selectorViewBuilder: (context, selectedItems) {
+                selectorViewBuilder: (context, selectedItems, String? error) {
                   return Container(
                     width: widget.width,
                     height: widget.height,

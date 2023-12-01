@@ -141,7 +141,6 @@ class _FormGroupWrapper {
 
   double get screenHeight => screenSize.height;
 
-  /// Just to make it more understandable
   Future scrollToFirstInvalidField([
     Duration? duration,
   ]) async {

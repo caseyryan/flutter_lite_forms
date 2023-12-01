@@ -175,10 +175,10 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
           ? this._decoration!.errorBorder
           : this._decoration!.enabledBorder;
     }
-    if (this._decoration!.isCollapsed) {
+    if (this._decoration?.isCollapsed == true) {
       contentPadding = decorationContentPadding ?? EdgeInsets.zero;
     } else if (border?.isOutline != true) {
-      if (this._decoration!.filled ?? false) {
+      if (this._decoration?.filled == true) {
         contentPadding = decorationContentPadding ??
             (decorationIsDense
                 ? const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0)
@@ -195,7 +195,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
               ? const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0)
               : const EdgeInsets.fromLTRB(12.0, 24.0, 12.0, 16.0));
     }
-    this._decoration = this._decoration!.copyWith(
+    this._decoration = this._decoration?.copyWith(
           contentPadding: contentPadding,
         );
 
@@ -215,6 +215,10 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     } else {
       _reactivate();
     }
+    field.updateValidatorsAndSerializer(
+      validators: validators,
+      serializer: serializer,
+    );
 
     if (addFocusNodeListener) {
       /// this is required to be able to iterate through form

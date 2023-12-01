@@ -5,6 +5,13 @@ import 'package:lite_state/lite_state.dart';
 
 import 'lite_forms_configuration.dart';
 
+/// Just a shorthand for [initializeLiteForms]
+void initForms({
+  LiteFormsConfiguration? config,
+}) {
+  initializeLiteForms(config: config);
+}
+
 /// Call it somewhere in the beginning of your app code
 /// [config] allows you to configure the look and feel
 /// for all of your form fields by default.
