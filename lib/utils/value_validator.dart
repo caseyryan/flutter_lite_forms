@@ -67,7 +67,7 @@ class AlwaysComplainingTestValidator extends LiteValidator {
   });
 
   /// [delayMilliseconds] if value is greater than zero
-  /// the validator 
+  /// the validator
   /// will be asynchronous
   final int delayMilliseconds;
 

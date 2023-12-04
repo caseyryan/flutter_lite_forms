@@ -465,11 +465,8 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
                 ),
                 maxMenuWidth: 330.0,
               ),
-          selectorViewBuilder: (
-            context,
-            List<LiteDropSelectorItem> selectedItems,
-            String? error
-          ) {
+          selectorViewBuilder: (context,
+              List<LiteDropSelectorItem> selectedItems, String? error) {
             final countyData = selectedItems.first.payload as CountryData;
             final padding = (decoration.contentPadding as EdgeInsets?)?.left ??
                 kDefaultPadding;

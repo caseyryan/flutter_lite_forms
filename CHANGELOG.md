@@ -1,3 +1,5 @@
+## 0.0.16
+* LiteFormGroup now can accept a `ScrollController` via parameters
 ## 0.0.15
 * validators and a serializer or a field are now updated dynamically
 * Fixed error line on LiteDropSelector if a custom builder is used

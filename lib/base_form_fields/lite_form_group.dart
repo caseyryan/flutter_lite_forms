@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/mixins/post_frame_mixin.dart';
@@ -27,7 +29,11 @@ typedef LiteFormBuilder = Widget Function(
 );
 
 class LiteFormGroup extends InheritedWidget {
-  final ScrollController scrollController = ScrollController();
+  ScrollController? _scrollController;
+  ScrollController get scrollController {
+    _scrollController ??= ScrollController();
+    return _scrollController!;
+  }
 
   /// Wrap your form with this group. Inside you can use any
   /// LiteForm fields. Here's the list of basic LiteFormFields ->
@@ -45,6 +51,7 @@ class LiteFormGroup extends InheritedWidget {
     this.autoRemoveUnregisteredFields = true,
     this.allowUnfocusOnTapOutside,
     this.translationBuilder = defaultTranslationBuilder,
+    ScrollController? scrollController,
     required LiteFormBuilder builder,
   }) : super(
           child: _LiteGroupWrapper(
@@ -65,7 +72,9 @@ class LiteFormGroup extends InheritedWidget {
                   formState: formState,
                   autoRemoveUnregisteredFields: autoRemoveUnregisteredFields,
                 );
-
+                // if (LiteFormGroup.of(c)!.scrollController == null) {
+                //   LiteFormGroup.of(c)!.scrollController = ScrollController();
+                // }
                 return builder(
                   c,
                   LiteFormGroup.of(c)!.scrollController,
@@ -74,7 +83,9 @@ class LiteFormGroup extends InheritedWidget {
             ),
           ),
           key: key,
-        );
+        ) {
+    _scrollController = scrollController;
+  }
 
   /// Form name.
   final String name;
