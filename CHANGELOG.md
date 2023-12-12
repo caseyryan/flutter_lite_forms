@@ -1,3 +1,5 @@
+## 0.0.17
+* Extended the number of possible initial value types for LiteDropSelector
 ## 0.0.16
 * LiteFormGroup now can accept a `ScrollController` via parameters
 ## 0.0.15

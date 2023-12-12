@@ -323,6 +323,22 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
             .whereNotNull()
             .cast<LiteDropSelectorItem>()
             .toList();
+      } else {
+        final byPayload = widget.items.firstWhereOrNull(
+          (dynamic i) {
+            if (preparedInitialValue is LiteDropSelectorItem) {
+              return preparedInitialValue.payload == i.payload;
+            } else {
+              return i is LiteDropSelectorItem &&
+                  i.payload == preparedInitialValue;
+            }
+          },
+        );
+        if (byPayload != null) {
+          preparedInitialValue = <LiteDropSelectorItem>[
+            byPayload as LiteDropSelectorItem,
+          ];
+        }
       }
     }
     if (_isStringItems) {

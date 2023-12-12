@@ -52,6 +52,35 @@ class SignupFormPage extends StatelessWidget {
                           iconPosition: LiteSearchFieldIconPosition.left,
                         ),
                       ),
+
+                      LiteDropSelector(
+                        initialValue: LiteDropSelectorItem(
+                          title: 'I have a 24-word long secret phrase',
+                          payload: 24,
+                        ),
+                        paddingBottom: 12,
+                        paddingTop: 12,
+                        dropSelectorType: LiteDropSelectorViewType.menu,
+                        settings: const LiteDropSelectorSettings(
+                          maxMenuWidth: double.infinity,
+                        ),
+                        name: 'phraseLengthDropSelector',
+                        items: [
+                          LiteDropSelectorItem(
+                            title: 'I have a 24-word long secret phrase',
+                            payload: 24,
+                          ),
+                          LiteDropSelectorItem(
+                            title: 'I have a 18-word long secret phrase',
+                            payload: 18,
+                          ),
+                          LiteDropSelectorItem(
+                            title: 'I have a 12-word long secret phrase',
+                            payload: 12,
+                          ),
+                        ],
+                      ),
+
                       // LiteDatePicker(
                       //   paddingTop: 20.0,
                       //   readOnly: false,
