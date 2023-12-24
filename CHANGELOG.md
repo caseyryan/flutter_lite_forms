@@ -1,3 +1,5 @@
+## 0.0.20
+* Added `firstToUpper` parameter to `toCamelCase()` extension 
 ## 0.0.19
 * Fix `Hive` on web
 ## 0.0.18
