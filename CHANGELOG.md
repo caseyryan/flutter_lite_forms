@@ -1,3 +1,5 @@
+## 0.0.18
+* Updated lite_state and flutter_multi_formatter versions
 ## 0.0.17
 * Extended the number of possible initial value types for LiteDropSelector
 ## 0.0.16
