@@ -57,10 +57,15 @@ extension StringExtensions on String {
     return split.join();
   }
 
-  String toCamelCase() {
+  String toCamelCase([
+    bool firstToUpper = true,
+  ]) {
     if (isEmpty) return this;
     final replaced = replaceAll(RegExp(r'[^A-Za-z ]+'), '');
-    return replaced.firstToUpperCase();
+    if (firstToUpper) {
+      return replaced.firstToUpperCase();
+    }
+    return replaced;
   }
 
   String _capitalizeString(String string) {
