@@ -1,3 +1,5 @@
+## 0.0.19
+* Fix `Hive` on web
 ## 0.0.18
 * Updated lite_state and flutter_multi_formatter versions
 ## 0.0.17
