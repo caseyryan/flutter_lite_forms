@@ -1,3 +1,5 @@
+## 0.0.22
+* `LiteSearchField` can now accept custom `TextEditingController`
 ## 0.0.21
 * Updated `lite_state` version
 ## 0.0.20

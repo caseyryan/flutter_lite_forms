@@ -42,6 +42,7 @@ class LiteSearchField extends StatefulWidget {
   const LiteSearchField({
     super.key,
     required this.onSearch,
+    this.textEditingController,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
@@ -69,6 +70,7 @@ class LiteSearchField extends StatefulWidget {
   final ValueChanged<String> onSearch;
   final TextStyle? style;
   final bool readOnly;
+  final TextEditingController? textEditingController;
 
   @override
   State<LiteSearchField> createState() => _LiteSearchFieldState();
@@ -78,14 +80,16 @@ class _LiteSearchFieldState extends State<LiteSearchField>
     with LiteSearchMixin {
   String? _hintText;
   String _searchValue = '';
+  TextEditingController? _myTextEditingController;
 
   @override
   void initState() {
     _hintText = widget.hintText;
     _updateSettings();
+    _myTextEditingController = widget.textEditingController ?? textEditingController;
     super.initState();
     if (widget.initialValue?.isNotEmpty == true) {
-      textEditingController.text = widget.initialValue!;
+      _myTextEditingController!.text = widget.initialValue!;
     }
   }
 
@@ -118,7 +122,7 @@ class _LiteSearchFieldState extends State<LiteSearchField>
     return LiteState<LiteFormRebuildController>(
       builder: (BuildContext c, LiteFormRebuildController controller) {
         if (!_isManualSearch) {
-          if (textEditingController.text.isNotEmpty) {
+          if (_myTextEditingController!.text.isNotEmpty) {
             return const Icon(
               Icons.clear_rounded,
             );
@@ -161,12 +165,12 @@ class _LiteSearchFieldState extends State<LiteSearchField>
         onTap: () {
           if (_isManualSearch) {
             onChanged(
-              textEditingController.text,
+              _myTextEditingController!.text,
               triggerImmediately: true,
             );
           } else {
             if (_searchValue.isNotEmpty) {
-              textEditingController.clear();
+              _myTextEditingController!.clear();
               _onSearch('');
             }
           }
@@ -207,7 +211,7 @@ class _LiteSearchFieldState extends State<LiteSearchField>
         },
         textInputAction: TextInputAction.search,
         onChanged: onChanged,
-        controller: textEditingController,
+        controller: _myTextEditingController,
         decoration: decoration,
       ),
     );
