@@ -1,3 +1,5 @@
+## 0.0.21
+* Updated `lite_state` version
 ## 0.0.20
 * Added `firstToUpper` parameter to `toCamelCase()` extension 
 ## 0.0.19
