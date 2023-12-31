@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/error_line.dart';
+import 'package:lite_forms/base_form_fields/lite_drop_selector/lite_drop_selector_button.dart';
 import 'package:lite_forms/base_form_fields/lite_form_group.dart';
 import 'package:lite_forms/base_form_fields/lite_search_field.dart';
 import 'package:lite_forms/base_form_fields/mixins/form_field_mixin.dart';
@@ -19,10 +20,10 @@ import 'package:lite_forms/utils/exports.dart';
 import 'package:lite_forms/utils/swipe_detector.dart';
 import 'package:lite_state/lite_state.dart';
 
-import 'lite_drop_selector_button.dart';
 import 'lite_drop_selector_multi_sheet.dart';
 
 part '_lite_drop_selector_item.dart';
+part 'drop_selector_view.dart';
 part 'lite_drop_selector_enum.dart';
 part 'lite_drop_selector_route.dart';
 
@@ -45,9 +46,9 @@ class LiteDropSelector extends StatefulWidget {
     required this.items,
     this.menuItemBuilder,
     this.selectorViewBuilder,
-    this.settings = const LiteDropSelectorSettings(),
-    this.dropSelectorType = LiteDropSelectorViewType.adaptive,
-    this.dropSelectorActionType = LiteDropSelectorActionType.simple,
+    this.settings,
+    // this.dropSelectorType = LiteDropSelectorViewType.adaptive,
+    // this.dropSelectorActionType = LiteDropSelectorActionType.simple,
     this.initialValueDeserializer,
     this.validators,
     this.serializer = nonConvertingValueConvertor,
@@ -102,9 +103,7 @@ class LiteDropSelector extends StatefulWidget {
   final LiteDropSelectorViewBuilder? selectorViewBuilder;
 
   /// [settings] for a sheet where all menu items are displayed
-  final LiteDropSelectorSettings settings;
-
-  final LiteDropSelectorActionType dropSelectorActionType;
+  final DropSelectorSettings? settings;
 
   /// It is assumed that the initial value is DateTime? but you might
   /// also pass something else, for example a iso8601 String, and the
@@ -114,7 +113,6 @@ class LiteDropSelector extends StatefulWidget {
   final Object? initialValue;
   final Color? pickerBackgroundColor;
   final AutovalidateMode? autovalidateMode;
-  final LiteDropSelectorViewType dropSelectorType;
 
   /// [menuItemBuilder] if you want menu items to have a custom
   /// look and feel, just pass a builder for them
@@ -182,8 +180,7 @@ class LiteDropSelector extends StatefulWidget {
   State<LiteDropSelector> createState() => _LiteDropSelectorState();
 }
 
-class _LiteDropSelectorState extends State<LiteDropSelector>
-    with FormFieldMixin {
+class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin {
   final _globalKey = GlobalKey<State<StatefulWidget>>();
 
   bool get _useErrorDecoration {
@@ -229,6 +226,28 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
     }
   }
 
+  DropSelectorSettings get _settings {
+    final defaultSettings = liteFormController.config?.dropSelectorSettings ?? const DropSelectorSettings();
+    if (widget.settings != null) {
+      return widget.settings!.copyWith(
+        bottomLeftRadius: defaultSettings.bottomLeftRadius,
+        chipContentPadding: defaultSettings.chipContentPadding,
+        topLeftRadius: defaultSettings.topLeftRadius,
+        buttonHeight: defaultSettings.buttonHeight,
+        dropSelectorType: defaultSettings.dropSelectorType,
+        bottomRightRadius: defaultSettings.bottomRightRadius,
+        dropSelectorActionType: defaultSettings.dropSelectorActionType,
+        maxVeilOpacity: defaultSettings.maxVeilOpacity,
+        menuSearchConfiguration: defaultSettings.menuSearchConfiguration,
+        sheetPadding: defaultSettings.sheetPadding,
+        topRightRadius: defaultSettings.topLeftRadius,
+        veilColor: defaultSettings.veilColor,
+        withScrollBar: defaultSettings.withScrollBar,
+      );
+    }
+    return defaultSettings;
+  }
+
   Future _onTap() async {
     if (widget.readOnly) {
       return;
@@ -236,10 +255,10 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
     final renderBox = _globalKey.currentContext?.findRenderObject();
     if (renderBox is RenderBox) {
       var size = renderBox.size;
-      if (widget.settings.buttonHeight != null) {
+      if (_settings.buttonHeight != null) {
         size = Size(
           size.width,
-          widget.settings.buttonHeight!,
+          _settings.buttonHeight!,
         );
       }
       final buttonLeftTopCorner = renderBox.localToGlobal(Offset.zero);
@@ -251,10 +270,8 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
         decoration: decoration,
         tapPosition: buttonLeftTopCorner,
         context: context,
-        dropSelectorType: widget.dropSelectorType,
-        dropSelectorActionType: widget.dropSelectorActionType,
         buttonSize: size,
-        settings: widget.settings,
+        settings: _settings,
         menuItemBuilder: widget.menuItemBuilder,
       );
       _updateList(list);
@@ -329,8 +346,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
             if (preparedInitialValue is LiteDropSelectorItem) {
               return preparedInitialValue.payload == i.payload;
             } else {
-              return i is LiteDropSelectorItem &&
-                  i.payload == preparedInitialValue;
+              return i is LiteDropSelectorItem && i.payload == preparedInitialValue;
             }
           },
         );
@@ -484,8 +500,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
                                   ),
                                 ),
                           strutStyle: widget.strutStyle,
-                          style: liteFormController.config?.defaultTextStyle ??
-                              widget.style,
+                          style: liteFormController.config?.defaultTextStyle ?? widget.style,
                           textAlign: widget.textAlign,
                           textAlignVertical: widget.textAlignVertical,
                           textCapitalization: widget.textCapitalization,
@@ -495,8 +510,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
                     ),
                   ),
                   LiteState<LiteFormRebuildController>(
-                    builder:
-                        (BuildContext c, LiteFormRebuildController controller) {
+                    builder: (BuildContext c, LiteFormRebuildController controller) {
                       return LiteDropSelectorMultipleSheet(
                         items: _selectedOptions,
                         paddingTop: widget.multiselectorSpacing,

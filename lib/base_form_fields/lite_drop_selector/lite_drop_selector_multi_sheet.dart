@@ -22,7 +22,7 @@ class LiteDropSelectorMultipleSheet extends StatelessWidget {
   final double paddingBottom;
   final double paddingLeft;
   final double paddingRight;
-  final LiteDropSelectorSettings? settings;
+  final DropSelectorSettings? settings;
   final ValueChanged<LiteDropSelectorItem> onRemove;
 
   final List<LiteDropSelectorItem> items;
@@ -107,7 +107,7 @@ class LiteDropSelectorChip extends StatelessWidget {
   });
 
   final LiteDropSelectorItem item;
-  final LiteDropSelectorSettings? settings;
+  final DropSelectorSettings? settings;
   final ValueChanged<LiteDropSelectorItem> onRemove;
 
   Color _getBackgroundColor(ThemeData theme) {
@@ -165,7 +165,7 @@ class LiteDropSelectorChip extends StatelessWidget {
   //   );
   // }
 
-  LiteDropSelectorSettings? get _settings {
+  DropSelectorSettings? get _settings {
     return settings ?? formConfig?.dropSelectorSettings;
   }
 

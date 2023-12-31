@@ -27,7 +27,7 @@ class LiteFormsConfiguration {
   /// Has no effect on web
   final bool? allowUnfocusOnTapOutside;
 
-  final LiteDropSelectorSettings dropSelectorSettings;
+  final DropSelectorSettings dropSelectorSettings;
 
   final LiteFormsTheme? lightTheme;
   final LiteFormsTheme? darkTheme;
@@ -78,7 +78,7 @@ class LiteFormsConfiguration {
     this.lightTheme,
     this.darkTheme,
     this.autovalidateMode,
-    this.dropSelectorSettings = const LiteDropSelectorSettings(
+    this.dropSelectorSettings = const DropSelectorSettings(
       topLeftRadius: kDefaultFormSmoothRadius,
       topRightRadius: kDefaultFormSmoothRadius,
       bottomLeftRadius: kDefaultFormSmoothRadius,

@@ -60,8 +60,8 @@ class SignupFormPage extends StatelessWidget {
                         ),
                         paddingBottom: 12,
                         paddingTop: 12,
-                        dropSelectorType: LiteDropSelectorViewType.menu,
-                        settings: const LiteDropSelectorSettings(
+                        settings: const DropSelectorSettings(
+                          dropSelectorType: LiteDropSelectorViewType.menu,
                           maxMenuWidth: double.infinity,
                         ),
                         name: 'phraseLengthDropSelector',
@@ -253,23 +253,22 @@ class SignupFormPage extends StatelessWidget {
                         readOnly: false,
                         name: 'classes',
                         autovalidateMode: AutovalidateMode.onUserInteraction,
-                        dropSelectorType: LiteDropSelectorViewType.menu,
-                        // dropSelectorType: LiteDropSelectorViewType.bottomsheet,
-                        // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
-                        // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
-                        dropSelectorActionType:
-                            LiteDropSelectorActionType.multiselect,
                         menuItemBuilder: (index, item, isLast) {
-                          return Container(
+                          return SizedBox(
                             width: double.infinity,
                             height: 60.0,
                           );
                         },
-                        settings: LiteDropSelectorSettings(
+                        settings: DropSelectorSettings(
                           bottomLeftRadius: 10.0,
                           bottomRightRadius: 10.0,
                           topLeftRadius: 10.0,
                           topRightRadius: 10.0,
+                          dropSelectorType: LiteDropSelectorViewType.menu,
+                          // dropSelectorType: LiteDropSelectorViewType.bottomsheet,
+                          // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
+                          // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
+                          dropSelectorActionType: LiteDropSelectorActionType.multiselect,
                           sheetPadding: EdgeInsets.all(12.0),
 
                           // chipBuilder: (item, removeItem) {
@@ -345,7 +344,6 @@ class SignupFormPage extends StatelessWidget {
                             },
                           ),
                         ],
-
                         serializer: (value) {
                           if (value is List) {
                             return value.map(
@@ -461,26 +459,20 @@ class SignupFormPage extends StatelessWidget {
                       SizedBox(height: 20.0),
                       MaterialButton(
                         onPressed: () async {
-                          final value =
-                              await form('signupForm.phone').field.get(true);
+                          final value = await form('signupForm.phone').field.get(true);
                           // print(value);
                           // form('signupForm.phone').phone.set(
                           //       '(999) 444 6677',
                           //       country: CountryData.find('GB'),
                           //     );
-                          form('signupForm.phone2')
-                              .phone
-                              .set('+44 (999) 444 6677');
+                          form('signupForm.phone2').phone.set('+44 (999) 444 6677');
                         },
                         child: Text('Set Phone'),
                       ),
 
                       MaterialButton(
                         onPressed: () async {
-                          liteTimerController.resetTimerByName(
-                              timerName: 'timer',
-                              groupName: formName,
-                              numSeconds: 40);
+                          liteTimerController.resetTimerByName(timerName: 'timer', groupName: formName, numSeconds: 40);
                         },
                         child: Text('Reset Timer'),
                       ),

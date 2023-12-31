@@ -157,7 +157,7 @@ class LitePhoneInputField extends StatefulWidget {
   /// [leadingWidth] the width of the drop selector for a country code
   /// it makes sense only if [phoneInputType] == [LitePhoneInputType.manualCode]
   final double leadingWidth;
-  final LiteDropSelectorSettings? countrySelectorSettings;
+  final DropSelectorSettings? countrySelectorSettings;
 
   /// Pass false here if you don't want to display errors on invalid fields at all
   ///
@@ -459,7 +459,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
             });
           },
           settings: widget.countrySelectorSettings ??
-              const LiteDropSelectorSettings(
+              const DropSelectorSettings(
                 menuSearchConfiguration: MenuSearchConfiguration(
                   autofocusSearchField: true,
                 ),

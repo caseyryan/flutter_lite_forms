@@ -160,8 +160,7 @@ class LiteFilePicker extends StatefulWidget {
   State<LiteFilePicker> createState() => _LiteFilePickerState();
 }
 
-class _LiteFilePickerState extends State<LiteFilePicker>
-    with FormFieldMixin, PostFrameMixin {
+class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, PostFrameMixin {
   final ImagePicker _picker = ImagePicker();
   final _sizeKey = GlobalKey<State<StatefulWidget>>();
   double _widgetWidth = 0.0;
@@ -443,9 +442,7 @@ class _LiteFilePickerState extends State<LiteFilePicker>
                             },
                       child: Padding(
                         padding: EdgeInsets.all(
-                          files.length == 1
-                              ? widget.imageSpacing
-                              : widget.imageSpacing * .5,
+                          files.length == 1 ? widget.imageSpacing : widget.imageSpacing * .5,
                         ),
                         child: Stack(
                           children: [
@@ -511,14 +508,11 @@ class _LiteFilePickerState extends State<LiteFilePicker>
   }
 
   bool get _isMultimedia {
-    return widget.sources.contains(FileSource.camera) &&
-        widget.sources.contains(FileSource.gallery);
+    return widget.sources.contains(FileSource.camera) && widget.sources.contains(FileSource.gallery);
   }
 
   BoxDecoration _buildDecoration() {
-    return widget.decoration ??
-        liteFormController.config?.filePickerDecoration ??
-        const BoxDecoration();
+    return widget.decoration ?? liteFormController.config?.filePickerDecoration ?? const BoxDecoration();
   }
 
   bool get _isAttaching {
@@ -657,10 +651,9 @@ class _LiteFilePickerState extends State<LiteFilePicker>
           child: LiteState<LiteFormRebuildController>(
             builder: (BuildContext c, LiteFormRebuildController controller) {
               return LiteDropSelector(
-                dropSelectorType: widget.dropSelectorType,
-                dropSelectorActionType:
-                    LiteDropSelectorActionType.simpleWithNoSelection,
-                settings: LiteDropSelectorSettings(
+                settings: DropSelectorSettings(
+                  dropSelectorType: widget.dropSelectorType,
+                  dropSelectorActionType: LiteDropSelectorActionType.simpleWithNoSelection,
                   buttonHeight: widget.menuButtonHeight,
                 ),
                 validators: widget.validators,
@@ -680,8 +673,7 @@ class _LiteFilePickerState extends State<LiteFilePicker>
                     final payload = value.first.payload;
                     if (payload is FileSource) {
                       if (widget.maxFiles > 1) {
-                        if (payload.isSupportedByImagePicker &&
-                            (widget.allowImages || widget.allowVideo)) {
+                        if (payload.isSupportedByImagePicker && (widget.allowImages || widget.allowVideo)) {
                           List<XFile> xFiles;
 
                           if (widget.allowVideo) {
@@ -695,8 +687,7 @@ class _LiteFilePickerState extends State<LiteFilePicker>
                             } else {
                               final result = await _picker.pickVideo(
                                 source: payload.toImageSource()!,
-                                preferredCameraDevice:
-                                    widget.preferredCameraDevice,
+                                preferredCameraDevice: widget.preferredCameraDevice,
                               );
                               if (result != null) {
                                 xFiles = [result];
@@ -708,8 +699,7 @@ class _LiteFilePickerState extends State<LiteFilePicker>
                             if (payload == FileSource.camera) {
                               final result = await _picker.pickVideo(
                                 source: payload.toImageSource()!,
-                                preferredCameraDevice:
-                                    widget.preferredCameraDevice,
+                                preferredCameraDevice: widget.preferredCameraDevice,
                               );
                               if (result != null) {
                                 xFiles = [result];
@@ -765,8 +755,7 @@ class _LiteFilePickerState extends State<LiteFilePicker>
                           );
                         }
                       } else {
-                        if (payload.isSupportedByImagePicker &&
-                            (widget.allowImages || widget.allowVideo)) {
+                        if (payload.isSupportedByImagePicker && (widget.allowImages || widget.allowVideo)) {
                           XFile? xFile;
                           if (widget.allowVideo) {
                             xFile = await _picker.pickMedia(

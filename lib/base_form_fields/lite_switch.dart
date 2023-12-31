@@ -288,7 +288,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
     return CupertinoSwitch(
       value: value,
       dragStartBehavior: widget.dragStartBehavior,
-      activeColor: widget.activeColor,
+      activeColor: widget.activeColor ?? Theme.of(context).primaryColor,
       thumbColor: value ? widget.activeColor : widget.inactiveThumbColor,
       trackColor: value ? widget.activeTrackColor : widget.inactiveTrackColor,
       onChanged: (value) {
@@ -314,9 +314,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
   }
 
   TextStyle? get _textStyle {
-    return liteFormController.config?.defaultTextStyle ??
-        widget.style ??
-        Theme.of(context).textTheme.bodyMedium;
+    return widget.style ?? liteFormController.config?.defaultTextStyle ?? Theme.of(context).textTheme.bodyMedium;
   }
 
   Widget _buildChild() {
@@ -328,8 +326,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
           onTapLink: widget.onTapLink ??
               (text, href, title) {
                 if (kDebugMode) {
-                  print(
-                      'Link tap: $href. Provide [widget.onTapLink] callback to process it');
+                  print('Link tap: $href. Provide [widget.onTapLink] callback to process it');
                 }
               },
           styleSheet: widget.markdownStyleSheet ??
@@ -346,7 +343,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
       } else {
         child = Text(
           widget.text!,
-          style: liteFormController.config?.defaultTextStyle ?? widget.style,
+          style: _textStyle,
         );
       }
     } else {
