@@ -1,3 +1,5 @@
+## 0.0.23
+* Fixes and updates for control settings
 ## 0.0.22
 * `LiteSearchField` can now accept custom `TextEditingController`
 ## 0.0.21
