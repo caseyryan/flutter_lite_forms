@@ -91,6 +91,7 @@ class _LiteSearchFieldState extends State<LiteSearchField>
     if (widget.initialValue?.isNotEmpty == true) {
       _myTextEditingController!.text = widget.initialValue!;
     }
+    _searchValue = _myTextEditingController!.text;
   }
 
   @override
