@@ -35,11 +35,11 @@ class SmoothIconBase extends StatelessWidget {
         left: paddingLeft,
         right: paddingRight,
       ),
-      child: AspectRatio(
-        aspectRatio: 1.0,
-        child: SizedBox(
-          width: size,
-          height: size,
+      child: SizedBox(
+         width: size,
+            height: size,
+        child: AspectRatio(
+          aspectRatio: 1.0,
           child: LayoutBuilder(
             builder: (c, BoxConstraints constraints) {
               final biggestSide = constraints.maxWidth;
@@ -52,7 +52,7 @@ class SmoothIconBase extends StatelessWidget {
                       ),
                   shape: SmoothRectangleBorder(
                     borderRadius: SmoothBorderRadius(
-                      cornerRadius: biggestSide / 6.0,
+                      cornerRadius: biggestSide / 3.75,
                       cornerSmoothing: 1.0,
                     ),
                   ),
