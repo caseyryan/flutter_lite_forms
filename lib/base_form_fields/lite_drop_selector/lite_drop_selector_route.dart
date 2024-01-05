@@ -84,10 +84,10 @@ class DropSelectorSettings {
     this.menuSearchConfiguration = const MenuSearchConfiguration(),
     this.veilColor,
     this.maxMenuWidth,
-    this.maxVeilOpacity = .04,
+    this.maxVeilOpacity = .3,
     this.withScrollBar = true,
-    this.dropSelectorType,
-    this.dropSelectorActionType,
+    required this.dropSelectorType,
+    required this.dropSelectorActionType,
     this.sheetPadding = const EdgeInsets.all(
       8.0,
     ),
@@ -159,6 +159,7 @@ class DropSelectorSettings {
       sheetPadding: sheetPadding ?? this.sheetPadding,
       dropSelectorActionType: dropSelectorActionType ?? this.dropSelectorActionType,
       dropSelectorType: dropSelectorType ?? this.dropSelectorType,
+      
     );
   }
 }

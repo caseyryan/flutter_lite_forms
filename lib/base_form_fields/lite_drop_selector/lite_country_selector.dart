@@ -17,9 +17,10 @@ class LiteCountrySelector extends StatefulWidget {
     required this.name,
     this.menuItemBuilder,
     this.selectorViewBuilder,
-    this.settings = const DropSelectorSettings(),
-    this.dropSelectorType = LiteDropSelectorViewType.adaptive,
-    this.dropSelectorActionType = LiteDropSelectorActionType.simple,
+    this.settings = const DropSelectorSettings(
+      dropSelectorActionType: LiteDropSelectorActionType.simple,
+      dropSelectorType: LiteDropSelectorViewType.adaptive,
+    ),
     this.initialValueDeserializer,
     this.validators,
     this.serializer = nonConvertingValueConvertor,
@@ -77,7 +78,6 @@ class LiteCountrySelector extends StatefulWidget {
   /// [settings] for a sheet where all menu items are displayed
   final DropSelectorSettings settings;
 
-  final LiteDropSelectorActionType dropSelectorActionType;
 
   /// It is assumed that the initial value is DateTime? but you might
   /// also pass something else, for example a iso8601 String, and the
@@ -87,7 +87,6 @@ class LiteCountrySelector extends StatefulWidget {
   final Object? initialValue;
   final Color? pickerBackgroundColor;
   final AutovalidateMode? autovalidateMode;
-  final LiteDropSelectorViewType dropSelectorType;
   final bool sortBySelection;
 
   /// [menuItemBuilder] if you want menu items to have a custom

@@ -37,14 +37,18 @@ class _FormShorthand {
           (e) => e.hasFocus,
         );
     if (index < 0) {
-      allFields[0].requestFocus();
+      if (allFields[0].value == null) {
+        allFields[0].requestFocus();
+      }
     } else {
       index++;
       if (index >= allFields.length) {
         index = 0;
       }
       final field = allFields[index];
-      field.requestFocus();
+      if (field.value == null) {
+        field.requestFocus();
+      }
     }
   }
 

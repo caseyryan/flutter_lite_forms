@@ -62,6 +62,7 @@ class SignupFormPage extends StatelessWidget {
                         paddingTop: 12,
                         settings: const DropSelectorSettings(
                           dropSelectorType: LiteDropSelectorViewType.menu,
+                          dropSelectorActionType: LiteDropSelectorActionType.simple,
                           maxMenuWidth: double.infinity,
                         ),
                         name: 'phraseLengthDropSelector',

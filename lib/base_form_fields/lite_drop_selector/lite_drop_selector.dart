@@ -227,22 +227,26 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
   }
 
   DropSelectorSettings get _settings {
-    final defaultSettings = liteFormController.config?.dropSelectorSettings ?? const DropSelectorSettings();
+    final defaultSettings =  liteFormController.config?.dropSelectorSettings ?? const DropSelectorSettings(
+      dropSelectorActionType: null,
+      dropSelectorType: null,
+    );
     if (widget.settings != null) {
-      return widget.settings!.copyWith(
-        bottomLeftRadius: defaultSettings.bottomLeftRadius,
-        chipContentPadding: defaultSettings.chipContentPadding,
-        topLeftRadius: defaultSettings.topLeftRadius,
-        buttonHeight: defaultSettings.buttonHeight,
-        dropSelectorType: defaultSettings.dropSelectorType,
-        bottomRightRadius: defaultSettings.bottomRightRadius,
-        dropSelectorActionType: defaultSettings.dropSelectorActionType,
-        maxVeilOpacity: defaultSettings.maxVeilOpacity,
-        menuSearchConfiguration: defaultSettings.menuSearchConfiguration,
-        sheetPadding: defaultSettings.sheetPadding,
-        topRightRadius: defaultSettings.topLeftRadius,
-        veilColor: defaultSettings.veilColor,
-        withScrollBar: defaultSettings.withScrollBar,
+      return defaultSettings.copyWith(
+        bottomLeftRadius: widget.settings!.bottomLeftRadius,
+        chipContentPadding: widget.settings!.chipContentPadding,
+        topLeftRadius: widget.settings!.topLeftRadius,
+        buttonHeight: widget.settings!.buttonHeight,
+        dropSelectorType: widget.settings!.dropSelectorType,
+        bottomRightRadius: widget.settings!.bottomRightRadius,
+        dropSelectorActionType: widget.settings!.dropSelectorActionType,
+        maxVeilOpacity: widget.settings!.maxVeilOpacity,
+        menuSearchConfiguration: widget.settings!.menuSearchConfiguration,
+        sheetPadding: widget.settings!.sheetPadding,
+        topRightRadius: widget.settings!.topLeftRadius,
+        veilColor: widget.settings!.veilColor,
+        withScrollBar: widget.settings!.withScrollBar,
+        
       );
     }
     return defaultSettings;

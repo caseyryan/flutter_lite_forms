@@ -55,9 +55,15 @@ class LiteFile {
   LiteFile({
     this.xFile,
     this.platformFile,
+    this.userSetName,
   });
   final XFile? xFile;
   final PlatformFile? platformFile;
+
+  /// when we rebuild LiteFile from xFile, xFile
+  /// does not set name (seems like a bug in xFile)
+  /// so this is used instead
+  final String? userSetName;
 
   @override
   bool operator ==(covariant LiteFile other) {
@@ -76,7 +82,13 @@ class LiteFile {
   }
 
   String get name {
-    return xFile?.name ?? platformFile?.name ?? '';
+    final n = xFile?.name ?? platformFile?.name ?? '';
+    if (n.isEmpty) {
+      if (userSetName?.isNotEmpty == true) {
+        return userSetName!;
+      }
+    }
+    return n;
   }
 
   int get width {
@@ -120,13 +132,11 @@ class LiteFile {
     if (_infos.containsKey(name) && _imageProvider != null) {
       return;
     }
-    if (platformFile != null) {
+    if (platformFile != null || xFile != null) {
       if (await bytes != null) {
         bool isImage = false;
         await getMimeType(_bytes);
-        if (_mimeType!.contains('xls') ||
-            _mimeType!.contains('spreadsheet') ||
-            _mimeType!.endsWith('sheet')) {
+        if (_mimeType!.contains('xls') || _mimeType!.contains('spreadsheet') || _mimeType!.endsWith('sheet')) {
           /// xls
           _imageProvider = const AssetImage(
             'assets/icons/xlsx_icon.png',
@@ -150,6 +160,7 @@ class LiteFile {
           final image = Image.memory(_bytes!);
           isImage = true;
           await _imageToImageInfo(image);
+          _imageProvider = MemoryImage(_bytes!);
         } else {
           _imageProvider = const AssetImage(
             'assets/icons/unknown_icon.png',
@@ -254,7 +265,24 @@ class LiteFile {
     return _bytes;
   }
 
-  Future<Map> toMap() async {
+  static Future<LiteFile> fromMapAsync(Map json) async {
+    final intList = (json['bytes'] as List).cast<int>();
+    final Uint8List bytes = Uint8List.fromList(intList);
+    // XFile();
+    final file = LiteFile(
+      xFile: XFile.fromData(
+        bytes,
+        mimeType: json['mimeType'],
+        name: json['name'],
+      ),
+      userSetName: json['name'],
+    );
+
+    await file._updateFileInfo();
+    return file;
+  }
+
+  Future<Map> toMapAsync() async {
     return {
       'name': name,
       'mimeType': await getMimeType(),

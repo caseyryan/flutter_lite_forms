@@ -228,6 +228,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField>
           isInitialValue: true,
           view: null,
         );
+        widget.onChanged?.call(result);
       }
     }
   }

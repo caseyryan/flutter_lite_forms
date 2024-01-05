@@ -33,30 +33,30 @@ class LiteFormsConfiguration {
   final LiteFormsTheme? darkTheme;
 
   TextStyle? get defaultTextStyle {
-    return _activeTheme?.defaultTextStyle;
+    return activeTheme?.defaultTextStyle;
   }
 
   InputDecoration? get inputDecoration {
-    return _activeTheme?.inputDecoration;
+    return activeTheme?.inputDecoration;
   }
 
   BoxDecoration? get filePickerDecoration {
-    return _activeTheme?.filePickerDecoration;
+    return activeTheme?.filePickerDecoration;
   }
 
   Color? get shadowColor {
-    return _activeTheme?.shadowColor;
+    return activeTheme?.shadowColor;
   }
 
   Color? get destructiveColor {
-    return _activeTheme?.destructiveColor;
+    return activeTheme?.destructiveColor;
   }
 
   Color? get dropSelectorChipColor {
-    return _activeTheme?.dropSelectorChipColor;
+    return activeTheme?.dropSelectorChipColor;
   }
 
-  LiteFormsTheme? get _activeTheme {
+  LiteFormsTheme? get activeTheme {
     return isDarkTheme ? darkTheme : lightTheme;
   }
 
@@ -83,6 +83,8 @@ class LiteFormsConfiguration {
       topRightRadius: kDefaultFormSmoothRadius,
       bottomLeftRadius: kDefaultFormSmoothRadius,
       bottomRightRadius: kDefaultFormSmoothRadius,
+      dropSelectorActionType: LiteDropSelectorActionType.simple,
+      dropSelectorType: LiteDropSelectorViewType.adaptive,
     ),
 
     /// [defaultDateFormat] is a string pattern acceptable by [DateFormat]

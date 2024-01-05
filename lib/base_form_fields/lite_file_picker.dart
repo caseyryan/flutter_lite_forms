@@ -54,6 +54,7 @@ class LiteFilePicker extends StatefulWidget {
     this.smoothErrorPadding = const EdgeInsets.only(
       top: 6.0,
     ),
+    this.onChanged,
     this.imageSpacing = 1.0,
     this.menuButtonHeight = 54.0,
     this.requestFullMetadata = false,
@@ -86,6 +87,7 @@ class LiteFilePicker extends StatefulWidget {
   final String name;
   final FocusNode? focusNode;
   final double menuButtonHeight;
+  final ValueChanged<Object?>? onChanged;
 
   /// [allowedExtensions] files extensions accepted by file picker
   /// this will make sense only if you add
@@ -336,22 +338,32 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
   }
 
   void _clear() {
+    Object? result;
     if (_hasSelection) {
-      final unselected = _selectedFiles.where((e) => !e.isSelected).toList();
+      result = _selectedFiles.where((e) => !e.isSelected).toList();
       liteFormController.onValueChanged(
         formName: formName,
         fieldName: widget.name,
-        value: unselected,
+        value: result,
         view: null,
       );
     } else {
+      result = <LiteFile>[];
       liteFormController.onValueChanged(
         formName: formName,
         fieldName: widget.name,
-        value: <LiteFile>[],
+        value: result,
         view: null,
       );
     }
+    _onChanged(result);
+  }
+
+  void _onChanged(Object? value) {
+    if (kDebugMode) {
+      print('ON CHANGED: $value');
+    }
+    widget.onChanged?.call(value);
   }
 
   bool get _hasSelection {
@@ -449,10 +461,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
                             Container(
                               width: double.infinity,
                               height: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                  3.0,
-                                ),
+                              decoration: _buildDecoration().copyWith(
                                 image: e._imageProvider != null
                                     ? DecorationImage(
                                         fit: BoxFit.cover,
@@ -602,6 +611,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
       _loaderKey,
       false,
     );
+    _onChanged(newValue);
     return temp;
   }
 
@@ -647,186 +657,207 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
         right: widget.paddingRight,
       ),
       child: _tryWrapWithConstraints(
-        child: _tryWrapWithAspectRatio(
-          child: LiteState<LiteFormRebuildController>(
-            builder: (BuildContext c, LiteFormRebuildController controller) {
-              return LiteDropSelector(
-                settings: DropSelectorSettings(
-                  dropSelectorType: widget.dropSelectorType,
-                  dropSelectorActionType: LiteDropSelectorActionType.simpleWithNoSelection,
-                  buttonHeight: widget.menuButtonHeight,
-                ),
-                validators: widget.validators,
-                selectorViewBuilder: (context, selectedItems, String? error) {
-                  return Container(
-                    width: widget.width,
-                    height: widget.height,
-                    margin: widget.margin,
-                    decoration: _buildDecoration(),
-                    child: _buildLoader(
-                      child: _buildView(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _tryWrapWithAspectRatio(
+              child: LiteState<LiteFormRebuildController>(
+                builder: (BuildContext c, LiteFormRebuildController controller) {
+                  return LiteDropSelector(
+                    settings: DropSelectorSettings(
+                      dropSelectorType: widget.dropSelectorType,
+                      dropSelectorActionType: LiteDropSelectorActionType.simpleWithNoSelection,
+                      buttonHeight: widget.menuButtonHeight,
                     ),
+                    validators: widget.validators,
+                    selectorViewBuilder: (context, selectedItems, String? error) {
+                      return Container(
+                        width: widget.width,
+                        height: widget.height,
+                        margin: widget.margin,
+                        decoration: _buildDecoration(),
+                        child: _buildLoader(
+                          child: _buildView(),
+                        ),
+                      );
+                    },
+                    onChanged: (value) async {
+                      if (value is List && value.isNotEmpty) {
+                        final payload = value.first.payload;
+                        if (payload is FileSource) {
+                          if (widget.maxFiles > 1) {
+                            if (payload.isSupportedByImagePicker && (widget.allowImages || widget.allowVideo)) {
+                              List<XFile> xFiles;
+
+                              if (widget.allowVideo) {
+                                if (widget.allowImages) {
+                                  xFiles = await _picker.pickMultipleMedia(
+                                    imageQuality: widget.imageQuality,
+                                    maxHeight: widget.maxHeight,
+                                    maxWidth: widget.maxHeight,
+                                    requestFullMetadata: widget.requestFullMetadata,
+                                  );
+                                } else {
+                                  final result = await _picker.pickVideo(
+                                    source: payload.toImageSource()!,
+                                    preferredCameraDevice: widget.preferredCameraDevice,
+                                  );
+                                  if (result != null) {
+                                    xFiles = [result];
+                                  } else {
+                                    xFiles = [];
+                                  }
+                                }
+                              } else {
+                                if (payload == FileSource.camera) {
+                                  final result = await _picker.pickVideo(
+                                    source: payload.toImageSource()!,
+                                    preferredCameraDevice: widget.preferredCameraDevice,
+                                  );
+                                  if (result != null) {
+                                    xFiles = [result];
+                                  } else {
+                                    xFiles = [];
+                                  }
+                                } else {
+                                  xFiles = await _picker.pickMultiImage(
+                                    imageQuality: widget.imageQuality,
+                                    maxHeight: widget.maxHeight,
+                                    maxWidth: widget.maxHeight,
+                                    requestFullMetadata: widget.requestFullMetadata,
+                                  );
+                                }
+                              }
+                              liteFormRebuildController.setIsLoading(
+                                _loaderKey,
+                                true,
+                              );
+                              final wrappers = xFiles.take(widget.maxFiles).map(
+                                (e) {
+                                  return LiteFile(xFile: e);
+                                },
+                              ).toList();
+                              if (wrappers.isNotEmpty) {
+                                for (var w in wrappers) {
+                                  await w._updateMediaInfo();
+                                }
+                                final result = _mergeWrappers(
+                                  firstList: wrappers,
+                                  secondList: _selectedFiles,
+                                );
+
+                                liteFormController.onValueChanged(
+                                  formName: formName,
+                                  fieldName: widget.name,
+                                  value: result,
+                                  view: null,
+                                );
+                                liteFormRebuildController.setIsLoading(
+                                  _loaderKey,
+                                  false,
+                                );
+                                _onChanged(result);
+                              } else {
+                                liteFormRebuildController.setIsLoading(
+                                  _loaderKey,
+                                  false,
+                                );
+                              }
+                            } else {
+                              final result = await FilePicker.platform.pickFiles(
+                                allowMultiple: true,
+                                allowedExtensions: widget.allowedExtensions,
+                              );
+                              _processFilePickResult(
+                                result,
+                                true,
+                              );
+                            }
+                          } else {
+                            if (payload.isSupportedByImagePicker && (widget.allowImages || widget.allowVideo)) {
+                              XFile? xFile;
+                              if (widget.allowVideo) {
+                                xFile = await _picker.pickMedia(
+                                  imageQuality: widget.imageQuality,
+                                  maxHeight: widget.maxHeight,
+                                  maxWidth: widget.maxHeight,
+                                  requestFullMetadata: widget.requestFullMetadata,
+                                );
+                              } else {
+                                xFile = await _picker.pickImage(
+                                  source: payload.toImageSource()!,
+                                  imageQuality: widget.imageQuality,
+                                  maxHeight: widget.maxHeight,
+                                  maxWidth: widget.maxHeight,
+                                  requestFullMetadata: widget.requestFullMetadata,
+                                );
+                              }
+                              if (xFile != null) {
+                                liteFormRebuildController.setIsLoading(
+                                  _loaderKey,
+                                  true,
+                                );
+                                final wrapper = LiteFile(xFile: xFile);
+                                await wrapper._updateMediaInfo();
+                                List<LiteFile>? newValue;
+
+                                /// this condition may meet only for a camera
+                                if (widget.maxFiles > 1) {
+                                  newValue = _selectedFiles
+                                      .take(
+                                        widget.maxFiles - 1,
+                                      )
+                                      .toList();
+                                  newValue.add(wrapper);
+                                } else {
+                                  newValue = [wrapper];
+                                }
+                                final result = newValue.take(widget.maxFiles).toList();
+                                liteFormController.onValueChanged(
+                                  formName: formName,
+                                  fieldName: widget.name,
+                                  value: result,
+                                  view: null,
+                                );
+                                liteFormRebuildController.setIsLoading(
+                                  _loaderKey,
+                                  false,
+                                );
+                                _onChanged(result);
+                              }
+                            } else {
+                              final result = await FilePicker.platform.pickFiles(
+                                allowMultiple: false,
+                                allowedExtensions: widget.allowedExtensions,
+                              );
+                              _processFilePickResult(
+                                result,
+                                false,
+                              );
+                            }
+                          }
+                        } else if (payload is String) {
+                          if (payload == 'clear') {
+                            _clear();
+                          }
+                        }
+                      }
+                    },
+                    name: widget.name.toFormIgnoreName(),
+                    items: _getItems(),
                   );
                 },
-                onChanged: (value) async {
-                  if (value is List && value.isNotEmpty) {
-                    final payload = value.first.payload;
-                    if (payload is FileSource) {
-                      if (widget.maxFiles > 1) {
-                        if (payload.isSupportedByImagePicker && (widget.allowImages || widget.allowVideo)) {
-                          List<XFile> xFiles;
-
-                          if (widget.allowVideo) {
-                            if (widget.allowImages) {
-                              xFiles = await _picker.pickMultipleMedia(
-                                imageQuality: widget.imageQuality,
-                                maxHeight: widget.maxHeight,
-                                maxWidth: widget.maxHeight,
-                                requestFullMetadata: widget.requestFullMetadata,
-                              );
-                            } else {
-                              final result = await _picker.pickVideo(
-                                source: payload.toImageSource()!,
-                                preferredCameraDevice: widget.preferredCameraDevice,
-                              );
-                              if (result != null) {
-                                xFiles = [result];
-                              } else {
-                                xFiles = [];
-                              }
-                            }
-                          } else {
-                            if (payload == FileSource.camera) {
-                              final result = await _picker.pickVideo(
-                                source: payload.toImageSource()!,
-                                preferredCameraDevice: widget.preferredCameraDevice,
-                              );
-                              if (result != null) {
-                                xFiles = [result];
-                              } else {
-                                xFiles = [];
-                              }
-                            } else {
-                              xFiles = await _picker.pickMultiImage(
-                                imageQuality: widget.imageQuality,
-                                maxHeight: widget.maxHeight,
-                                maxWidth: widget.maxHeight,
-                                requestFullMetadata: widget.requestFullMetadata,
-                              );
-                            }
-                          }
-                          liteFormRebuildController.setIsLoading(
-                            _loaderKey,
-                            true,
-                          );
-                          final wrappers = xFiles.take(widget.maxFiles).map(
-                            (e) {
-                              return LiteFile(xFile: e);
-                            },
-                          ).toList();
-                          if (wrappers.isNotEmpty) {
-                            for (var w in wrappers) {
-                              await w._updateMediaInfo();
-                            }
-                            final result = _mergeWrappers(
-                              firstList: wrappers,
-                              secondList: _selectedFiles,
-                            );
-
-                            liteFormController.onValueChanged(
-                              formName: formName,
-                              fieldName: widget.name,
-                              value: result,
-                              view: null,
-                            );
-                          }
-                          liteFormRebuildController.setIsLoading(
-                            _loaderKey,
-                            false,
-                          );
-                        } else {
-                          final result = await FilePicker.platform.pickFiles(
-                            allowMultiple: true,
-                            allowedExtensions: widget.allowedExtensions,
-                          );
-                          _processFilePickResult(
-                            result,
-                            true,
-                          );
-                        }
-                      } else {
-                        if (payload.isSupportedByImagePicker && (widget.allowImages || widget.allowVideo)) {
-                          XFile? xFile;
-                          if (widget.allowVideo) {
-                            xFile = await _picker.pickMedia(
-                              imageQuality: widget.imageQuality,
-                              maxHeight: widget.maxHeight,
-                              maxWidth: widget.maxHeight,
-                              requestFullMetadata: widget.requestFullMetadata,
-                            );
-                          } else {
-                            xFile = await _picker.pickImage(
-                              source: payload.toImageSource()!,
-                              imageQuality: widget.imageQuality,
-                              maxHeight: widget.maxHeight,
-                              maxWidth: widget.maxHeight,
-                              requestFullMetadata: widget.requestFullMetadata,
-                            );
-                          }
-                          if (xFile != null) {
-                            liteFormRebuildController.setIsLoading(
-                              _loaderKey,
-                              true,
-                            );
-                            final wrapper = LiteFile(xFile: xFile);
-                            await wrapper._updateMediaInfo();
-                            List<LiteFile>? newValue;
-
-                            /// this condition may meet only for a camera
-                            if (widget.maxFiles > 1) {
-                              newValue = _selectedFiles
-                                  .take(
-                                    widget.maxFiles - 1,
-                                  )
-                                  .toList();
-                              newValue.add(wrapper);
-                            } else {
-                              newValue = [wrapper];
-                            }
-                            liteFormController.onValueChanged(
-                              formName: formName,
-                              fieldName: widget.name,
-                              value: newValue.take(widget.maxFiles).toList(),
-                              view: null,
-                            );
-                            liteFormRebuildController.setIsLoading(
-                              _loaderKey,
-                              false,
-                            );
-                          }
-                        } else {
-                          final result = await FilePicker.platform.pickFiles(
-                            allowMultiple: false,
-                            allowedExtensions: widget.allowedExtensions,
-                          );
-                          _processFilePickResult(
-                            result,
-                            false,
-                          );
-                        }
-                      }
-                    } else if (payload is String) {
-                      if (payload == 'clear') {
-                        _clear();
-                      }
-                    }
-                  }
-                },
-                name: widget.name.toFormIgnoreName(),
-                items: _getItems(),
-              );
-            },
-          ),
+              ),
+            ),
+            if (hintText != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  hintText!,
+                  style: decoration.hintStyle,
+                ),
+              )
+          ],
         ),
       ),
     );
