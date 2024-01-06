@@ -116,7 +116,7 @@ class LitePhoneInputField extends StatefulWidget {
     this.useSmoothError = true,
     this.allowErrorTexts = true,
     this.allowEndlessPhone = false,
-    this.countrySelectorViewType = LiteDropSelectorViewType.menu,
+    this.countrySelectorViewType = DropSelectorType.menu,
   }) : super(key: key ?? Key(name));
 
   final String name;
@@ -137,7 +137,7 @@ class LitePhoneInputField extends StatefulWidget {
   /// [countrySelectorViewType] specifies how the DropSelector sheet for
   /// the country code will look like. Makes sense only if [phoneInputType] is
   /// [LitePhoneInputType.manualCode]
-  final LiteDropSelectorViewType countrySelectorViewType;
+  final DropSelectorType countrySelectorViewType;
 
   /// [allowEndlessPhone] sometimes you might want to allow users to enter
   /// more numbers than a phone mask allows (very rare but potentially possible cases)

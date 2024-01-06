@@ -58,7 +58,7 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
 
   /// [type] the type of each button can be set independently of
   /// the whole menu
-  LiteDropSelectorViewType? type;
+  DropSelectorType? type;
   ValueChanged<List<LiteDropSelectorItem>>? onMultiSelection;
 
   /// [isSeparator] means the button won't have a view.

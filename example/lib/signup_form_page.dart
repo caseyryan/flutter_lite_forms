@@ -61,7 +61,7 @@ class SignupFormPage extends StatelessWidget {
                         paddingBottom: 12,
                         paddingTop: 12,
                         settings: const DropSelectorSettings(
-                          dropSelectorType: LiteDropSelectorViewType.menu,
+                          dropSelectorType: DropSelectorType.menu,
                           dropSelectorActionType: LiteDropSelectorActionType.simple,
                           maxMenuWidth: double.infinity,
                         ),
@@ -265,7 +265,7 @@ class SignupFormPage extends StatelessWidget {
                           bottomRightRadius: 10.0,
                           topLeftRadius: 10.0,
                           topRightRadius: 10.0,
-                          dropSelectorType: LiteDropSelectorViewType.menu,
+                          dropSelectorType: DropSelectorType.menu,
                           // dropSelectorType: LiteDropSelectorViewType.bottomsheet,
                           // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
                           // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,

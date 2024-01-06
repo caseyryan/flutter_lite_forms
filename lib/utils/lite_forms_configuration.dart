@@ -84,7 +84,7 @@ class LiteFormsConfiguration {
       bottomLeftRadius: kDefaultFormSmoothRadius,
       bottomRightRadius: kDefaultFormSmoothRadius,
       dropSelectorActionType: LiteDropSelectorActionType.simple,
-      dropSelectorType: LiteDropSelectorViewType.adaptive,
+      dropSelectorType: DropSelectorType.adaptive,
     ),
 
     /// [defaultDateFormat] is a string pattern acceptable by [DateFormat]

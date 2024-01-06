@@ -42,7 +42,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     final size = MediaQuery.of(context).size;
     _initialScreenHeight = size.height;
     setState(() {
-      if (_settings.dropSelectorType == LiteDropSelectorViewType.bottomsheet) {
+      if (_settings.dropSelectorType == DropSelectorType.bottomsheet) {
         _menuWidth = size.width;
       } else {
         _menuWidth = _sizeKey.currentContext!.size!.width.clamp(0.0, size.width);
@@ -469,10 +469,10 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
   }
 
   bool get _isBottomSheet {
-    if (_settings.dropSelectorType == LiteDropSelectorViewType.adaptive) {
+    if (_settings.dropSelectorType == DropSelectorType.adaptive) {
       return isNarrowScreen;
     }
-    if (_settings.dropSelectorType == LiteDropSelectorViewType.menu) {
+    if (_settings.dropSelectorType == DropSelectorType.menu) {
       return false;
     }
     return true;

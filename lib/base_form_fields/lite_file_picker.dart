@@ -34,7 +34,7 @@ class LiteFilePicker extends StatefulWidget {
     this.validators,
     this.hintText,
     this.label,
-    this.dropSelectorType = LiteDropSelectorViewType.adaptive,
+    this.dropSelectorType = DropSelectorType.adaptive,
     this.errorStyle,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
@@ -109,7 +109,7 @@ class LiteFilePicker extends StatefulWidget {
   final bool allowImages;
   final DropSelectorItemIconBuilder? menuItemBuilder;
   final List<FileSource> sources;
-  final LiteDropSelectorViewType dropSelectorType;
+  final DropSelectorType dropSelectorType;
   final double paddingTop;
   final BoxConstraints? constraints;
   final double paddingBottom;

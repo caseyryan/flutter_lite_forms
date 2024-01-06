@@ -1,6 +1,6 @@
 part of 'lite_drop_selector.dart';
 
-enum LiteDropSelectorViewType {
+enum DropSelectorType {
   /// [bottomsheet] means the the selector will appear from the
   /// bottom of the screen
   bottomsheet,

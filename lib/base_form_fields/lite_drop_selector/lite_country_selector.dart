@@ -19,7 +19,7 @@ class LiteCountrySelector extends StatefulWidget {
     this.selectorViewBuilder,
     this.settings = const DropSelectorSettings(
       dropSelectorActionType: LiteDropSelectorActionType.simple,
-      dropSelectorType: LiteDropSelectorViewType.adaptive,
+      dropSelectorType: DropSelectorType.adaptive,
     ),
     this.initialValueDeserializer,
     this.validators,

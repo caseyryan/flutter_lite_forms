@@ -107,7 +107,7 @@ class DropSelectorSettings {
   final double? bottomLeftRadius;
   final double? bottomRightRadius;
   final double? maxMenuWidth;
-  final LiteDropSelectorViewType? dropSelectorType;
+  final DropSelectorType? dropSelectorType;
   final LiteDropSelectorActionType? dropSelectorActionType;
 
   final double chipTopLeftRadius;
@@ -143,7 +143,7 @@ class DropSelectorSettings {
     bool? withScrollBar,
     EdgeInsets? sheetPadding,
     EdgeInsets? chipContentPadding,
-    LiteDropSelectorViewType? dropSelectorType,
+    DropSelectorType? dropSelectorType,
     LiteDropSelectorActionType? dropSelectorActionType,
   }) {
     return DropSelectorSettings(
