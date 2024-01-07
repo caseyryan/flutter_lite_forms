@@ -128,12 +128,16 @@ class LiteFile {
     return _mimeType?.startsWith('video') == true;
   }
 
+  bool get isAudio {
+    return _mimeType?.startsWith('audio') == true;
+  }
+
   Future _updateFileInfo() async {
     if (_infos.containsKey(name) && _imageProvider != null) {
       return;
     }
     if (platformFile != null || xFile != null) {
-      if (await bytes != null) {
+      if (await getBytesAsync() != null) {
         bool isImage = false;
         await getMimeType(_bytes);
         if (_mimeType!.contains('xls') || _mimeType!.contains('spreadsheet') || _mimeType!.endsWith('sheet')) {
@@ -236,20 +240,21 @@ class LiteFile {
   ]) async {
     _mimeType ??= lookupMimeType(
           name,
-          headerBytes: bytes ?? await this.bytes,
+          headerBytes: bytes ?? await getBytesAsync(),
         )?.toLowerCase() ??
         ''.toLowerCase();
     return _mimeType!;
   }
 
   Uint8List? _bytes;
+  Uint8List? get bytes => _bytes;
 
   FutureOr<int> get kiloBytes async {
-    final numBytes = (await bytes)?.length ?? 0;
+    final numBytes = (await getBytesAsync())?.length ?? 0;
     return numBytes ~/ 1024;
   }
 
-  Future<Uint8List?> get bytes async {
+  Future<Uint8List?> getBytesAsync() async {
     if (_bytes != null) {
       return _bytes!;
     }
@@ -263,6 +268,22 @@ class LiteFile {
       }
     }
     return _bytes;
+  }
+
+  static Future<LiteFile> fromBytesData({
+    required List<int> bytes,
+    required String name,
+    required String mimeType,
+  }) async {
+    final file = LiteFile(
+      xFile: XFile.fromData(
+        Uint8List.fromList(bytes),
+        name: name,
+      ),
+      userSetName: name,
+    );
+    await file._updateFileInfo();
+    return file;
   }
 
   static Future<LiteFile> fromMapAsync(Map json) async {
@@ -286,7 +307,7 @@ class LiteFile {
     return {
       'name': name,
       'mimeType': await getMimeType(),
-      'bytes': await bytes,
+      'bytes': await getBytesAsync(),
     };
   }
 }

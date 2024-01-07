@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lite_forms/base_form_fields/mixins/post_frame_mixin.dart';
 import 'package:lite_forms/base_form_fields/treemap/src/treenode.dart';
 import 'package:lite_forms/constants.dart';
@@ -67,6 +68,7 @@ class LiteFilePicker extends StatefulWidget {
       FileSource.fileExplorer,
     ],
     this.allowedExtensions,
+    this.fileType,
     // this.allowedExtensions = const [
     //   'jpg',
     //   'jpeg',
@@ -88,6 +90,7 @@ class LiteFilePicker extends StatefulWidget {
   final FocusNode? focusNode;
   final double menuButtonHeight;
   final ValueChanged<Object?>? onChanged;
+  final FileType? fileType;
 
   /// [allowedExtensions] files extensions accepted by file picker
   /// this will make sense only if you add
@@ -464,7 +467,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
                               decoration: _buildDecoration().copyWith(
                                 image: e._imageProvider != null
                                     ? DecorationImage(
-                                        fit: BoxFit.cover,
+                                        fit: e._imageProvider is AssetImage ? BoxFit.contain : BoxFit.cover,
                                         image: e._imageProvider!,
                                       )
                                     : null,
@@ -494,18 +497,18 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
       return null;
     }
     if (_isAllFiles) {
-      return Icon(
+      return FaIcon(
         Icons.file_open,
         color: Theme.of(context).iconTheme.color,
       );
     } else if (_isMultimedia) {
-      return Icon(
+      return FaIcon(
         Icons.camera,
         color: Theme.of(context).iconTheme.color,
       );
     }
-    return Icon(
-      Icons.camera_alt,
+    return FaIcon(
+      Icons.device_unknown,
       color: Theme.of(context).iconTheme.color,
     );
   }
@@ -517,7 +520,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
   }
 
   bool get _isMultimedia {
-    return widget.sources.contains(FileSource.camera) && widget.sources.contains(FileSource.gallery);
+    return widget.sources.contains(FileSource.camera) || widget.sources.contains(FileSource.gallery);
   }
 
   BoxDecoration _buildDecoration() {
@@ -829,6 +832,9 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
                               final result = await FilePicker.platform.pickFiles(
                                 allowMultiple: false,
                                 allowedExtensions: widget.allowedExtensions,
+                                type: widget.allowedExtensions?.isNotEmpty == true
+                                    ? FileType.custom
+                                    : (widget.fileType ?? FileType.any),
                               );
                               _processFilePickResult(
                                 result,
@@ -849,12 +855,21 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
                 },
               ),
             ),
-            if (hintText != null)
+            if (hintText != null && _selectedFiles.isEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
                   hintText!,
                   style: decoration.hintStyle,
+                ),
+              )
+            else if (_selectedFiles.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  _selectedFiles.map((e) => e.name).join(', '),
+                  style: decoration.hintStyle,
+                  maxLines: 2,
                 ),
               )
           ],

@@ -31,6 +31,25 @@ class LiteSerializers {
     return toDouble(value).toInt();
   }
 
+  static Future<List<List<int>>> liteFilesToBytes(
+    Object? value,
+  ) async {
+    if (value is LiteFile) {
+      final bytes = await value.getBytesAsync as List<int>;
+      return [bytes];
+    } else if (value is List) {
+      final tempList = <List<int>>[];
+      for (var file in value) {
+        if (file is LiteFile) {
+          final wrapper = await liteFilesToBytes(file);
+          tempList.addAll(wrapper);
+        }
+      }
+      return tempList;
+    }
+    return const [];
+  }
+
   static FutureOr<Object?> filesToMapList(Object? value) async {
     if (value is LiteFile) {
       return await value.toMapAsync();
