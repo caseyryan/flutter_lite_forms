@@ -506,7 +506,6 @@ class __TextEntryPageState extends State<_TextEntryPage> {
                   padding: EdgeInsets.zero,
                   child: const Icon(
                     Icons.close,
-                    color: CupertinoColors.label,
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();
