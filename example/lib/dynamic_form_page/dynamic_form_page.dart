@@ -82,7 +82,7 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                             readOnly: false,
                             paddingTop: 20.0,
                             maxLines: 1,
-                            textEntryType: LiteTextEntryType.normal,
+                            textEntryType: TextEntryType.normal,
                             useSmoothError: true,
                             name: 'login',
                             initialValue: 'Konstantin',

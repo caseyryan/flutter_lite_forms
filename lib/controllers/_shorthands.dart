@@ -3,17 +3,17 @@
 part of 'lite_form_controller.dart';
 
 /// example of usage form('signup.firstName').field.get();
-_FormShorthand form(String path) {
-  return _FormShorthand.fromPath(path);
+_FormShorthand form(String formGroupName) {
+  return _FormShorthand.fromFormName(formGroupName);
 }
 
 class _FormShorthand {
   final String formName;
-  final String fieldName;
+  // final String fieldName;
 
   _FormShorthand._({
     required this.formName,
-    required this.fieldName,
+    // required this.fieldName,
   });
 
   /// Just requests a focus on a field next to
@@ -64,7 +64,7 @@ class _FormShorthand {
     }
   }
 
-  void focus() {
+  void focus(String fieldName) {
     liteFormController
         .tryGetField(
           formName: formName,
@@ -73,7 +73,7 @@ class _FormShorthand {
         ?.requestFocus();
   }
 
-  void unfocus() {
+  void unfocus(String fieldName) {
     liteFormController
         .tryGetField(
           formName: formName,
@@ -84,21 +84,13 @@ class _FormShorthand {
         );
   }
 
-  factory _FormShorthand.fromPath(String path) {
-    final split = path.split('.');
-    if (split.length == 2) {
-      return _FormShorthand._(
-        formName: split[0],
-        fieldName: split[1],
-      );
-    }
+  factory _FormShorthand.fromFormName(String formGroupName) {
     return _FormShorthand._(
-      formName: path,
-      fieldName: '',
+      formName: formGroupName,
     );
   }
 
-  _TimerFieldShorthand get timer {
+  _TimerFieldShorthand timer(String fieldName) {
     return _TimerFieldShorthand(
       formName: formName,
       name: fieldName,
@@ -107,7 +99,7 @@ class _FormShorthand {
 
   /// General field expects the exact data type
   /// which it stores
-  _GeneralFieldShorthand get field {
+  _GeneralFieldShorthand field(String fieldName) {
     final formField = liteFormController.tryGetField(
       formName: formName,
       fieldName: fieldName,
@@ -115,7 +107,7 @@ class _FormShorthand {
     return _GeneralFieldShorthand().._formField = formField;
   }
 
-  _PhoneFieldShorthand get phone {
+  _PhoneFieldShorthand phone(String fieldName) {
     final formField = liteFormController.tryGetField(
       formName: formName,
       fieldName: fieldName,

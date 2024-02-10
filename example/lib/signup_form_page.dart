@@ -460,13 +460,13 @@ class SignupFormPage extends StatelessWidget {
                       SizedBox(height: 20.0),
                       MaterialButton(
                         onPressed: () async {
-                          final value = await form('signupForm.phone').field.get(true);
+                          final value = await form('signupForm').field('phone').get(true);
                           // print(value);
                           // form('signupForm.phone').phone.set(
                           //       '(999) 444 6677',
                           //       country: CountryData.find('GB'),
                           //     );
-                          form('signupForm.phone2').phone.set('+44 (999) 444 6677');
+                          form('signupForm').phone('phone2').set('+44 (999) 444 6677');
                         },
                         child: Text('Set Phone'),
                       ),
@@ -486,8 +486,8 @@ class SignupFormPage extends StatelessWidget {
                           // );
                           // final isActive = form('$formName.timer').timer.isActive;
                           // print(isActive);
-                          form('$formName.timer').timer.start();
-                          form('$formName.phone2').focus();
+                          form(formName).timer('timer').start();
+                          form(formName).focus('phone2');
                         },
                         child: Text('Start Timer'),
                       ),

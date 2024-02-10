@@ -10,7 +10,7 @@ import 'package:lite_forms/utils/value_validator.dart';
 import 'error_line.dart';
 import 'mixins/form_field_mixin.dart';
 
-enum LiteTextEntryType {
+enum TextEntryType {
   normal,
   onModalRoute,
 }
@@ -28,7 +28,7 @@ class LiteTextFormField extends StatefulWidget {
   LiteTextFormField({
     Key? key,
     required this.name,
-    this.textEntryType = LiteTextEntryType.normal,
+    this.textEntryType = TextEntryType.normal,
     this.useSmoothError = true,
     this.allowErrorTexts = true,
     this.smoothErrorPadding = const EdgeInsets.only(
@@ -101,16 +101,16 @@ class LiteTextFormField extends StatefulWidget {
   final String? label;
   final TextEditingController? controller;
 
-  /// makes sense only if [textEntryType] is [LiteTextEntryType.onModalRoute]
+  /// makes sense only if [textEntryType] is [TextEntryType.onModalRoute]
   final TextEntryModalRouteSettings? modalRouteSettings;
 
   /// makes sense only of [useSmoothError] is true
   final EdgeInsets? smoothErrorPadding;
 
-  /// if you pass [LiteTextEntryType.onModalRoute]
+  /// if you pass [TextEntryType.onModalRoute]
   /// then when you tap a text field a separate full screen
   /// route will be opened to enter a text
-  final LiteTextEntryType textEntryType;
+  final TextEntryType textEntryType;
 
   /// if true, this will use a smoothly animated error
   /// that uses AnimateSize to display, unlike the standard
@@ -203,7 +203,7 @@ class LiteTextFormField extends StatefulWidget {
 class _LiteTextFormFieldState extends State<LiteTextFormField>
     with FormFieldMixin {
   VoidCallback? _getTapMethod() {
-    if (widget.textEntryType == LiteTextEntryType.onModalRoute) {
+    if (widget.textEntryType == TextEntryType.onModalRoute) {
       return _openTextEntryRoute;
     }
     return null;
