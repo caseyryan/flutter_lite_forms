@@ -216,6 +216,18 @@ class _GeneralFieldShorthand {
     return _formField?.getValue(serialize) as T?;
   }
 
+  void selectText([
+    int start = 0,
+    int end = 999999999,
+  ]) {
+    Future.delayed(const Duration(milliseconds: 50)).then((value) {
+      _formField?.textEditingController?.setSelection(
+        start,
+        end,
+      );
+    });
+  }
+
   void set(Object? value) {
     if (_formField == null) {
       return;

@@ -51,4 +51,16 @@ extension TextEditingControllerExtension on TextEditingController {
     );
     focusNode?.requestFocus();
   }
+
+  void setSelection([
+    int start = 0,
+    int end = 9999999,
+    FocusNode? focusNode,
+  ]) {
+    selection = TextSelection(
+      baseOffset: start.clamp(0, text.length),
+      extentOffset: end.clamp(0, text.length),
+    );
+    focusNode?.requestFocus();
+  }
 }
