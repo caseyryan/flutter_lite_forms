@@ -200,8 +200,7 @@ class LiteTextFormField extends StatefulWidget {
   State<LiteTextFormField> createState() => _LiteTextFormFieldState();
 }
 
-class _LiteTextFormFieldState extends State<LiteTextFormField>
-    with FormFieldMixin {
+class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMixin {
   VoidCallback? _getTapMethod() {
     if (widget.textEntryType == TextEntryType.onModalRoute) {
       return _openTextEntryRoute;
@@ -293,7 +292,14 @@ class _LiteTextFormFieldState extends State<LiteTextFormField>
             autofocus: widget.autofocus,
             autovalidateMode: null,
             buildCounter: widget.buildCounter,
-            contextMenuBuilder: widget.contextMenuBuilder,
+            /// There's some bug with this in flutter. If we just pass null here
+            /// the context menu will not appear at all. 
+            contextMenuBuilder: widget.contextMenuBuilder ??
+                (BuildContext context, EditableTextState editableTextState) {
+                  return AdaptiveTextSelectionToolbar.editableText(
+                    editableTextState: editableTextState,
+                  );
+                },
             controller: textEditingController,
             cursorColor: widget.cursorColor,
             cursorHeight: widget.cursorHeight,
@@ -465,8 +471,7 @@ class __TextEntryPageState extends State<_TextEntryPage> {
   @override
   Widget build(BuildContext context) {
     final TextEntryModalRouteSettings? routeSettings =
-        widget.modalRouteSettings ??
-            liteFormController.config?.defaultTextEntryModalRouteSettings;
+        widget.modalRouteSettings ?? liteFormController.config?.defaultTextEntryModalRouteSettings;
     _textEditingController = TextEditingController(
       text: widget.text,
     );
@@ -535,8 +540,7 @@ class __TextEntryPageState extends State<_TextEntryPage> {
                         right: 8.0,
                       ),
                       child: TextFormField(
-                        textCapitalization: routeSettings?.textCapitalization ??
-                            TextCapitalization.sentences,
+                        textCapitalization: routeSettings?.textCapitalization ?? TextCapitalization.sentences,
                         decoration: InputDecoration.collapsed(
                           hintText: widget.hintText,
                         ),
