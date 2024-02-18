@@ -379,10 +379,10 @@ packages:
     dependency: transitive
     description:
       name: lite_state
-      sha256: e6ea9ef5d1b3dca94bf9041a05eaec08d74e72a5849b1258c1bb2d148a61d2f6
+      sha256: a2b3e66dd22d578fb0216b61e99f7fee494f32e412291c798cadf87994975b65
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.1"
+    version: "3.0.3"
   markdown:
     dependency: transitive
     description:
