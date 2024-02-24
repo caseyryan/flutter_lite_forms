@@ -82,23 +82,27 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
   }
 
   bool get _isMultiselect {
-    return _settings.dropSelectorActionType == LiteDropSelectorActionType.multiselect;
+    return _settings.dropSelectorActionType == DropSelectorActionType.multiselect;
   }
 
   bool get _isSimpleWithNoSelection {
-    return _settings.dropSelectorActionType == LiteDropSelectorActionType.simpleWithNoSelection;
+    return _settings.dropSelectorActionType == DropSelectorActionType.simpleWithNoSelection;
   }
 
   bool get _isSingleSelect {
-    return _settings.dropSelectorActionType == LiteDropSelectorActionType.singleSelect;
+    return _settings.dropSelectorActionType == DropSelectorActionType.singleSelect;
   }
 
   bool get _isSimple {
-    return _isSimpleWithNoSelection || _settings.dropSelectorActionType == LiteDropSelectorActionType.simple;
+    if (_settings.dropSelectorActionType == null) {
+      return true;
+    }
+    return _isSimpleWithNoSelection || _settings.dropSelectorActionType == DropSelectorActionType.simple;
   }
 
   void _onButtonPressed(
     LiteDropSelectorItem value,
+    DropSelectorType? type,
   ) {
     FocusScope.of(context).unfocus();
     if (value.isSelected) {
@@ -319,7 +323,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
 
     return GestureDetector(
       onTap: () {
-        _onButtonPressed(item);
+        _onButtonPressed(item, _settings.dropSelectorType);
       },
       child: Row(
         mainAxisSize: MainAxisSize.min,

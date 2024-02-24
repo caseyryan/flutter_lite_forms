@@ -204,7 +204,11 @@ class FormGroupField<T> {
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           try {
             textEditingController?.text = view ?? _value.toString();
-          } catch (e) {}
+          } catch (e) {
+            if (kDebugMode) {
+              print(e);
+            }
+          }
         });
       } else {
         if (view != null) {

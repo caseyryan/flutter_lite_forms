@@ -62,7 +62,7 @@ class SignupFormPage extends StatelessWidget {
                         paddingTop: 12,
                         settings: const DropSelectorSettings(
                           dropSelectorType: DropSelectorType.menu,
-                          dropSelectorActionType: LiteDropSelectorActionType.simple,
+                          dropSelectorActionType: DropSelectorActionType.simple,
                           maxMenuWidth: double.infinity,
                         ),
                         name: 'phraseLengthDropSelector',
@@ -269,7 +269,7 @@ class SignupFormPage extends StatelessWidget {
                           // dropSelectorType: LiteDropSelectorViewType.bottomsheet,
                           // dropSelectorActionType: LiteDropSelectorActionType.multiselect,
                           // dropSelectorActionType: LiteDropSelectorActionType.singleSelect,
-                          dropSelectorActionType: LiteDropSelectorActionType.multiselect,
+                          dropSelectorActionType: DropSelectorActionType.multiselect,
                           sheetPadding: EdgeInsets.all(12.0),
 
                           // chipBuilder: (item, removeItem) {

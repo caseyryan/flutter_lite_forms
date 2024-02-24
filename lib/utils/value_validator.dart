@@ -49,6 +49,16 @@ abstract class LiteValidator {
     );
   }
 
+  static LiteValidator youtube({
+    String? errorText,
+    bool allowEmpty = false,
+  }) {
+    return YoutubeUrlValidator(
+      errorText: errorText,
+      allowEmpty: allowEmpty,
+    );
+  }
+
   static LiteValidator alwaysComplaining({
     int delayMilliseconds = 0,
   }) {
@@ -125,10 +135,7 @@ class DateOfBirthValidator extends LiteValidator {
   final String? errorText;
 
   bool get _isRequired {
-    return minAgeMonths != null ||
-        minAgeYears != null ||
-        maxAgeMonths != null ||
-        minAgeMonths != null;
+    return minAgeMonths != null || minAgeYears != null || maxAgeMonths != null || minAgeMonths != null;
   }
 
   @override
@@ -213,9 +220,7 @@ class FileSize {
   FileSize({
     this.megaBytes = 5,
     this.kiloBytes = 0,
-  }) : assert(megaBytes >= 0 &&
-            kiloBytes >= 0 &&
-            (kiloBytes > 0 || megaBytes > 0));
+  }) : assert(megaBytes >= 0 && kiloBytes >= 0 && (kiloBytes > 0 || megaBytes > 0));
 
   int get totalKilobytes {
     return megaBytes * 1024 + kiloBytes;
@@ -247,6 +252,33 @@ class RequiredFieldValidator extends LiteValidator {
   }) {
     if (value == null || (value is bool && value == false)) {
       return errorText ?? '$fieldName is required';
+    }
+    return null;
+  }
+}
+
+class YoutubeUrlValidator extends LiteValidator {
+  static final RegExp _youtubeRegexp = RegExp(r'^https:\/\/www\.youtube\.com\/watch\?v=[a-zA-Z0-9_]+');
+
+  YoutubeUrlValidator({
+    this.errorText,
+    this.allowEmpty = false,
+  });
+  final String? errorText;
+  final bool allowEmpty;
+
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) {
+    if (value is String && value.isNotEmpty == true) {
+      if (!_youtubeRegexp.hasMatch(value)) {
+        return errorText ?? '$fieldName must contain a valid YouTube url';
+      }
+    }
+    if (!allowEmpty) {
+      return errorText ?? '$fieldName must contain a valid YouTube url';
     }
     return null;
   }

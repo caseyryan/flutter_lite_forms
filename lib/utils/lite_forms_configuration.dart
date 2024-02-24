@@ -83,7 +83,7 @@ class LiteFormsConfiguration {
       topRightRadius: kDefaultFormSmoothRadius,
       bottomLeftRadius: kDefaultFormSmoothRadius,
       bottomRightRadius: kDefaultFormSmoothRadius,
-      dropSelectorActionType: LiteDropSelectorActionType.simple,
+      dropSelectorActionType: DropSelectorActionType.simple,
       dropSelectorType: DropSelectorType.adaptive,
     ),
 

@@ -29,7 +29,7 @@ LiteFormsConfiguration _thinFields(
     defaultDateFormat: 'dd MMM, yyyy',
     defaultTimeFormat: 'HH:mm',
     dropSelectorSettings: const DropSelectorSettings(
-      dropSelectorActionType: LiteDropSelectorActionType.simple,
+      dropSelectorActionType: DropSelectorActionType.simple,
       dropSelectorType: DropSelectorType.adaptive,
     ),
     autovalidateMode: AutovalidateMode.onUserInteraction,

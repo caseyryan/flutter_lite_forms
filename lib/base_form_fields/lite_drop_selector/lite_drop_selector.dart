@@ -47,8 +47,6 @@ class LiteDropSelector extends StatefulWidget {
     this.menuItemBuilder,
     this.selectorViewBuilder,
     this.settings,
-    // this.dropSelectorType = LiteDropSelectorViewType.adaptive,
-    // this.dropSelectorActionType = LiteDropSelectorActionType.simple,
     this.initialValueDeserializer,
     this.validators,
     this.serializer = nonConvertingValueConvertor,
@@ -194,10 +192,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
   }
 
   List<LiteDropSelectorItem> get _selectedOptions {
-    final value = getFieldValue<List<LiteDropSelectorItem>>(
-      formName: formName,
-      fieldName: widget.name,
-    );
+    final value = form(formName).field(widget.name).get();
     return value ?? <LiteDropSelectorItem>[];
   }
 
@@ -503,6 +498,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
                                     color: Colors.transparent,
                                   ),
                                 ),
+                          
                           strutStyle: widget.strutStyle,
                           style: liteFormController.config?.defaultTextStyle ?? widget.style,
                           textAlign: widget.textAlign,

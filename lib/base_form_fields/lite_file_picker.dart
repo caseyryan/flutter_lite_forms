@@ -669,7 +669,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
                   return LiteDropSelector(
                     settings: DropSelectorSettings(
                       dropSelectorType: widget.dropSelectorType,
-                      dropSelectorActionType: LiteDropSelectorActionType.simpleWithNoSelection,
+                      dropSelectorActionType: DropSelectorActionType.simpleWithNoSelection,
                       buttonHeight: widget.menuButtonHeight,
                     ),
                     validators: widget.validators,

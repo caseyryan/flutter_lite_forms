@@ -462,7 +462,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField> with FormFiel
                 menuSearchConfiguration: const MenuSearchConfiguration(
                   autofocusSearchField: true,
                 ),
-                dropSelectorActionType: LiteDropSelectorActionType.simple,
+                dropSelectorActionType: DropSelectorActionType.simple,
                 dropSelectorType: widget.countrySelectorViewType,
                 maxMenuWidth: 330.0,
               ),

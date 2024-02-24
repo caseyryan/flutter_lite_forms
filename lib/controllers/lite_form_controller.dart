@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/controllers/lite_timer_controller.dart';

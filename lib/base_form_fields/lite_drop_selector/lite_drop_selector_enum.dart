@@ -13,7 +13,7 @@ enum DropSelectorType {
   adaptive,
 }
 
-enum LiteDropSelectorActionType {
+enum DropSelectorActionType {
   singleSelect,
   multiselect,
   simple,
