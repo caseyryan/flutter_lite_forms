@@ -57,7 +57,7 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                             text: 'Use phone',
                             paddingTop: 20.0,
                             initialValue: false,
-                            type: LiteSwitchType.adaptive,
+                            type: SwitchStyle.adaptive,
                           ),
                           Row(
                             children: [

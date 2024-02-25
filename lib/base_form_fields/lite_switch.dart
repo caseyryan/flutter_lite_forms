@@ -27,7 +27,7 @@ Widget simpleSquareToggleBuilder(
   );
 }
 
-enum LiteSwitchType {
+enum SwitchStyle {
   cupertino,
   material,
   adaptive,
@@ -61,7 +61,7 @@ class LiteSwitch extends StatefulWidget {
     this.validators,
     this.initialValue,
     this.autovalidateMode,
-    this.type = LiteSwitchType.adaptive,
+    this.type = SwitchStyle.adaptive,
     this.customLiteToggleBuilder,
     this.activeColor,
     this.activeThumbImage,
@@ -141,9 +141,9 @@ class LiteSwitch extends StatefulWidget {
 
   /// The look and feel of the switch.
   ///
-  /// [LiteSwitchType.adaptive] by default. It means it will use
+  /// [SwitchStyle.adaptive] by default. It means it will use
   /// cupertino style on iOS and Material on Android
-  final LiteSwitchType type;
+  final SwitchStyle type;
 
   /// If you don't want the toggle to look like Cupertino or Material
   /// you may provide you own toggle builder here
@@ -248,9 +248,9 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
     }
 
     bool isMaterial = false;
-    if (widget.type == LiteSwitchType.material) {
+    if (widget.type == SwitchStyle.material) {
       isMaterial = true;
-    } else if (widget.type == LiteSwitchType.adaptive) {
+    } else if (widget.type == SwitchStyle.adaptive) {
       if (!ExtendedPlatform.isIOS) {
         isMaterial = true;
       }
