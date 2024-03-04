@@ -73,6 +73,19 @@ class _FormShorthand {
         ?.requestFocus();
   }
 
+  /// Returns the name of the field that is currently focused
+  /// or null is none is focused
+  String? get focusedFieldNameOrNull {
+    final allFields = liteFormController
+        .getAllFieldsOfForm(
+          formName: formName,
+          mountedOnly: true,
+          includeIgnored: true,
+        )
+        .toList();
+    return allFields.firstWhereOrNull((e) => e.hasFocus)?.name;
+  }
+
   void unfocus(String fieldName) {
     liteFormController
         .tryGetField(
