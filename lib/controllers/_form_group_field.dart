@@ -41,6 +41,8 @@ class FormGroupField<T> {
   bool _isRemoved = false;
   bool get isRemoved => _isRemoved;
 
+  ValueChanged<TextSelection?>? onSelectionChange;
+
   void unmount() {
     _isMounted = false;
     _context = null;
@@ -78,8 +80,18 @@ class FormGroupField<T> {
 
   void _onTextUpdate() {
     _lastTextValue = _textEditingController?.text ?? '';
+    _onSelectionChange(_textEditingController?.selection);
   }
 
+  void _onSelectionChange(TextSelection? value) {
+    if (value != _selection) {
+      _selection = value;
+      onSelectionChange?.call(value);
+    }
+  }
+
+  TextSelection? _selection;
+  TextSelection? get selection => _selection;
   String _lastTextValue = '';
   FocusNode? _focusNode;
   FocusNode? get focusNode => _focusNode;

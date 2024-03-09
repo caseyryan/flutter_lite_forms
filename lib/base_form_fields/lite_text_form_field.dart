@@ -94,12 +94,14 @@ class LiteTextFormField extends StatefulWidget {
     this.paddingLeft = 0.0,
     this.paddingRight = 0.0,
     this.modalRouteSettings,
+    this.onSelectionChange,
   }) : super(key: key ?? Key(name));
 
   final String name;
   final String? hintText;
   final String? label;
   final TextEditingController? controller;
+  final ValueChanged<TextSelection?>? onSelectionChange;
 
   /// makes sense only if [textEntryType] is [TextEntryType.onModalRoute]
   final TextEntryModalRouteSettings? modalRouteSettings;
@@ -237,6 +239,12 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
   }
 
   @override
+  void onSelectionChange(TextSelection? value) {
+    widget.onSelectionChange?.call(value);
+    super.onSelectionChange(value);
+  }
+
+  @override
   Widget build(BuildContext context) {
     initializeFormField<String>(
       fieldName: widget.name,
@@ -292,8 +300,9 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
             autofocus: widget.autofocus,
             autovalidateMode: null,
             buildCounter: widget.buildCounter,
+
             /// There's some bug with this in flutter. If we just pass null here
-            /// the context menu will not appear at all. 
+            /// the context menu will not appear at all.
             contextMenuBuilder: widget.contextMenuBuilder ??
                 (BuildContext context, EditableTextState editableTextState) {
                   return AdaptiveTextSelectionToolbar.editableText(

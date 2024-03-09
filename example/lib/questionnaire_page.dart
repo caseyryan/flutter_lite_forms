@@ -11,7 +11,7 @@ class QuestionnairePage extends StatefulWidget {
 class _QuestionnairePageState extends State<QuestionnairePage> {
   @override
   Widget build(BuildContext context) {
-    return LiteFormGroup(
+    return LiteForm(
       name: 'questionnaire',
       autoDispose: false,
       allowUnfocusOnTapOutside: true,

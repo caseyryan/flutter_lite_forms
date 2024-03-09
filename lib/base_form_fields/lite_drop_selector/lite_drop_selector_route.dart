@@ -14,7 +14,7 @@ Future showDropSelector({
   required Size buttonSize,
   required DropSelectorSettings settings,
   required TextStyle? style,
-  required LiteFormGroup group,
+  required LiteForm group,
   MenuItemBuilder? menuItemBuilder,
 }) async {
   FocusScope.of(context).unfocus();
@@ -182,7 +182,7 @@ class LiteDropSelectorRouteArgs {
     this.menuItemBuilder,
   });
 
-  final LiteFormGroup group;
+  final LiteForm group;
   final InputDecoration? decoration;
   final List<LiteDropSelectorItem> items;
   final Offset buttonLeftTopCorner;

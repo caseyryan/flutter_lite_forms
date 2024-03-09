@@ -26,7 +26,7 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
       builder: (BuildContext c, DynamicFormController controller) {
         return Scaffold(
           appBar: AppBar(),
-          body: LiteFormGroup(
+          body: LiteForm(
             autoDispose: false,
             allowUnfocusOnTapOutside: false,
             name: formName,

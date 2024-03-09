@@ -88,7 +88,7 @@ class _LiteTimeoutState extends State<LiteTimeout> {
 
   @override
   Widget build(BuildContext context) {
-    final group = LiteFormGroup.of(context)!;
+    final group = LiteForm.of(context)!;
     if (_timerData == null) {
       _timerData = liteTimerController.tryStartTimer(
         seconds: widget.seconds,

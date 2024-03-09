@@ -28,7 +28,7 @@ typedef LiteFormBuilder = Widget Function(
   ScrollController scrollController,
 );
 
-class LiteFormGroup extends InheritedWidget {
+class LiteForm extends InheritedWidget {
   ScrollController? _scrollController;
   ScrollController get scrollController {
     _scrollController ??= ScrollController();
@@ -44,7 +44,7 @@ class LiteFormGroup extends InheritedWidget {
   /// [LiteDatePicker] : a flexible and powerful date picker which
   /// can use a cupertino or a material style, or use an adaptive view.
   /// It can be used to pick date, date and time, or time only
-  LiteFormGroup({
+  LiteForm({
     Key? key,
     required this.name,
     this.autoDispose = true,
@@ -79,7 +79,7 @@ class LiteFormGroup extends InheritedWidget {
                 // }
                 return builder(
                   c,
-                  LiteFormGroup.of(c)!.scrollController,
+                  LiteForm.of(c)!.scrollController,
                 );
               },
             ),
@@ -120,9 +120,9 @@ class LiteFormGroup extends InheritedWidget {
   final bool? allowUnfocusOnTapOutside;
 
   @override
-  bool updateShouldNotify(LiteFormGroup oldWidget) => false;
-  static LiteFormGroup? of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<LiteFormGroup>();
+  bool updateShouldNotify(LiteForm oldWidget) => false;
+  static LiteForm? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<LiteForm>();
 }
 
 class _LiteGroupWrapper extends StatefulWidget {

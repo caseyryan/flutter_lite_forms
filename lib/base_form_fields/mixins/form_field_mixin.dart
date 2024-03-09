@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lite_forms/base_form_fields/lite_form_group.dart';
+import 'package:lite_forms/base_form_fields/lite_form.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/utils/string_extensions.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
@@ -8,8 +8,8 @@ import 'package:lite_forms/utils/value_validator.dart';
 typedef OnChanged = Function(Object? value);
 
 mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
-  LiteFormGroup? _group;
-  LiteFormGroup get group => _group!;
+  LiteForm? _group;
+  LiteForm get group => _group!;
 
   late final FormGroupField field;
   late final String _fieldName;
@@ -78,9 +78,8 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     super.dispose();
     if (_isInitialized) {
       field.unmount();
-      if (field.focusNode != null) {
-        field.focusNode?.removeListener(onFocusChange);
-      }
+      field.onSelectionChange = null;
+      field.focusNode?.removeListener(onFocusChange);
     }
   }
 
@@ -138,7 +137,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
       'You must add a key to your Form Field widget',
     );
 
-    _group = LiteFormGroup.of(context)!;
+    _group = LiteForm.of(context)!;
     _label = label;
 
     this._decoration = decoration ?? formConfig?.inputDecoration ?? const InputDecoration();
@@ -210,6 +209,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
       validators: validators,
       serializer: serializer,
     );
+    field.onSelectionChange = onSelectionChange;
 
     if (addFocusNodeListener) {
       /// this is required to be able to iterate through form
@@ -222,13 +222,13 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     }
   }
 
-  // int _lastFocusChangeMillis = 0;
+  /// can be overridden
+  void onSelectionChange(TextSelection? value) {}
+
   void _updateFocus() {
-    // print('UPDATE FOCUS');
     if (field.focusNode == null) {
       return;
     }
-
     onFocusChange();
   }
 

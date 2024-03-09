@@ -13,7 +13,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: LiteFormGroup(
+      body: LiteForm(
         name: 'profileForm',
         autoDispose: true,
         builder: (c, scrollController) {

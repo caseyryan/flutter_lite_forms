@@ -7,6 +7,7 @@ _FormShorthand form(String formGroupName) {
   return _FormShorthand.fromFormName(formGroupName);
 }
 
+
 class _FormShorthand {
   final String formName;
   // final String fieldName;
@@ -101,6 +102,10 @@ class _FormShorthand {
     return _FormShorthand._(
       formName: formGroupName,
     );
+  }
+
+  void clear() {
+    clearLiteForm(formName);
   }
 
   _TimerFieldShorthand timer(String fieldName) {
@@ -227,6 +232,11 @@ class _GeneralFieldShorthand {
     bool serialize = false,
   ]) {
     return _formField?.getValue(serialize) as T?;
+  }
+
+  /// Returns the current text selection if any
+  TextSelection? getSelection() {
+    return _formField?.selection;
   }
 
   void selectText([

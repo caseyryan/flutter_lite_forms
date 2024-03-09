@@ -158,7 +158,7 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
 
   @override
   Widget build(BuildContext context) {
-    final group = LiteFormGroup.of(context)!;
+    final group = LiteForm.of(context)!;
     final repeatName = widget.repeatPlaceholder ??
         '${group.translationBuilder('Confirm')} ${widget.name}';
     final allowErrorTexts = widget.settings.validator != null;
@@ -348,7 +348,7 @@ class _PasswordValidator extends LiteValidator {
   });
   final String? firstValue;
   final String? secondValue;
-  final LiteFormGroup group;
+  final LiteForm group;
   final PasswordSettings settings;
 
   @override
@@ -427,7 +427,7 @@ class PasswordSettings {
   Widget _buildChecker({
     required double paddingTop,
     required double paddingBottom,
-    required LiteFormGroup group,
+    required LiteForm group,
     required String name,
     required String repeatName,
     required InputDecoration decoration,
@@ -503,7 +503,7 @@ class PasswordSettings {
   Future<String?> _validate({
     required String? value,
     required bool passwordsMatch,
-    required LiteFormGroup? group,
+    required LiteForm? group,
   }) async {
     if (validator != null) {
       if (passwordFieldCheckType == PasswordFieldCheckType.repeatPassword) {
@@ -560,7 +560,7 @@ class PasswordRequirements {
   String? _validate({
     required String? value,
     required bool passwordsMatch,
-    required LiteFormGroup? group,
+    required LiteForm? group,
     bool rebuild = true,
   }) {
     if (value?.isNotEmpty != true) {
@@ -686,7 +686,7 @@ class PasswordChecker extends StatelessWidget {
   final int minPasswordLength;
   final double paddingTop;
   final double paddingBottom;
-  final LiteFormGroup group;
+  final LiteForm group;
   final Color? errorColor;
   final Color? successColor;
   final Color? textColor;

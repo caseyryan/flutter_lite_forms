@@ -18,7 +18,7 @@ class SignupFormPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(),
-      body: LiteFormGroup(
+      body: LiteForm(
         /// autoDispose: false will store the form
         /// (despite that the LiteFormGroup might be disposed of) until
         /// you call clearForm from anywhere
