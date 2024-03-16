@@ -56,7 +56,11 @@ class LiteFile {
     this.xFile,
     this.platformFile,
     this.userSetName,
-  });
+  }) {
+    _updateFileInfo().then((value) {
+      liteFormRebuildController.rebuild();
+    });
+  }
   final XFile? xFile;
   final PlatformFile? platformFile;
 
@@ -270,19 +274,27 @@ class LiteFile {
     return _bytes;
   }
 
-  static Future<LiteFile> fromBytesData({
+  static LiteFile fromBytesData({
     required List<int> bytes,
     required String name,
-    required String mimeType,
-  }) async {
+    String? mimeType,
+  }) {
+    mimeType ??= lookupMimeType(
+      name,
+      headerBytes: bytes,
+    );
     final file = LiteFile(
       xFile: XFile.fromData(
         Uint8List.fromList(bytes),
         name: name,
+        mimeType: mimeType,
       ),
       userSetName: name,
     );
-    await file._updateFileInfo();
+
+    file._updateFileInfo().then((value) {
+      liteFormRebuildController.rebuild();
+    });
     return file;
   }
 

@@ -4,6 +4,7 @@ import 'package:lite_forms/lite_forms.dart';
 
 /// used to write custom value serializers / deserializers
 typedef LiteFormValueSerializer = FutureOr<Object?> Function(dynamic value);
+typedef LiteFormValueDeserializer = Object? Function(dynamic value);
 
 /// The default for all fields. This means that the values is
 /// supposed to be accepted as is. If you need to convert the

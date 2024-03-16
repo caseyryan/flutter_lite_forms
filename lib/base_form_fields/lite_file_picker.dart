@@ -158,7 +158,7 @@ class LiteFilePicker extends StatefulWidget {
   /// like so: initialValueDeserializer: (value) => DateTime.parse(value);
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
-  final LiteFormValueSerializer? initialValueDeserializer;
+  final LiteFormValueDeserializer? initialValueDeserializer;
   final List<LiteValidator>? validators;
 
   @override
@@ -633,11 +633,16 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
       focusNode: widget.focusNode,
       addFocusNodeListener: false,
     );
-
-    tryDeserializeInitialValueIfNecessary(
-      rawInitialValue: widget.initialValue,
-      initialValueDeserializer: widget.initialValueDeserializer,
-    );
+    if (widget.initialValue != null) {
+      dynamic initValue = widget.initialValue;
+      if (initValue is! List) {
+        initValue = [initValue];
+      }
+      tryDeserializeInitialValueIfNecessary(
+        rawInitialValue: initValue,
+        initialValueDeserializer: widget.initialValueDeserializer,
+      );
+    }
 
     setInitialValue(
       fieldName: widget.name,

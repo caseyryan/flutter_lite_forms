@@ -102,7 +102,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
 
   void tryDeserializeInitialValueIfNecessary<E>({
     required Object? rawInitialValue,
-    required LiteFormValueSerializer? initialValueDeserializer,
+    required LiteFormValueDeserializer? initialValueDeserializer,
   }) {
     final storedValue = liteFormController.tryGetValueForField(
       formName: group.name,
@@ -113,6 +113,9 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
           storedValue ?? initialValueDeserializer?.call(rawInitialValue)?.toString() ?? rawInitialValue?.toString();
     } else {
       _initialValue = storedValue ?? initialValueDeserializer?.call(rawInitialValue) as E? ?? rawInitialValue as E?;
+    }
+    if (_initialValue is Future) {
+      throw 'initialValueDeserializer cannot be async';
     }
   }
 

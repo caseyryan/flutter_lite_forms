@@ -45,7 +45,10 @@ T? getFieldValue<T>({
       return null;
     }
   }
-  return value as T?;
+  try {
+    return value as T?;
+  } catch (_) {}
+  return null;
 }
 
 /// Allows to check if a form is in the process of being validated
