@@ -222,10 +222,11 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
   }
 
   DropSelectorSettings get _settings {
-    final defaultSettings =  liteFormController.config?.dropSelectorSettings ?? const DropSelectorSettings(
-      dropSelectorActionType: null,
-      dropSelectorType: null,
-    );
+    final defaultSettings = liteFormController.config?.dropSelectorSettings ??
+        const DropSelectorSettings(
+          dropSelectorActionType: null,
+          dropSelectorType: null,
+        );
     if (widget.settings != null) {
       return defaultSettings.copyWith(
         bottomLeftRadius: widget.settings!.bottomLeftRadius,
@@ -241,7 +242,6 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
         topRightRadius: widget.settings!.topLeftRadius,
         veilColor: widget.settings!.veilColor,
         withScrollBar: widget.settings!.withScrollBar,
-        
       );
     }
     return defaultSettings;
@@ -307,15 +307,33 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
 
   @override
   Widget build(BuildContext context) {
+    if (_isStringItems) {
+      /// Items is the full list
+      _items = widget.items
+          .map((e) => LiteDropSelectorItem(
+                title: e as String,
+                payload: e,
+              ))
+          .toList();
+    } else {
+      _items = widget.items.cast<LiteDropSelectorItem>().toList();
+    }
     dynamic preparedInitialValue = widget.initialValue;
     if (preparedInitialValue != null) {
       if (preparedInitialValue is String) {
-        preparedInitialValue = [
-          LiteDropSelectorItem(
-            title: preparedInitialValue,
-            payload: preparedInitialValue,
-          ),
-        ];
+        final contained = _items.firstWhereOrNull(
+          (e) => e.payload == preparedInitialValue || e.title == preparedInitialValue,
+        );
+        if (contained != null) {
+          preparedInitialValue = [contained];
+        } else {
+          preparedInitialValue = [
+            LiteDropSelectorItem(
+              title: preparedInitialValue,
+              payload: preparedInitialValue,
+            ),
+          ];
+        }
       } else if (preparedInitialValue is List) {
         preparedInitialValue = preparedInitialValue
             .map((e) {
@@ -355,17 +373,6 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
           ];
         }
       }
-    }
-    if (_isStringItems) {
-      /// Items is the full list
-      _items = widget.items
-          .map((e) => LiteDropSelectorItem(
-                title: e as String,
-                payload: e,
-              ))
-          .toList();
-    } else {
-      _items = widget.items.cast<LiteDropSelectorItem>().toList();
     }
 
     initializeFormField(
@@ -498,7 +505,6 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
                                     color: Colors.transparent,
                                   ),
                                 ),
-                          
                           strutStyle: widget.strutStyle,
                           style: liteFormController.config?.defaultTextStyle ?? widget.style,
                           textAlign: widget.textAlign,

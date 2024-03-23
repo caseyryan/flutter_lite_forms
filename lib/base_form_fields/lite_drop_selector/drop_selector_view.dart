@@ -235,6 +235,9 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
         });
       });
     }
+    if (_settings.menuSearchConfiguration.searchFieldVisibility == SearchFieldVisibility.none) {
+      return;
+    }
     if (_isTopDirected) {
       children.add(
         SizedBox(

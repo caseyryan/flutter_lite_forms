@@ -157,6 +157,7 @@ class DropSelectorSettings {
       buttonHeight: buttonHeight ?? this.buttonHeight,
       withScrollBar: withScrollBar ?? this.withScrollBar,
       sheetPadding: sheetPadding ?? this.sheetPadding,
+      menuSearchConfiguration: menuSearchConfiguration ?? this.menuSearchConfiguration,
       dropSelectorActionType: dropSelectorActionType ?? this.dropSelectorActionType,
       dropSelectorType: dropSelectorType ?? this.dropSelectorType,
       

@@ -17,6 +17,10 @@ class _FormShorthand {
     // required this.fieldName,
   });
 
+  Future<bool> validate() async {
+    return validateLiteForm(formName);
+  }
+
   /// Just requests a focus on a field next to
   /// the current focused one. If non is focused
   /// it will request a focus on the first field
