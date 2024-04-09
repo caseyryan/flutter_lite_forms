@@ -58,6 +58,11 @@ abstract class LiteValidator {
       allowEmpty: allowEmpty,
     );
   }
+  static LiteValidator email({
+    String? errorText,
+  }) {
+    return EmailValidator();
+  }
 
   static LiteValidator alwaysComplaining({
     int delayMilliseconds = 0,
@@ -210,6 +215,31 @@ class PhoneValidator extends LiteValidator {
     if (value.isValid != true) {
       return 'A phone is invalid';
     }
+    return null;
+  }
+}
+
+final RegExp _emailRegex = RegExp(
+    r"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*@((([\-\w]+\.)+[a-zA-Z]{2,12})|(([0-9]{1,12}\.){12}[0-9]{1,12}))$");
+
+bool isEmailValid(String value) {
+  if (value.isEmpty) return false;
+  return _emailRegex.stringMatch(value) != null;
+}
+
+class EmailValidator extends LiteValidator {
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) {
+    if (value == null) {
+      return '$fieldName is required';
+    }
+    if (!isEmailValid(value.toString())) {
+      return '$fieldName is invalid';
+    }
+    
     return null;
   }
 }

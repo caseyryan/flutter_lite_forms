@@ -34,7 +34,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
   }
 
   void onFocusChange() {
-    print('FOCUS CHANGE ${field.name}');
+    debugPrint('FOCUS CHANGE ${field.name}');
   }
 
   @override
