@@ -159,7 +159,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     final TextDirection textDirection = Directionality.of(context);
     final EdgeInsets? decorationContentPadding = this._decoration!.contentPadding?.resolve(textDirection);
 
-    final EdgeInsets? contentPadding;
+    EdgeInsets? contentPadding;
     final decorationIsDense = this._decoration!.isDense == true;
     final bool isError = this._decoration!.errorText != null;
     InputBorder? border;
@@ -188,9 +188,11 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
               ? const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0)
               : const EdgeInsets.fromLTRB(12.0, 24.0, 12.0, 16.0));
     }
+    
     this._decoration = this._decoration?.copyWith(
           contentPadding: contentPadding,
         );
+
 
     if (!_isInitialized) {
       _isInitialized = true;

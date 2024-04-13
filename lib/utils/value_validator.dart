@@ -25,6 +25,10 @@ abstract class LiteValidator {
     return PhoneValidator();
   }
 
+  static LiteValidator name() {
+    return NameValidator();
+  }
+
   static LiteValidator dateOfBirth({
     int? minAgeYears,
     int? maxAgeYears,
@@ -58,6 +62,7 @@ abstract class LiteValidator {
       allowEmpty: allowEmpty,
     );
   }
+
   static LiteValidator email({
     String? errorText,
   }) {
@@ -239,7 +244,7 @@ class EmailValidator extends LiteValidator {
     if (!isEmailValid(value.toString())) {
       return '$fieldName is invalid';
     }
-    
+
     return null;
   }
 }
@@ -283,6 +288,62 @@ class RequiredFieldValidator extends LiteValidator {
     if (value == null || (value is bool && value == false)) {
       return errorText ?? '$fieldName is required';
     }
+    return null;
+  }
+}
+
+class NameValidator extends LiteValidator {
+  final RegExp _nameValidatorRegExp = RegExp(r'^(?!\s)([А-Яа-яA-Za-z- ])+$');
+  final RegExp _doubleSpaceRegExp = RegExp(r'\s{2}');
+  final RegExp _dashKillerRegExp = RegExp(r'(-{2})|(-[\s]+)|(\s[-]+)');
+  final RegExp _lettersRegExp = RegExp(r'[А-Яа-яA-Za-z]+');
+
+  String _lastCharacter(String value) {
+    if (value.isEmpty) return '';
+    return value[value.length - 1];
+  }
+
+  String? _validateName(String? value) {
+    if (value?.isNotEmpty != true) {
+      return null;
+    }
+    if (!value!.startsWith(_lettersRegExp)) {
+      return 'This field must start with a letter';
+    }
+    if (!_lettersRegExp.hasMatch(_lastCharacter(value))) {
+      return 'This field must end with a letter';
+    }
+
+    if (!_nameValidatorRegExp.hasMatch(value.trim())) {
+      return 'This field must contain only letters, dashes, or spaces in the middle';
+    }
+
+    if (_doubleSpaceRegExp.hasMatch(value)) {
+      return 'Only a single space is allowed between words';
+    }
+
+    if (_dashKillerRegExp.hasMatch(value)) {
+      return 'Only a single dash is allowed between words';
+    }
+
+    return null;
+  }
+
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) {
+    if (value is String) {
+      if (value.isNotEmpty != true) {
+        return '$fieldName is required';
+      }
+      final error = _validateName(value.toString());
+      if (error?.isNotEmpty == true) {
+        return '$fieldName is required';
+      }
+    }
+
     return null;
   }
 }

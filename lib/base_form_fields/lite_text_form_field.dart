@@ -286,13 +286,18 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
         right: widget.paddingRight,
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           TextFormField(
             restorationId: widget.restorationId,
             scrollController: widget.scrollController,
             validator: widget.validators != null
                 ? (value) {
-                    return group.translationBuilder(field.error);
+                    final error = group.translationBuilder(field.error);
+                    if (error?.isEmpty == true) {
+                      return null;
+                    }
+                    return error;
                   }
                 : null,
             autocorrect: widget.autocorrect,
@@ -310,7 +315,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
                   );
                 },
             controller: textEditingController,
-            cursorColor: widget.cursorColor,
+            cursorColor: widget.cursorColor ?? Theme.of(context).textTheme.bodyMedium?.color,
             cursorHeight: widget.cursorHeight,
             cursorRadius: widget.cursorRadius,
             cursorWidth: widget.cursorWidth,
@@ -318,7 +323,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
                 ? decoration
                 : decoration.copyWith(
                     errorStyle: const TextStyle(
-                      fontSize: .01,
+                      fontSize: 0.0,
                       color: Colors.transparent,
                     ),
                   ),

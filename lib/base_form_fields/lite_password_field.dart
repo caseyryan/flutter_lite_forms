@@ -188,8 +188,10 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         LiteTextFormField(
+          useSmoothError: widget.useSmoothError,
           name: widget.name,
           allowErrorTexts: allowErrorTexts,
           autocorrect: false,
@@ -264,6 +266,7 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
         ),
         if (_isDoubleLine)
           LiteTextFormField(
+            useSmoothError: widget.useSmoothError,
             allowErrorTexts: allowErrorTexts,
             name: repeatName,
             validators: [

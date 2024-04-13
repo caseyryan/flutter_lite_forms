@@ -619,7 +619,11 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField> with FormFiel
                   restorationId: widget.restorationId,
                   validator: widget.validators != null
                       ? (value) {
-                          return group.translationBuilder(field.error);
+                          final error = group.translationBuilder(field.error);
+                          if (error?.isEmpty == true) {
+                            return null;
+                          }
+                          return error;
                         }
                       : null,
                   autovalidateMode: null,
