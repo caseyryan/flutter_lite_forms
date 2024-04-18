@@ -1,3 +1,5 @@
+## 0.0.24
+* A lot of updates and breaking changes
 ## 0.0.23
 * Fixes and updates for control settings
 ## 0.0.22
