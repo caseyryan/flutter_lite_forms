@@ -620,7 +620,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField> with FormFiel
                   validator: widget.validators != null
                       ? (value) {
                           final error = group.translationBuilder(field.error);
-                          if (error?.isEmpty == true) {
+                          if (error?.isNotEmpty != true) {
                             return null;
                           }
                           return error;
