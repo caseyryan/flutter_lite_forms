@@ -45,6 +45,7 @@ LiteFormsConfiguration _vanila(BuildContext context) {
       defaultTextStyle: const TextStyle(
         fontSize: 15.0,
         color: Color.fromARGB(255, 32, 32, 32),
+        fontWeight: FontWeight.normal,
       ),
       destructiveColor: Colors.red,
       filePickerDecoration: const BoxDecoration(
@@ -86,6 +87,7 @@ LiteFormsConfiguration _vanila(BuildContext context) {
       defaultTextStyle: const TextStyle(
         fontSize: 15.0,
         color: Color.fromARGB(255, 248, 248, 248),
+        fontWeight: FontWeight.normal,
       ),
       destructiveColor: Colors.redAccent,
       inputDecoration: InputDecoration(

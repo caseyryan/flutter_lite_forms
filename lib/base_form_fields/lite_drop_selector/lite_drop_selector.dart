@@ -338,7 +338,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
         preparedInitialValue = preparedInitialValue
             .map((e) {
               final byPayload = widget.items.firstWhereOrNull(
-                (i) => i is LiteDropSelectorItem && i.payload == e,
+                (i) => i is LiteDropSelectorItem && i.payload == e.payload
               );
               if (byPayload != null) {
                 return byPayload;

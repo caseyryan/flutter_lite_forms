@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:lite_forms/base_form_fields/lite_file_picker.dart';
 import 'package:lite_forms/base_form_fields/lite_phone_input_field.dart';
 import 'package:lite_forms/utils/age_difference.dart';
@@ -214,6 +215,7 @@ class PhoneValidator extends LiteValidator {
     Object? value, {
     String? fieldName,
   }) {
+    debugPrint('VALIDATING PHONE: $value');
     if (value == null || value is! PhoneData) {
       return 'A phone is required';
     }

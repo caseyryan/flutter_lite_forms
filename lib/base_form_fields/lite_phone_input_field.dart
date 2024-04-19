@@ -512,7 +512,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField> with FormFiel
   }
 
   TextStyle? get _textStyle {
-    return liteFormController.config?.defaultTextStyle ?? widget.style ?? Theme.of(context).textTheme.titleMedium;
+    return liteFormController.config?.defaultTextStyle ?? widget.style ?? Theme.of(context).textTheme.bodyMedium;
   }
 
   PhonePreprocessor get _preprocessor {
