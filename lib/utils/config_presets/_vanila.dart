@@ -1,6 +1,6 @@
 part of '../lite_forms_configuration.dart';
 
-LiteFormsConfiguration _vanila(BuildContext context) {
+LiteFormsConfiguration _vanilla(BuildContext context) {
   final primaryColor = Theme.of(context).primaryColor;
   const cornerRadius = 6.0;
   const normalBorderWidth = .1;
