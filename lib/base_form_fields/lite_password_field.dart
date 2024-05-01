@@ -769,7 +769,7 @@ class __PasswordRequirementLineState extends State<_PasswordRequirementLine> {
   @override
   Widget build(BuildContext context) {
     if (widget.isOk == null) {
-      return const SizedBox.shrink();
+      return const SizedBox.shrink();;
     }
     _theme = Theme.of(context);
     return Padding(

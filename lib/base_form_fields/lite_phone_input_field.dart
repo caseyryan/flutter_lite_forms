@@ -422,12 +422,12 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField> with FormFiel
 
   Widget _buildCountryDropSelector() {
     if (widget.phoneInputType == LitePhoneInputType.autodetectCode) {
-      return const SizedBox.shrink();
+      return const SizedBox.shrink();;
     }
     return LiteState<LiteFormRebuildController>(
       builder: (BuildContext c, LiteFormRebuildController controller) {
         if (_dropSelectorHeight == 0.0) {
-          return const SizedBox.shrink();
+          return const SizedBox.shrink();;
         }
         return LiteCountrySelector(
           countries: widget.phoneCountries,

@@ -66,7 +66,7 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
       );
     }
 
-    return const SizedBox.shrink();
+    return const SizedBox.shrink();;
   }
 
   Color get _selectedBorderColor {
