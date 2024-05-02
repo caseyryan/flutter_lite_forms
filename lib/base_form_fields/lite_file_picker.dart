@@ -291,9 +291,9 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
                       Icons.file_open,
                     );
                   }
-                  return const SizedBox.shrink();;
+                  return const SizedBox.shrink();
                 }
-                return const SizedBox.shrink();;
+                return const SizedBox.shrink();
               },
           payload: e,
         );
@@ -316,7 +316,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
                     Icons.cleaning_services,
                   );
                 }
-                return const SizedBox.shrink();;
+                return const SizedBox.shrink();
               },
         ),
       );
@@ -412,7 +412,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
         ),
       );
     }
-    return const SizedBox.shrink();;
+    return const SizedBox.shrink();
   }
 
   Widget _buildView() {

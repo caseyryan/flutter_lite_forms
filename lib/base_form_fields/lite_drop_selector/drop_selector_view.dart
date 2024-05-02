@@ -160,7 +160,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
 
   Widget _buildButtonRow() {
     if (_isSimple) {
-      return const SizedBox.shrink();;
+      return const SizedBox.shrink();
     }
     return SizedBox(
       width: _menuWidth,

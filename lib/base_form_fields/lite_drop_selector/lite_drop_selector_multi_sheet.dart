@@ -67,7 +67,7 @@ class LiteDropSelectorMultipleSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.length < 2) {
-      return const SizedBox.shrink();;
+      return const SizedBox.shrink();
     }
     final chips = items.mapIndexed(
       (i, e) {
