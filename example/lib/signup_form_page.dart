@@ -293,7 +293,7 @@ class SignupFormPage extends StatelessWidget {
                           selectedItems,
                           String? error,
                         ) {
-                          print('ERROR: $error');
+                          // print('ERROR: $error');
                           return Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
