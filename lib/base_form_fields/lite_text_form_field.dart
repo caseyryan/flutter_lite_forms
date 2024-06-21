@@ -3,6 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lite_forms/base_form_fields/label.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
 import 'package:lite_forms/utils/value_validator.dart';
@@ -244,6 +245,10 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
     super.onSelectionChange(value);
   }
 
+  String? get _labelText {
+    return widget.label ?? widget.hintText;
+  }
+
   @override
   Widget build(BuildContext context) {
     initializeFormField<String>(
@@ -288,13 +293,17 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (_labelText?.isNotEmpty == true)
+            Label(
+              text: _labelText!,
+            ),
           TextFormField(
             restorationId: widget.restorationId,
             scrollController: widget.scrollController,
             validator: widget.validators != null
                 ? (value) {
                     final error = group.translationBuilder(field.error);
-                    if (error?.isEmpty == true) {
+                    if (error?.isNotEmpty != true) {
                       return null;
                     }
                     return error;

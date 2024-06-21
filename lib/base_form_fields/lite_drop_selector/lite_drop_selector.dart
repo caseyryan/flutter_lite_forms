@@ -17,6 +17,7 @@ import 'package:lite_forms/constants.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/utils/exports.dart';
+import 'package:lite_forms/utils/size_detector.dart';
 import 'package:lite_forms/utils/swipe_detector.dart';
 import 'package:lite_state/lite_state.dart';
 
@@ -338,7 +339,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
         preparedInitialValue = preparedInitialValue
             .map((e) {
               final byPayload = widget.items.firstWhereOrNull(
-                (i) => i is LiteDropSelectorItem && i.payload == e,
+                (i) => i is LiteDropSelectorItem && i.payload == e.payload
               );
               if (byPayload != null) {
                 return byPayload;

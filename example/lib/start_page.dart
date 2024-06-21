@@ -15,7 +15,7 @@ class StartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     initializeLiteForms(
-      config: LiteFormsConfiguration.vanila(context),
+      config: LiteFormsConfiguration.vanilla(context),
       // config: LiteFormsConfiguration.thinFields(context),
     );
     return Scaffold(

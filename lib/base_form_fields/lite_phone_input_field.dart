@@ -512,7 +512,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField> with FormFiel
   }
 
   TextStyle? get _textStyle {
-    return liteFormController.config?.defaultTextStyle ?? widget.style ?? Theme.of(context).textTheme.titleMedium;
+    return liteFormController.config?.defaultTextStyle ?? widget.style ?? Theme.of(context).textTheme.bodyMedium;
   }
 
   PhonePreprocessor get _preprocessor {
@@ -620,7 +620,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField> with FormFiel
                   validator: widget.validators != null
                       ? (value) {
                           final error = group.translationBuilder(field.error);
-                          if (error?.isEmpty == true) {
+                          if (error?.isNotEmpty != true) {
                             return null;
                           }
                           return error;

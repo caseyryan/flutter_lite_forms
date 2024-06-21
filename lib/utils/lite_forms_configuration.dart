@@ -60,12 +60,12 @@ class LiteFormsConfiguration {
     return isDarkTheme ? darkTheme : lightTheme;
   }
 
-  /// [LiteFormsConfiguration.vanila] is a default preset which you can
+  /// [LiteFormsConfiguration.vanilla] is a default preset which you can
   /// use as a starting point
-  factory LiteFormsConfiguration.vanila(
+  factory LiteFormsConfiguration.vanilla(
     BuildContext context,
   ) {
-    return _vanila(context);
+    return _vanilla(context);
   }
 
   factory LiteFormsConfiguration.thinFields(

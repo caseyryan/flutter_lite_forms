@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:lite_forms/base_form_fields/lite_file_picker.dart';
 import 'package:lite_forms/base_form_fields/lite_phone_input_field.dart';
 import 'package:lite_forms/utils/age_difference.dart';
@@ -157,7 +158,7 @@ class DateOfBirthValidator extends LiteValidator {
       return null;
     }
     if (value == null) {
-      return errorText ?? '$fieldName is required';
+      return errorText ?? '${fieldName?.firstToUpper()} is required';
     }
     if (value is DateTime) {
       final difference = AgeDifference.fromNow(value);
@@ -214,6 +215,7 @@ class PhoneValidator extends LiteValidator {
     Object? value, {
     String? fieldName,
   }) {
+    debugPrint('VALIDATING PHONE: $value');
     if (value == null || value is! PhoneData) {
       return 'A phone is required';
     }
@@ -239,10 +241,10 @@ class EmailValidator extends LiteValidator {
     String? fieldName,
   }) {
     if (value == null) {
-      return '$fieldName is required';
+      return '${fieldName?.firstToUpper()} is required';
     }
     if (!isEmailValid(value.toString())) {
-      return '$fieldName is invalid';
+      return '${fieldName?.firstToUpper()} is invalid';
     }
 
     return null;
@@ -285,8 +287,8 @@ class RequiredFieldValidator extends LiteValidator {
     Object? value, {
     String? fieldName,
   }) {
-    if (value == null || (value is bool && value == false)) {
-      return errorText ?? '$fieldName is required';
+    if (value == null || (value is bool && value == false) || (value is String && value.isEmpty)) {
+      return errorText ?? '${fieldName?.firstToUpper()} is required';
     }
     return null;
   }
@@ -336,11 +338,11 @@ class NameValidator extends LiteValidator {
   }) {
     if (value is String) {
       if (value.isNotEmpty != true) {
-        return '$fieldName is required';
+        return '${fieldName?.firstToUpper()} is required';
       }
       final error = _validateName(value.toString());
       if (error?.isNotEmpty == true) {
-        return '$fieldName is required';
+        return '${fieldName?.firstToUpper()} is required';
       }
     }
 
@@ -406,3 +408,18 @@ class FileSizeValidator extends LiteValidator {
     return null;
   }
 }
+
+
+extension _ValidatorStringExtension on String {
+  String firstToUpper() {
+    if (isEmpty) {
+      return this;
+    }
+    if (length == 1) {
+      return toUpperCase();
+    }
+    final firstPart = substring(0, 1);
+    final secondPart = substring(1, length);
+    return '${firstPart.toUpperCase()}$secondPart';
+  }
+} 

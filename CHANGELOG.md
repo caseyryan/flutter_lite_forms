@@ -1,3 +1,5 @@
+## 0.0.25
+* Fixed phone input
 ## 0.0.24
 * A lot of updates and breaking changes
 ## 0.0.23

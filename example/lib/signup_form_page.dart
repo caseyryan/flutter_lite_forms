@@ -293,7 +293,7 @@ class SignupFormPage extends StatelessWidget {
                           selectedItems,
                           String? error,
                         ) {
-                          print('ERROR: $error');
+                          // print('ERROR: $error');
                           return Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -460,7 +460,7 @@ class SignupFormPage extends StatelessWidget {
                       SizedBox(height: 20.0),
                       MaterialButton(
                         onPressed: () async {
-                          final value = await form('signupForm').field('phone').get(true);
+                          // final value = await form('signupForm').field('phone').get(true);
                           // print(value);
                           // form('signupForm.phone').phone.set(
                           //       '(999) 444 6677',

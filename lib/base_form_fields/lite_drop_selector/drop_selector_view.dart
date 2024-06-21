@@ -65,8 +65,13 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
 
   @override
   void initState() {
-    _initialSelection =
-        widget.args.items.where((e) => e.isSelected).map((e) => _TempSelection(title: e.title)).toList();
+    _initialSelection = widget.args.items
+        .where(
+          (e) => e.isSelected,
+        )
+        .map((e) => _TempSelection(title: e.title))
+        .toList();
+    _setInitialHeights();
     super.initState();
   }
 
@@ -144,7 +149,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
   }
 
   double get _totalButtonsHeight {
-    return widget.args.items.length * _singleButtonHeight;
+    return _itemHeights.fold(0, (previousValue, element) => previousValue + element);
   }
 
   bool get _hasSearchField {
@@ -276,10 +281,17 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     }
   }
 
+  List<double> _itemHeights = <double>[];
+
   void _onSearch(String? value) {
     setState(() {
       _searchValue = value;
+      _setInitialHeights();
     });
+  }
+
+  void _setInitialHeights() {
+    _itemHeights = List.filled(_filteredItems.length, _singleButtonHeight);
   }
 
   bool get _requiresList {
@@ -359,10 +371,15 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
                             final item = items[index];
-                            return _buildButton(
-                              index,
-                              item,
-                              items,
+                            return SizeDetector(
+                              onSizeDetected: (Size value) {
+                                _itemHeights[index] = value.height;
+                              },
+                              child: _buildButton(
+                                index,
+                                item,
+                                items,
+                              ),
                             );
                           },
                           childCount: items.length,
@@ -377,10 +394,15 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                       mainAxisSize: MainAxisSize.min,
                       children: items.mapIndexed(
                         (int index, item) {
-                          return _buildButton(
-                            index,
-                            item,
-                            items,
+                          return SizeDetector(
+                            onSizeDetected: (Size value) {
+                              _itemHeights[index] = value.height;
+                            },
+                            child: _buildButton(
+                              index,
+                              item,
+                              items,
+                            ),
                           );
                         },
                       ).toList(),
@@ -459,7 +481,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
   }
 
   double get _initialChildSize {
-    return ((_totalButtonsHeight + _totalVerticalPadding + _bottomInset) / _viewportHeight).clamp(0.0, 1.0);
+    return ((_totalButtonsHeight + _bottomInset) / _viewportHeight).clamp(0.0, 1.0);
   }
 
   double get _totalVerticalPadding {
