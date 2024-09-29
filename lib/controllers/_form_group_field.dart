@@ -255,7 +255,10 @@ class FormGroupField<T> {
       case AutovalidateMode.always:
       case AutovalidateMode.onUserInteraction:
         return true;
+      case AutovalidateMode.onUnfocus:
+        break;
     }
+    return false;
   }
 
   Future _checkError() async {
