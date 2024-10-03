@@ -36,25 +36,38 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
 
   /// for cancellation case
   List<_TempSelection> _initialSelection = [];
+  bool _sizeCalculated = false;
 
   @override
   void didFirstLayoutFinished(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    _initialScreenHeight = size.height;
-    setState(() {
-      if (_settings.dropSelectorType == DropSelectorType.bottomsheet) {
-        _menuWidth = size.width;
-      } else {
-        _menuWidth = _sizeKey.currentContext!.size!.width.clamp(0.0, size.width);
-      }
-      if (!_isSimple || _hasSearchField) {
-        _menuWidth = max(
-          _menuWidth,
-          _maxMenuWidth - _totalHorizontalPadding,
-        );
-      }
-      for (var d in widget.args.items) {
-        d._menuWidth = _menuWidth;
+    _tryCalculateSizes();
+  }
+
+  void _tryCalculateSizes() {
+    if (_sizeCalculated) {
+      return;
+    }
+    onPostframe(() {
+      if (mounted && _sizeKey.currentContext != null) {
+        final size = MediaQuery.of(context).size;
+        _initialScreenHeight = size.height;
+        setState(() {
+          _sizeCalculated = true;
+          if (_settings.dropSelectorType == DropSelectorType.bottomsheet) {
+            _menuWidth = size.width;
+          } else {
+            _menuWidth = _sizeKey.currentContext!.size!.width.clamp(0.0, size.width);
+          }
+          if (!_isSimple || _hasSearchField) {
+            _menuWidth = max(
+              _menuWidth,
+              _maxMenuWidth - _totalHorizontalPadding,
+            );
+          }
+          for (var d in widget.args.items) {
+            d._menuWidth = _menuWidth;
+          }
+        });
       }
     });
   }
@@ -624,7 +637,6 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       bottom = max(0.0, bottom);
       availableHeight = min(
         availableHeight,
-        // _viewportHeight - _topInset,
         _viewportHeight,
       );
     } else if (top != null) {
@@ -658,7 +670,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
           initialOffset * (1.0 - widget.animation.value),
         ),
         child: Opacity(
-          opacity: widget.animation.value,
+          opacity: widget.animation.value * (_sizeKey.currentContext != null ? 1.0 : 0.0),
           child: ConstrainedBox(
             key: _sizeKey,
             constraints: BoxConstraints(
@@ -720,6 +732,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     return AnimatedBuilder(
       animation: widget.animation,
       builder: (c, w) {
+        _tryCalculateSizes();
         return Scaffold(
           extendBodyBehindAppBar: true,
           resizeToAvoidBottomInset: true,

@@ -208,7 +208,16 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
         value: list,
         view: _getLabelView(list as dynamic),
       );
-      widget.onChanged?.call(list);
+      if (_settings.dropSelectorActionType == DropSelectorActionType.singleSelect ||
+          _settings.dropSelectorActionType == DropSelectorActionType.simpleWithNoSelection) {
+        if (list.isNotEmpty) {
+          if (list.first is LiteDropSelectorItem) {
+            widget.onChanged?.call(list.first);
+          }
+        }
+      } else {
+        widget.onChanged?.call(list);
+      }
       textEditingController?.text = _getLabelView(list as dynamic) ?? '';
       liteFormRebuildController.rebuild();
     }
@@ -338,9 +347,8 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       } else if (preparedInitialValue is List) {
         preparedInitialValue = preparedInitialValue
             .map((e) {
-              final byPayload = widget.items.firstWhereOrNull(
-                (i) => i is LiteDropSelectorItem && i.payload == e.payload
-              );
+              final byPayload =
+                  widget.items.firstWhereOrNull((i) => i is LiteDropSelectorItem && i.payload == e.payload);
               if (byPayload != null) {
                 return byPayload;
               }
@@ -451,12 +459,15 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
           child: GestureDetector(
             onTap: _onTap,
             onLongPress: _onTap,
-            child: SizedBox(
+            child: Container(
+              color: Colors.transparent,
               key: _globalKey,
-              child: widget.selectorViewBuilder!(
-                context,
-                _selectedOptions,
-                errorText,
+              child: IgnorePointer(
+                child: widget.selectorViewBuilder!(
+                  context,
+                  _selectedOptions,
+                  errorText,
+                ),
               ),
             ),
           ),
