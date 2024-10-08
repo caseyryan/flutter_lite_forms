@@ -254,7 +254,7 @@ class SignupFormPage extends StatelessWidget {
                         readOnly: false,
                         name: 'classes',
                         autovalidateMode: AutovalidateMode.onUserInteraction,
-                        menuItemBuilder: (index, item, isLast) {
+                        menuItemBuilder: (index, item, bool isLast, double menuWidth) {
                           return SizedBox(
                             width: double.infinity,
                             height: 60.0,

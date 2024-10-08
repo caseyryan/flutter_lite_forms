@@ -1,9 +1,10 @@
 part of 'lite_drop_selector.dart';
 
-typedef MenuItemBuilder = Widget Function(
+typedef MenuItemBuilder = Widget? Function(
   int index,
   LiteDropSelectorItem item,
   bool isLast,
+  double menuWidth,
 );
 
 Future showDropSelector({

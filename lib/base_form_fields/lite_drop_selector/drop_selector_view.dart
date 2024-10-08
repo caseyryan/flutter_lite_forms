@@ -317,37 +317,43 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     List items,
   ) {
     final isLast = index == items.length - 1;
-    Widget button;
-    if (widget.args.menuItemBuilder != null) {
-      button = ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: _isBottomSheet ? MediaQuery.of(context).size.width : _maxMenuWidth,
-          maxHeight: _viewportHeight,
-        ),
-        child: widget.args.menuItemBuilder!(
-          index,
-          item,
-          isLast,
-        ),
+    Widget? button;
+
+    /// in case the builder returns null it will use a general view for an item
+    if (widget.args.menuItemBuilder != null && !item.isSeparator) {
+      final menuWidth = _isBottomSheet ? MediaQuery.of(context).size.width : _maxMenuWidth;
+      final builtItem = widget.args.menuItemBuilder!(
+        index,
+        item,
+        isLast,
+        menuWidth,
       );
-    } else {
-      button = Padding(
-        padding: EdgeInsets.only(
-          bottom: isLast ? 0.0 : _settings.sheetPadding.bottom,
-        ),
-        child: LiteDropSelectorButton(
-          data: item,
-          showSelection: !_isSimpleWithNoSelection,
-          sheetSettings: _settings,
-          decoration: widget.args.decoration,
-          style: widget.args.style,
-          paddingLeft: _settings.sheetPadding.left,
-          paddingRight: _settings.sheetPadding.right,
-          key: ValueKey(item),
-          buttonHeight: _singleButtonHeight,
-        ),
-      );
+      if (builtItem != null) {
+        button = ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: menuWidth,
+            maxHeight: _viewportHeight,
+          ),
+          child: builtItem,
+        );
+      }
     }
+    button ??= Padding(
+      padding: EdgeInsets.only(
+        bottom: isLast ? 0.0 : _settings.sheetPadding.bottom,
+      ),
+      child: LiteDropSelectorButton(
+        data: item,
+        showSelection: !_isSimpleWithNoSelection,
+        sheetSettings: _settings,
+        decoration: widget.args.decoration,
+        style: widget.args.style,
+        paddingLeft: _settings.sheetPadding.left,
+        paddingRight: _settings.sheetPadding.right,
+        key: ValueKey(item),
+        buttonHeight: _singleButtonHeight,
+      ),
+    );
 
     return GestureDetector(
       onTap: () {

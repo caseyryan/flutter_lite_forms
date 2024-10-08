@@ -9,6 +9,7 @@ typedef DropSelectorItemIconBuilder = Widget Function(
 class LiteDropSelectorItem<T> with SearchQueryMixin {
   LiteDropSelectorItem({
     required this.title,
+     this.subtitle,
     required this.payload,
     this.onPressed,
     this.iconBuilder,
@@ -35,6 +36,7 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
   final Color? selectedBorderColor;
   final double? selectedBorderWidth;
   final String title;
+  final String? subtitle;
   final T payload;
 
   /// [isDestructive]
