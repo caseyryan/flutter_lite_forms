@@ -246,7 +246,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
   }
 
   String? get _labelText {
-    return widget.label ?? widget.hintText;
+    return widget.label;
   }
 
   @override
