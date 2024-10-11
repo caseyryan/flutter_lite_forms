@@ -132,8 +132,8 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
 
     if (value.type != null) {
       if (_isSimple) {
-        Navigator.of(context).pop([value]);
-        value.onPressed?.call([value]);
+        Navigator.of(context).pop(value);
+        value.onPressed?.call(value);
       }
     } else {
       if (_isMultiselect) {
@@ -166,11 +166,11 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
   }
 
   bool get _hasSearchField {
-    if (_settings.menuSearchConfiguration.searchFieldVisibility == SearchFieldVisibility.adaptive) {
+    if (_settings.searchSettings.searchFieldVisibility == SearchFieldVisibility.adaptive) {
       if (widget.args.items.length <= 8) {
         return false;
       }
-    } else if (_settings.menuSearchConfiguration.searchFieldVisibility == SearchFieldVisibility.none) {
+    } else if (_settings.searchSettings.searchFieldVisibility == SearchFieldVisibility.none) {
       return false;
     }
     return true;
@@ -253,7 +253,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
         });
       });
     }
-    if (_settings.menuSearchConfiguration.searchFieldVisibility == SearchFieldVisibility.none) {
+    if (_settings.searchSettings.searchFieldVisibility == SearchFieldVisibility.none) {
       return;
     }
     if (_isTopDirected) {
@@ -262,15 +262,15 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
           width: _menuWidth,
           key: _searchFieldSizeKey,
           child: LiteSearchField(
-            decoration: _settings.menuSearchConfiguration.searchFieldDecoration,
-            settings: _settings.menuSearchConfiguration.innerFieldSettings,
+            decoration: _settings.searchSettings.searchFieldDecoration,
+            settings: _settings.searchSettings.innerFieldSettings,
             onSearch: _onSearch,
-            autofocus: _settings.menuSearchConfiguration.autofocusSearchField,
+            autofocus: _settings.searchSettings.autofocusSearchField,
             style: widget.args.style,
-            paddingTop: _settings.menuSearchConfiguration.padding?.top ?? _settings.sheetPadding.top,
-            paddingBottom: _settings.menuSearchConfiguration.padding?.bottom ?? 0.0,
-            paddingLeft: _settings.menuSearchConfiguration.padding?.left ?? _settings.sheetPadding.left,
-            paddingRight: _settings.menuSearchConfiguration.padding?.right ?? _settings.sheetPadding.right,
+            paddingTop: _settings.searchSettings.padding?.top ?? _settings.sheetPadding.top,
+            paddingBottom: _settings.searchSettings.padding?.bottom ?? 0.0,
+            paddingLeft: _settings.searchSettings.padding?.left ?? _settings.sheetPadding.left,
+            paddingRight: _settings.searchSettings.padding?.right ?? _settings.sheetPadding.right,
           ),
         ),
       );
@@ -282,12 +282,12 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
           key: _searchFieldSizeKey,
           child: LiteSearchField(
             style: widget.args.style,
-            autofocus: _settings.menuSearchConfiguration.autofocusSearchField,
+            autofocus: _settings.searchSettings.autofocusSearchField,
             onSearch: _onSearch,
-            paddingTop: _settings.menuSearchConfiguration.padding?.top ?? 0.0,
-            paddingBottom: _settings.menuSearchConfiguration.padding?.bottom ?? _settings.sheetPadding.bottom,
-            paddingLeft: _settings.menuSearchConfiguration.padding?.left ?? _settings.sheetPadding.left,
-            paddingRight: _settings.menuSearchConfiguration.padding?.right ?? _settings.sheetPadding.right,
+            paddingTop: _settings.searchSettings.padding?.top ?? 0.0,
+            paddingBottom: _settings.searchSettings.padding?.bottom ?? _settings.sheetPadding.bottom,
+            paddingLeft: _settings.searchSettings.padding?.left ?? _settings.sheetPadding.left,
+            paddingRight: _settings.searchSettings.padding?.right ?? _settings.sheetPadding.right,
           ),
         ),
       );
@@ -723,7 +723,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
 
   void _onCancel() {
     _reselectToInitial();
-    if (_isSimpleWithNoSelection) {
+    if (_isSimpleWithNoSelection || _isSimple) {
       Navigator.of(context).pop(null);
     } else {
       Navigator.of(context).pop(

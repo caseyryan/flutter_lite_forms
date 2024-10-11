@@ -209,6 +209,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
         view: _getLabelView(list as dynamic),
       );
       if (_settings.dropSelectorActionType == DropSelectorActionType.singleSelect ||
+          _settings.dropSelectorActionType == DropSelectorActionType.simple ||
           _settings.dropSelectorActionType == DropSelectorActionType.simpleWithNoSelection) {
         if (list.isNotEmpty) {
           if (list.first is LiteDropSelectorItem) {
@@ -247,7 +248,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
         bottomRightRadius: widget.settings!.bottomRightRadius,
         dropSelectorActionType: widget.settings!.dropSelectorActionType,
         maxVeilOpacity: widget.settings!.maxVeilOpacity,
-        menuSearchConfiguration: widget.settings!.menuSearchConfiguration,
+        menuSearchConfiguration: widget.settings!.searchSettings,
         sheetPadding: widget.settings!.sheetPadding,
         topRightRadius: widget.settings!.topLeftRadius,
         veilColor: widget.settings!.veilColor,

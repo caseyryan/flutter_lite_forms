@@ -56,7 +56,7 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
     _isSelected = value;
   }
 
-  ValueChanged<List<LiteDropSelectorItem>>? onPressed;
+  ValueChanged<Object?>? onPressed;
 
   /// [type] the type of each button can be set independently of
   /// the whole menu

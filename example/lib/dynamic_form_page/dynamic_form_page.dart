@@ -136,7 +136,7 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                               sheetPadding: EdgeInsets.all(12.0),
                               dropSelectorType: DropSelectorType.menu,
                               dropSelectorActionType: DropSelectorActionType.multiselect,
-                              menuSearchConfiguration: MenuSearchConfiguration(
+                              searchSettings: MenuSearchConfiguration(
                                 searchFieldVisibility: SearchFieldVisibility.always,
                               ),
                             ),

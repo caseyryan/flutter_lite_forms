@@ -82,7 +82,7 @@ class DropSelectorSettings {
     this.chipBottomLeftRadius = kDefaultChipRadius,
     this.chipBottomRightRadius = kDefaultChipRadius,
     this.buttonHeight,
-    this.menuSearchConfiguration = const MenuSearchConfiguration(),
+    this.searchSettings = const MenuSearchConfiguration(),
     this.veilColor,
     this.maxMenuWidth,
     this.maxVeilOpacity = .3,
@@ -101,7 +101,7 @@ class DropSelectorSettings {
   /// chip for multi selector
   final MultiselectChipBuilder? chipBuilder;
   final MultiSelectorStyle multiselectorStyle;
-  final MenuSearchConfiguration menuSearchConfiguration;
+  final MenuSearchConfiguration searchSettings;
   final double? chipSpacing;
   final double? topLeftRadius;
   final double? topRightRadius;
@@ -158,7 +158,7 @@ class DropSelectorSettings {
       buttonHeight: buttonHeight ?? this.buttonHeight,
       withScrollBar: withScrollBar ?? this.withScrollBar,
       sheetPadding: sheetPadding ?? this.sheetPadding,
-      menuSearchConfiguration: menuSearchConfiguration ?? this.menuSearchConfiguration,
+      searchSettings: menuSearchConfiguration ?? this.searchSettings,
       dropSelectorActionType: dropSelectorActionType ?? this.dropSelectorActionType,
       dropSelectorType: dropSelectorType ?? this.dropSelectorType,
       

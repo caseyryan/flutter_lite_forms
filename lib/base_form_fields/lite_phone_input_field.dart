@@ -459,7 +459,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField> with FormFiel
           },
           settings: widget.countrySelectorSettings ??
               DropSelectorSettings(
-                menuSearchConfiguration: const MenuSearchConfiguration(
+                searchSettings: const MenuSearchConfiguration(
                   autofocusSearchField: true,
                 ),
                 dropSelectorActionType: DropSelectorActionType.simple,

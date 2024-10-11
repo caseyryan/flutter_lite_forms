@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
+import 'package:lite_forms/utils/merge_decorations.dart';
 import 'package:lite_state/lite_state.dart';
 
 enum SearchTriggerType {
@@ -76,8 +77,7 @@ class LiteSearchField extends StatefulWidget {
   State<LiteSearchField> createState() => _LiteSearchFieldState();
 }
 
-class _LiteSearchFieldState extends State<LiteSearchField>
-    with LiteSearchMixin {
+class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin {
   String? _hintText;
   String _searchValue = '';
   TextEditingController? _myTextEditingController;
@@ -151,10 +151,15 @@ class _LiteSearchFieldState extends State<LiteSearchField>
 
   @override
   Widget build(BuildContext context) {
-    var decoration = widget.decoration ??
-        liteFormController.config?.inputDecoration ??
-        const InputDecoration();
-    if (_hintText?.isNotEmpty == true) {
+    // var decoration = widget.decoration ??
+    //     liteFormController.config?.inputDecoration ??
+    //     const InputDecoration();
+    var decoration = mergeInputDecorations([
+      const InputDecoration(),
+      liteFormController.config?.inputDecoration,
+      widget.decoration,
+    ]);
+    if (_hintText?.isNotEmpty == true && decoration.hintText?.isNotEmpty != true) {
       decoration = decoration.copyWith(
         hintText: _hintText,
       );

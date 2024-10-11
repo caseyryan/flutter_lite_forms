@@ -284,7 +284,7 @@ class SignupFormPage extends StatelessWidget {
                           //     ),
                           //   );
                           // },
-                          menuSearchConfiguration: MenuSearchConfiguration(
+                          searchSettings: MenuSearchConfiguration(
                             searchFieldVisibility: SearchFieldVisibility.always,
                           ),
                         ),
