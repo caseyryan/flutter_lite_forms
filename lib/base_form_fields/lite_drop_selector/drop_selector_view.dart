@@ -723,13 +723,13 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
 
   void _onCancel() {
     _reselectToInitial();
-    if (_isSimpleWithNoSelection || _isSimple) {
+    // if (_isSimpleWithNoSelection || _isSimple) {
       Navigator.of(context).pop(null);
-    } else {
-      Navigator.of(context).pop(
-        widget.args.items.where((i) => i.isSelected).toList(),
-      );
-    }
+    // } else {
+    //   Navigator.of(context).pop(
+    //     widget.args.items.where((i) => i.isSelected).toList(),
+    //   );
+    // }
   }
 
   @override
