@@ -17,9 +17,10 @@ class LiteCountrySelector extends StatefulWidget {
     required this.name,
     this.menuItemBuilder,
     this.selectorViewBuilder,
-    this.settings = const LiteDropSelectorSettings(),
-    this.dropSelectorType = LiteDropSelectorViewType.adaptive,
-    this.dropSelectorActionType = LiteDropSelectorActionType.simple,
+    this.settings = const DropSelectorSettings(
+      dropSelectorActionType: DropSelectorActionType.simple,
+      dropSelectorType: DropSelectorType.adaptive,
+    ),
     this.initialValueDeserializer,
     this.validators,
     this.serializer = nonConvertingValueConvertor,
@@ -75,9 +76,8 @@ class LiteCountrySelector extends StatefulWidget {
   final LiteDropSelectorViewBuilder? selectorViewBuilder;
 
   /// [settings] for a sheet where all menu items are displayed
-  final LiteDropSelectorSettings settings;
+  final DropSelectorSettings settings;
 
-  final LiteDropSelectorActionType dropSelectorActionType;
 
   /// It is assumed that the initial value is DateTime? but you might
   /// also pass something else, for example a iso8601 String, and the
@@ -87,7 +87,6 @@ class LiteCountrySelector extends StatefulWidget {
   final Object? initialValue;
   final Color? pickerBackgroundColor;
   final AutovalidateMode? autovalidateMode;
-  final LiteDropSelectorViewType dropSelectorType;
   final bool sortBySelection;
 
   /// [menuItemBuilder] if you want menu items to have a custom
@@ -142,7 +141,7 @@ class LiteCountrySelector extends StatefulWidget {
   /// like so: initialValueDeserializer: (value) => DateTime.parse(value);
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
-  final LiteFormValueSerializer? initialValueDeserializer;
+  final LiteFormValueDeserializer? initialValueDeserializer;
   final List<LiteValidator>? validators;
 
   @override
@@ -287,11 +286,9 @@ class _LiteCountrySelectorState extends State<LiteCountrySelector>
       readOnly: widget.readOnly,
       textCapitalization: widget.textCapitalization,
       initialValueDeserializer: widget.initialValueDeserializer,
-      dropSelectorActionType: widget.dropSelectorActionType,
       selectorViewBuilder: widget.selectorViewBuilder,
       menuItemBuilder: widget.menuItemBuilder,
       settings: widget.settings,
-      dropSelectorType: widget.dropSelectorType,
       paddingRight: widget.paddingRight,
       paddingLeft: widget.paddingLeft,
       paddingBottom: widget.paddingBottom,

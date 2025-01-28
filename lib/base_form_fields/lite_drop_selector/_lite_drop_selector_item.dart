@@ -9,6 +9,7 @@ typedef DropSelectorItemIconBuilder = Widget Function(
 class LiteDropSelectorItem<T> with SearchQueryMixin {
   LiteDropSelectorItem({
     required this.title,
+     this.subtitle,
     required this.payload,
     this.onPressed,
     this.iconBuilder,
@@ -35,6 +36,7 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
   final Color? selectedBorderColor;
   final double? selectedBorderWidth;
   final String title;
+  final String? subtitle;
   final T payload;
 
   /// [isDestructive]
@@ -54,11 +56,11 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
     _isSelected = value;
   }
 
-  ValueChanged<List<LiteDropSelectorItem>>? onPressed;
+  ValueChanged<Object?>? onPressed;
 
   /// [type] the type of each button can be set independently of
   /// the whole menu
-  LiteDropSelectorViewType? type;
+  DropSelectorType? type;
   ValueChanged<List<LiteDropSelectorItem>>? onMultiSelection;
 
   /// [isSeparator] means the button won't have a view.

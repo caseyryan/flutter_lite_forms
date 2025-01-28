@@ -22,7 +22,7 @@ class LiteDropSelectorMultipleSheet extends StatelessWidget {
   final double paddingBottom;
   final double paddingLeft;
   final double paddingRight;
-  final LiteDropSelectorSettings? settings;
+  final DropSelectorSettings? settings;
   final ValueChanged<LiteDropSelectorItem> onRemove;
 
   final List<LiteDropSelectorItem> items;
@@ -107,7 +107,7 @@ class LiteDropSelectorChip extends StatelessWidget {
   });
 
   final LiteDropSelectorItem item;
-  final LiteDropSelectorSettings? settings;
+  final DropSelectorSettings? settings;
   final ValueChanged<LiteDropSelectorItem> onRemove;
 
   Color _getBackgroundColor(ThemeData theme) {
@@ -115,64 +115,32 @@ class LiteDropSelectorChip extends StatelessWidget {
   }
 
   EdgeInsets get _contentPadding {
-    return formConfig?.dropSelectorSettings.chipContentPadding ??
-        const EdgeInsets.all(6.0);
+    return formConfig?.dropSelectorSettings.chipContentPadding ?? const EdgeInsets.all(6.0);
   }
 
   BorderRadius get _borderRadius {
     return BorderRadius.only(
       topLeft: Radius.circular(
-        formConfig?.dropSelectorSettings.chipTopLeftRadius ??
-            kDefaultChipRadius,
+        formConfig?.dropSelectorSettings.chipTopLeftRadius ?? kDefaultChipRadius,
       ),
       topRight: Radius.circular(
-        formConfig?.dropSelectorSettings.chipTopRightRadius ??
-            kDefaultChipRadius,
+        formConfig?.dropSelectorSettings.chipTopRightRadius ?? kDefaultChipRadius,
       ),
       bottomLeft: Radius.circular(
-        formConfig?.dropSelectorSettings.chipBottomLeftRadius ??
-            kDefaultChipRadius,
+        formConfig?.dropSelectorSettings.chipBottomLeftRadius ?? kDefaultChipRadius,
       ),
       bottomRight: Radius.circular(
-        formConfig?.dropSelectorSettings.chipBottomRightRadius ??
-            kDefaultChipRadius,
+        formConfig?.dropSelectorSettings.chipBottomRightRadius ?? kDefaultChipRadius,
       ),
     );
   }
 
-  // SmoothBorderRadius get _smoothBorderRadius {
-  //   return SmoothBorderRadius.only(
-  //     topLeft: SmoothRadius(
-  //       cornerRadius:
-  //           formConfig?.dropSelectorSettings.chipTopLeftRadius ?? kDefaultChipRadius,
-  //       cornerSmoothing: 1.0,
-  //     ),
-  //     topRight: SmoothRadius(
-  //       cornerRadius:
-  //           formConfig?.dropSelectorSettings.chipTopRightRadius ?? kDefaultChipRadius,
-  //       cornerSmoothing: 1.0,
-  //     ),
-  //     bottomLeft: SmoothRadius(
-  //       cornerRadius:
-  //           formConfig?.dropSelectorSettings.chipBottomLeftRadius ?? kDefaultChipRadius,
-  //       cornerSmoothing: 1.0,
-  //     ),
-  //     bottomRight: SmoothRadius(
-  //       cornerRadius:
-  //           formConfig?.dropSelectorSettings.chipBottomRightRadius ?? kDefaultChipRadius,
-  //       cornerSmoothing: 1.0,
-  //     ),
-  //   );
-  // }
-
-  LiteDropSelectorSettings? get _settings {
+  DropSelectorSettings? get _settings {
     return settings ?? formConfig?.dropSelectorSettings;
   }
 
   TextStyle? _getTextStyle(BuildContext context) {
-    return _settings?.chipTextStyle ??
-        formConfig?.defaultTextStyle ??
-        Theme.of(context).textTheme.titleMedium;
+    return _settings?.chipTextStyle ?? formConfig?.defaultTextStyle ?? Theme.of(context).textTheme.titleMedium;
   }
 
   @override
@@ -198,16 +166,14 @@ class LiteDropSelectorChip extends StatelessWidget {
                 width: 20.0,
                 height: 20.0,
                 decoration: BoxDecoration(
-                  color: _settings?.chipCloseButtonColor ??
-                      Theme.of(context).cardColor,
+                  color: _settings?.chipCloseButtonColor ?? Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: Center(
                   child: Icon(
                     Icons.close,
                     size: 16.0,
-                    color: _settings?.chipCloseIconButtonColor ??
-                        Theme.of(context).iconTheme.color,
+                    color: _settings?.chipCloseIconButtonColor ?? Theme.of(context).iconTheme.color,
                   ),
                 ),
                 // color: Colors.white,
@@ -218,8 +184,7 @@ class LiteDropSelectorChip extends StatelessWidget {
             ),
             Text(
               item.title,
-              style: _getTextStyle(context)
-                  ?.copyWith(color: Theme.of(context).cardColor),
+              style: _getTextStyle(context)?.copyWith(color: Theme.of(context).cardColor),
             ),
           ],
         ),

@@ -29,7 +29,7 @@ class LiteDropSelectorButton extends StatefulWidget {
   final TextStyle? style;
   final Color? destructiveItemColor;
   final InputDecoration? decoration;
-  final LiteDropSelectorSettings sheetSettings;
+  final DropSelectorSettings sheetSettings;
   final bool showSelection;
 
   @override

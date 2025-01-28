@@ -132,7 +132,7 @@ class LiteDatePicker extends StatefulWidget {
   /// like so: initialValueDeserializer: (value) => DateTime.parse(value);
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
-  final LiteFormValueSerializer? initialValueDeserializer;
+  final LiteFormValueDeserializer? initialValueDeserializer;
   final List<LiteValidator>? validators;
 
   @override
@@ -189,8 +189,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
       case DateInputType.date:
         newValue = await _showDatePicker(
           context: context,
-          pickerBackgroundColor:
-              widget.pickerBackgroundColor ?? theme.scaffoldBackgroundColor,
+          pickerBackgroundColor: widget.pickerBackgroundColor ?? theme.scaffoldBackgroundColor,
           initialDate: currentValue,
           minimumDate: minDate,
           maximumDate: maxDate,
@@ -199,8 +198,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
       case DateInputType.time:
         newValue = await _showTimePicker(
           context: context,
-          pickerBackgroundColor:
-              widget.pickerBackgroundColor ?? theme.scaffoldBackgroundColor,
+          pickerBackgroundColor: widget.pickerBackgroundColor ?? theme.scaffoldBackgroundColor,
           initialDate: currentValue,
           minimumDate: maxDate,
           maximumDate: minDate,
@@ -210,8 +208,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
       case DateInputType.both:
         newValue = await _showDateTimePicker(
           context: context,
-          pickerBackgroundColor:
-              widget.pickerBackgroundColor ?? theme.scaffoldBackgroundColor,
+          pickerBackgroundColor: widget.pickerBackgroundColor ?? theme.scaffoldBackgroundColor,
           initialDate: currentValue,
           minimumDate: minDate,
           maximumDate: maxDate,
@@ -227,25 +224,19 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
 
   local_intl.DateFormat get _dateFormat {
     if (widget.dateInputType == DateInputType.date) {
-      return widget.format ??
-          local_intl.DateFormat(
-              liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy');
+      return widget.format ?? local_intl.DateFormat(liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy');
     }
 
     if (widget.dateInputType == DateInputType.time) {
-      return widget.format ??
-          local_intl.DateFormat(
-              liteFormController.config?.defaultTimeFormat ?? _timeFormat);
+      return widget.format ?? local_intl.DateFormat(liteFormController.config?.defaultTimeFormat ?? _timeFormat);
     }
 
     if (widget.dateInputType == DateInputType.both) {
       if (widget.format != null) {
         return widget.format!;
       }
-      final timeFormatPattern =
-          liteFormController.config?.defaultTimeFormat ?? _timeFormat;
-      final dateFormatPattern =
-          liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy';
+      final timeFormatPattern = liteFormController.config?.defaultTimeFormat ?? _timeFormat;
+      final dateFormatPattern = liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy';
 
       return local_intl.DateFormat('$dateFormatPattern | $timeFormatPattern');
     }
@@ -353,10 +344,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                         CupertinoButton(
                           child: Text(
                             'Cancel',
-                            style: CupertinoTheme.of(context)
-                                .textTheme
-                                .textStyle
-                                .copyWith(
+                            style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
                                   color: CupertinoDynamicColor.resolve(
                                     CupertinoColors.placeholderText,
                                     context,
@@ -541,7 +529,11 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                     restorationId: widget.restorationId,
                     validator: widget.validators != null
                         ? (value) {
-                            return group.translationBuilder(field.error);
+                            final error = group.translationBuilder(field.error);
+                            if (error?.isEmpty == true) {
+                              return null;
+                            }
+                            return error;
                           }
                         : null,
                     autovalidateMode: null,
@@ -555,8 +547,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                             ),
                           ),
                     strutStyle: widget.strutStyle,
-                    style: liteFormController.config?.defaultTextStyle ??
-                        widget.style,
+                    style: liteFormController.config?.defaultTextStyle ?? widget.style,
                     textAlign: widget.textAlign,
                     textAlignVertical: widget.textAlignVertical,
                     textCapitalization: widget.textCapitalization,

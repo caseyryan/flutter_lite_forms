@@ -35,11 +35,20 @@ T? getFieldValue<T>({
   required String fieldName,
   bool applySerializer = false,
 }) {
-  return liteFormController.tryGetValueForField(
+  final value = liteFormController.tryGetValueForField(
     formName: formName,
     fieldName: fieldName,
     applySerializer: applySerializer,
-  ) as T?;
+  );
+  if (value is List) {
+    if (value is! List<LiteFile>) {
+      return null;
+    }
+  }
+  try {
+    return value as T?;
+  } catch (_) {}
+  return null;
 }
 
 /// Allows to check if a form is in the process of being validated

@@ -27,7 +27,7 @@ Widget simpleSquareToggleBuilder(
   );
 }
 
-enum LiteSwitchType {
+enum SwitchStyle {
   cupertino,
   material,
   adaptive,
@@ -61,7 +61,7 @@ class LiteSwitch extends StatefulWidget {
     this.validators,
     this.initialValue,
     this.autovalidateMode,
-    this.type = LiteSwitchType.adaptive,
+    this.type = SwitchStyle.adaptive,
     this.customLiteToggleBuilder,
     this.activeColor,
     this.activeThumbImage,
@@ -141,9 +141,9 @@ class LiteSwitch extends StatefulWidget {
 
   /// The look and feel of the switch.
   ///
-  /// [LiteSwitchType.adaptive] by default. It means it will use
+  /// [SwitchStyle.adaptive] by default. It means it will use
   /// cupertino style on iOS and Material on Android
-  final LiteSwitchType type;
+  final SwitchStyle type;
 
   /// If you don't want the toggle to look like Cupertino or Material
   /// you may provide you own toggle builder here
@@ -190,7 +190,7 @@ class LiteSwitch extends StatefulWidget {
   /// like so: initialValueDeserializer: (value) => DateTime.parse(value);
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
-  final LiteFormValueSerializer? initialValueDeserializer;
+  final LiteFormValueDeserializer? initialValueDeserializer;
   final List<LiteValidator>? validators;
 
   /// even though the type here is specified as Object?
@@ -248,9 +248,9 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
     }
 
     bool isMaterial = false;
-    if (widget.type == LiteSwitchType.material) {
+    if (widget.type == SwitchStyle.material) {
       isMaterial = true;
-    } else if (widget.type == LiteSwitchType.adaptive) {
+    } else if (widget.type == SwitchStyle.adaptive) {
       if (!ExtendedPlatform.isIOS) {
         isMaterial = true;
       }
@@ -288,7 +288,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
     return CupertinoSwitch(
       value: value,
       dragStartBehavior: widget.dragStartBehavior,
-      activeColor: widget.activeColor,
+      activeColor: widget.activeColor ?? Theme.of(context).primaryColor,
       thumbColor: value ? widget.activeColor : widget.inactiveThumbColor,
       trackColor: value ? widget.activeTrackColor : widget.inactiveTrackColor,
       onChanged: (value) {
@@ -314,9 +314,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
   }
 
   TextStyle? get _textStyle {
-    return liteFormController.config?.defaultTextStyle ??
-        widget.style ??
-        Theme.of(context).textTheme.bodyMedium;
+    return widget.style ?? liteFormController.config?.defaultTextStyle ?? Theme.of(context).textTheme.bodyMedium;
   }
 
   Widget _buildChild() {
@@ -328,8 +326,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
           onTapLink: widget.onTapLink ??
               (text, href, title) {
                 if (kDebugMode) {
-                  print(
-                      'Link tap: $href. Provide [widget.onTapLink] callback to process it');
+                  print('Link tap: $href. Provide [widget.onTapLink] callback to process it');
                 }
               },
           styleSheet: widget.markdownStyleSheet ??
@@ -346,7 +343,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
       } else {
         child = Text(
           widget.text!,
-          style: liteFormController.config?.defaultTextStyle ?? widget.style,
+          style: _textStyle,
         );
       }
     } else {

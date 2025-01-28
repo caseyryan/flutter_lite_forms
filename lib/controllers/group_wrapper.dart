@@ -159,7 +159,7 @@ class _FormGroupWrapper {
     field ??= findFirstInvalidField();
     if (field?.hasContext == true) {
       final scrollController =
-          LiteFormGroup.of(field!._context!)?.scrollController;
+          LiteForm.of(field!._context!)?.scrollController;
       if (scrollController?.hasClients == true) {
         final renderObject = field._context!.findRenderObject();
         if (renderObject is RenderBox) {

@@ -26,7 +26,7 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
       builder: (BuildContext c, DynamicFormController controller) {
         return Scaffold(
           appBar: AppBar(),
-          body: LiteFormGroup(
+          body: LiteForm(
             autoDispose: false,
             allowUnfocusOnTapOutside: false,
             name: formName,
@@ -42,8 +42,7 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                       delegate: SliverChildListDelegate(
                         [
                           LiteSwitch(
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
                             name: 'usePhone',
                             label: 'Privacy Policy',
                             reactionArea: LiteSwitchReactionArea.full,
@@ -58,7 +57,7 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                             text: 'Use phone',
                             paddingTop: 20.0,
                             initialValue: false,
-                            type: LiteSwitchType.adaptive,
+                            type: SwitchStyle.adaptive,
                           ),
                           Row(
                             children: [
@@ -83,7 +82,7 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                             readOnly: false,
                             paddingTop: 20.0,
                             maxLines: 1,
-                            textEntryType: LiteTextEntryType.normal,
+                            textEntryType: TextEntryType.normal,
                             useSmoothError: true,
                             name: 'login',
                             initialValue: 'Konstantin',
@@ -116,12 +115,10 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                               paddingTop: 20.0,
                               paddingBottom: 20.0,
                               initialValue: '+79517773344',
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
                               // phoneInputType: LitePhoneInputType.autodetectCode,
                               phoneInputType: LitePhoneInputType.manualCode,
-                              serializer:
-                                  LiteSerializers.phoneDataToFormattedString,
+                              serializer: LiteSerializers.phoneDataToFormattedString,
                               validators: [
                                 LiteValidator.phone(),
                               ],
@@ -130,20 +127,17 @@ class _DynamicFormPageState extends State<DynamicFormPage> {
                             paddingTop: 20.0,
                             readOnly: false,
                             name: 'settings',
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            dropSelectorType: LiteDropSelectorViewType.menu,
-                            dropSelectorActionType:
-                                LiteDropSelectorActionType.multiselect,
-                            settings: LiteDropSelectorSettings(
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            settings: DropSelectorSettings(
                               bottomLeftRadius: 10.0,
                               bottomRightRadius: 10.0,
                               topLeftRadius: 10.0,
                               topRightRadius: 10.0,
                               sheetPadding: EdgeInsets.all(12.0),
-                              menuSearchConfiguration: MenuSearchConfiguration(
-                                searchFieldVisibility:
-                                    SearchFieldVisibility.always,
+                              dropSelectorType: DropSelectorType.menu,
+                              dropSelectorActionType: DropSelectorActionType.multiselect,
+                              searchSettings: MenuSearchConfiguration(
+                                searchFieldVisibility: SearchFieldVisibility.always,
                               ),
                             ),
                             items: [

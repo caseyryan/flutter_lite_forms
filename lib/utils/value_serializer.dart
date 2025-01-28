@@ -4,6 +4,7 @@ import 'package:lite_forms/lite_forms.dart';
 
 /// used to write custom value serializers / deserializers
 typedef LiteFormValueSerializer = FutureOr<Object?> Function(dynamic value);
+typedef LiteFormValueDeserializer = Object? Function(dynamic value);
 
 /// The default for all fields. This means that the values is
 /// supposed to be accepted as is. If you need to convert the
@@ -31,9 +32,28 @@ class LiteSerializers {
     return toDouble(value).toInt();
   }
 
+  static Future<List<List<int>>> liteFilesToBytes(
+    Object? value,
+  ) async {
+    if (value is LiteFile) {
+      final bytes = await value.getBytesAsync as List<int>;
+      return [bytes];
+    } else if (value is List) {
+      final tempList = <List<int>>[];
+      for (var file in value) {
+        if (file is LiteFile) {
+          final wrapper = await liteFilesToBytes(file);
+          tempList.addAll(wrapper);
+        }
+      }
+      return tempList;
+    }
+    return const [];
+  }
+
   static FutureOr<Object?> filesToMapList(Object? value) async {
     if (value is LiteFile) {
-      return await value.toMap();
+      return await value.toMapAsync();
     } else if (value is List) {
       final tempList = <Map>[];
       for (var file in value) {

@@ -28,7 +28,7 @@ typedef LiteFormBuilder = Widget Function(
   ScrollController scrollController,
 );
 
-class LiteFormGroup extends InheritedWidget {
+class LiteForm extends InheritedWidget {
   ScrollController? _scrollController;
   ScrollController get scrollController {
     _scrollController ??= ScrollController();
@@ -44,7 +44,7 @@ class LiteFormGroup extends InheritedWidget {
   /// [LiteDatePicker] : a flexible and powerful date picker which
   /// can use a cupertino or a material style, or use an adaptive view.
   /// It can be used to pick date, date and time, or time only
-  LiteFormGroup({
+  LiteForm({
     Key? key,
     required this.name,
     this.autoDispose = true,
@@ -52,10 +52,12 @@ class LiteFormGroup extends InheritedWidget {
     this.allowUnfocusOnTapOutside,
     this.translationBuilder = defaultTranslationBuilder,
     ScrollController? scrollController,
+    VoidCallback? onPostFrame,
     required LiteFormBuilder builder,
   }) : super(
           child: _LiteGroupWrapper(
             name: name,
+            onPostFrame: onPostFrame,
             autoRemoveUnregisteredFields: autoRemoveUnregisteredFields,
             allowUnfocusOnTapOutside: allowUnfocusOnTapOutside,
             onDispose: () {
@@ -77,7 +79,7 @@ class LiteFormGroup extends InheritedWidget {
                 // }
                 return builder(
                   c,
-                  LiteFormGroup.of(c)!.scrollController,
+                  LiteForm.of(c)!.scrollController,
                 );
               },
             ),
@@ -118,9 +120,9 @@ class LiteFormGroup extends InheritedWidget {
   final bool? allowUnfocusOnTapOutside;
 
   @override
-  bool updateShouldNotify(LiteFormGroup oldWidget) => false;
-  static LiteFormGroup? of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<LiteFormGroup>();
+  bool updateShouldNotify(LiteForm oldWidget) => false;
+  static LiteForm? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<LiteForm>();
 }
 
 class _LiteGroupWrapper extends StatefulWidget {
@@ -130,6 +132,7 @@ class _LiteGroupWrapper extends StatefulWidget {
     required this.name,
     required this.allowUnfocusOnTapOutside,
     required this.autoRemoveUnregisteredFields,
+    this.onPostFrame,
   });
 
   final String name;
@@ -137,6 +140,9 @@ class _LiteGroupWrapper extends StatefulWidget {
   final VoidCallback onDispose;
   final bool? allowUnfocusOnTapOutside;
   final bool autoRemoveUnregisteredFields;
+  /// can be used, for example for setting some values manually or 
+  /// to select some text. Called after the form has been built
+  final VoidCallback? onPostFrame;
 
   @override
   State<_LiteGroupWrapper> createState() => __LiteGroupWrapperState();
@@ -155,6 +161,7 @@ class __LiteGroupWrapperState extends State<_LiteGroupWrapper>
   /// Called after a frame has been built
   /// to make sure all dependencies are set
   Future _tryUnregisterFields(BuildContext _) async {
+    widget.onPostFrame?.call();
     final allFields = liteFormController.getAllFieldsOfForm(
       formName: widget.name,
     );

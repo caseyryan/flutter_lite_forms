@@ -7,7 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/error_line.dart';
-import 'package:lite_forms/base_form_fields/lite_form_group.dart';
+import 'package:lite_forms/base_form_fields/lite_drop_selector/lite_drop_selector_button.dart';
+import 'package:lite_forms/base_form_fields/lite_form.dart';
 import 'package:lite_forms/base_form_fields/lite_search_field.dart';
 import 'package:lite_forms/base_form_fields/mixins/form_field_mixin.dart';
 import 'package:lite_forms/base_form_fields/mixins/post_frame_mixin.dart';
@@ -16,13 +17,14 @@ import 'package:lite_forms/constants.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/utils/exports.dart';
+import 'package:lite_forms/utils/size_detector.dart';
 import 'package:lite_forms/utils/swipe_detector.dart';
 import 'package:lite_state/lite_state.dart';
 
-import 'lite_drop_selector_button.dart';
 import 'lite_drop_selector_multi_sheet.dart';
 
 part '_lite_drop_selector_item.dart';
+part 'drop_selector_view.dart';
 part 'lite_drop_selector_enum.dart';
 part 'lite_drop_selector_route.dart';
 
@@ -45,9 +47,7 @@ class LiteDropSelector extends StatefulWidget {
     required this.items,
     this.menuItemBuilder,
     this.selectorViewBuilder,
-    this.settings = const LiteDropSelectorSettings(),
-    this.dropSelectorType = LiteDropSelectorViewType.adaptive,
-    this.dropSelectorActionType = LiteDropSelectorActionType.simple,
+    this.settings,
     this.initialValueDeserializer,
     this.validators,
     this.serializer = nonConvertingValueConvertor,
@@ -102,9 +102,7 @@ class LiteDropSelector extends StatefulWidget {
   final LiteDropSelectorViewBuilder? selectorViewBuilder;
 
   /// [settings] for a sheet where all menu items are displayed
-  final LiteDropSelectorSettings settings;
-
-  final LiteDropSelectorActionType dropSelectorActionType;
+  final DropSelectorSettings? settings;
 
   /// It is assumed that the initial value is DateTime? but you might
   /// also pass something else, for example a iso8601 String, and the
@@ -114,7 +112,6 @@ class LiteDropSelector extends StatefulWidget {
   final Object? initialValue;
   final Color? pickerBackgroundColor;
   final AutovalidateMode? autovalidateMode;
-  final LiteDropSelectorViewType dropSelectorType;
 
   /// [menuItemBuilder] if you want menu items to have a custom
   /// look and feel, just pass a builder for them
@@ -175,15 +172,14 @@ class LiteDropSelector extends StatefulWidget {
   /// like so: initialValueDeserializer: (value) => DateTime.parse(value);
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
-  final LiteFormValueSerializer? initialValueDeserializer;
+  final LiteFormValueDeserializer? initialValueDeserializer;
   final List<LiteValidator>? validators;
 
   @override
   State<LiteDropSelector> createState() => _LiteDropSelectorState();
 }
 
-class _LiteDropSelectorState extends State<LiteDropSelector>
-    with FormFieldMixin {
+class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin {
   final _globalKey = GlobalKey<State<StatefulWidget>>();
 
   bool get _useErrorDecoration {
@@ -197,10 +193,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
   }
 
   List<LiteDropSelectorItem> get _selectedOptions {
-    final value = getFieldValue<List<LiteDropSelectorItem>>(
-      formName: formName,
-      fieldName: widget.name,
-    );
+    final value = form(formName).field(widget.name).get();
     return value ?? <LiteDropSelectorItem>[];
   }
 
@@ -215,7 +208,17 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
         value: list,
         view: _getLabelView(list as dynamic),
       );
-      widget.onChanged?.call(list);
+      if (_settings.dropSelectorActionType == DropSelectorActionType.singleSelect ||
+          _settings.dropSelectorActionType == DropSelectorActionType.simple ||
+          _settings.dropSelectorActionType == DropSelectorActionType.simpleWithNoSelection) {
+        if (list.isNotEmpty) {
+          if (list.first is LiteDropSelectorItem) {
+            widget.onChanged?.call(list.first);
+          }
+        }
+      } else {
+        widget.onChanged?.call(list);
+      }
       textEditingController?.text = _getLabelView(list as dynamic) ?? '';
       liteFormRebuildController.rebuild();
     }
@@ -229,6 +232,32 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
     }
   }
 
+  DropSelectorSettings get _settings {
+    final defaultSettings = liteFormController.config?.dropSelectorSettings ??
+        const DropSelectorSettings(
+          dropSelectorActionType: null,
+          dropSelectorType: null,
+        );
+    if (widget.settings != null) {
+      return defaultSettings.copyWith(
+        bottomLeftRadius: widget.settings!.bottomLeftRadius,
+        chipContentPadding: widget.settings!.chipContentPadding,
+        topLeftRadius: widget.settings!.topLeftRadius,
+        buttonHeight: widget.settings!.buttonHeight,
+        dropSelectorType: widget.settings!.dropSelectorType,
+        bottomRightRadius: widget.settings!.bottomRightRadius,
+        dropSelectorActionType: widget.settings!.dropSelectorActionType,
+        maxVeilOpacity: widget.settings!.maxVeilOpacity,
+        menuSearchConfiguration: widget.settings!.searchSettings,
+        sheetPadding: widget.settings!.sheetPadding,
+        topRightRadius: widget.settings!.topLeftRadius,
+        veilColor: widget.settings!.veilColor,
+        withScrollBar: widget.settings!.withScrollBar,
+      );
+    }
+    return defaultSettings;
+  }
+
   Future _onTap() async {
     if (widget.readOnly) {
       return;
@@ -236,10 +265,10 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
     final renderBox = _globalKey.currentContext?.findRenderObject();
     if (renderBox is RenderBox) {
       var size = renderBox.size;
-      if (widget.settings.buttonHeight != null) {
+      if (_settings.buttonHeight != null) {
         size = Size(
           size.width,
-          widget.settings.buttonHeight!,
+          _settings.buttonHeight!,
         );
       }
       final buttonLeftTopCorner = renderBox.localToGlobal(Offset.zero);
@@ -251,10 +280,8 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
         decoration: decoration,
         tapPosition: buttonLeftTopCorner,
         context: context,
-        dropSelectorType: widget.dropSelectorType,
-        dropSelectorActionType: widget.dropSelectorActionType,
         buttonSize: size,
-        settings: widget.settings,
+        settings: _settings,
         menuItemBuilder: widget.menuItemBuilder,
       );
       /// null means cancel
@@ -294,21 +321,38 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
 
   @override
   Widget build(BuildContext context) {
+    if (_isStringItems) {
+      /// Items is the full list
+      _items = widget.items
+          .map((e) => LiteDropSelectorItem(
+                title: e as String,
+                payload: e,
+              ))
+          .toList();
+    } else {
+      _items = widget.items.cast<LiteDropSelectorItem>().toList();
+    }
     dynamic preparedInitialValue = widget.initialValue;
     if (preparedInitialValue != null) {
       if (preparedInitialValue is String) {
-        preparedInitialValue = [
-          LiteDropSelectorItem(
-            title: preparedInitialValue,
-            payload: preparedInitialValue,
-          ),
-        ];
+        final contained = _items.firstWhereOrNull(
+          (e) => e.payload == preparedInitialValue || e.title == preparedInitialValue,
+        );
+        if (contained != null) {
+          preparedInitialValue = [contained];
+        } else {
+          preparedInitialValue = [
+            LiteDropSelectorItem(
+              title: preparedInitialValue,
+              payload: preparedInitialValue,
+            ),
+          ];
+        }
       } else if (preparedInitialValue is List) {
         preparedInitialValue = preparedInitialValue
             .map((e) {
-              final byPayload = widget.items.firstWhereOrNull(
-                (i) => i is LiteDropSelectorItem && i.payload == e,
-              );
+              final byPayload =
+                  widget.items.firstWhereOrNull((i) => i is LiteDropSelectorItem && i.payload == e.payload);
               if (byPayload != null) {
                 return byPayload;
               }
@@ -332,8 +376,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
             if (preparedInitialValue is LiteDropSelectorItem) {
               return preparedInitialValue.payload == i.payload;
             } else {
-              return i is LiteDropSelectorItem &&
-                  i.payload == preparedInitialValue;
+              return i is LiteDropSelectorItem && i.payload == preparedInitialValue;
             }
           },
         );
@@ -343,17 +386,6 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
           ];
         }
       }
-    }
-    if (_isStringItems) {
-      /// Items is the full list
-      _items = widget.items
-          .map((e) => LiteDropSelectorItem(
-                title: e as String,
-                payload: e,
-              ))
-          .toList();
-    } else {
-      _items = widget.items.cast<LiteDropSelectorItem>().toList();
     }
 
     initializeFormField(
@@ -431,12 +463,15 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
           child: GestureDetector(
             onTap: _onTap,
             onLongPress: _onTap,
-            child: SizedBox(
+            child: Container(
+              color: Colors.transparent,
               key: _globalKey,
-              child: widget.selectorViewBuilder!(
-                context,
-                _selectedOptions,
-                errorText,
+              child: IgnorePointer(
+                child: widget.selectorViewBuilder!(
+                  context,
+                  _selectedOptions,
+                  errorText,
+                ),
               ),
             ),
           ),
@@ -487,8 +522,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
                                   ),
                                 ),
                           strutStyle: widget.strutStyle,
-                          style: liteFormController.config?.defaultTextStyle ??
-                              widget.style,
+                          style: liteFormController.config?.defaultTextStyle ?? widget.style,
                           textAlign: widget.textAlign,
                           textAlignVertical: widget.textAlignVertical,
                           textCapitalization: widget.textCapitalization,
@@ -498,8 +532,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
                     ),
                   ),
                   LiteState<LiteFormRebuildController>(
-                    builder:
-                        (BuildContext c, LiteFormRebuildController controller) {
+                    builder: (BuildContext c, LiteFormRebuildController controller) {
                       return LiteDropSelectorMultipleSheet(
                         items: _selectedOptions,
                         paddingTop: widget.multiselectorSpacing,

@@ -55,9 +55,19 @@ class LiteFile {
   LiteFile({
     this.xFile,
     this.platformFile,
-  });
+    this.userSetName,
+  }) {
+    _updateFileInfo().then((value) {
+      liteFormRebuildController.rebuild();
+    });
+  }
   final XFile? xFile;
   final PlatformFile? platformFile;
+
+  /// when we rebuild LiteFile from xFile, xFile
+  /// does not set name (seems like a bug in xFile)
+  /// so this is used instead
+  final String? userSetName;
 
   @override
   bool operator ==(covariant LiteFile other) {
@@ -76,7 +86,13 @@ class LiteFile {
   }
 
   String get name {
-    return xFile?.name ?? platformFile?.name ?? '';
+    final n = xFile?.name ?? platformFile?.name ?? '';
+    if (n.isEmpty) {
+      if (userSetName?.isNotEmpty == true) {
+        return userSetName!;
+      }
+    }
+    return n;
   }
 
   int get width {
@@ -116,17 +132,19 @@ class LiteFile {
     return _mimeType?.startsWith('video') == true;
   }
 
+  bool get isAudio {
+    return _mimeType?.startsWith('audio') == true;
+  }
+
   Future _updateFileInfo() async {
     if (_infos.containsKey(name) && _imageProvider != null) {
       return;
     }
-    if (platformFile != null) {
-      if (await bytes != null) {
+    if (platformFile != null || xFile != null) {
+      if (await getBytesAsync() != null) {
         bool isImage = false;
         await getMimeType(_bytes);
-        if (_mimeType!.contains('xls') ||
-            _mimeType!.contains('spreadsheet') ||
-            _mimeType!.endsWith('sheet')) {
+        if (_mimeType!.contains('xls') || _mimeType!.contains('spreadsheet') || _mimeType!.endsWith('sheet')) {
           /// xls
           _imageProvider = const AssetImage(
             'assets/icons/xlsx_icon.png',
@@ -150,6 +168,7 @@ class LiteFile {
           final image = Image.memory(_bytes!);
           isImage = true;
           await _imageToImageInfo(image);
+          _imageProvider = MemoryImage(_bytes!);
         } else {
           _imageProvider = const AssetImage(
             'assets/icons/unknown_icon.png',
@@ -225,20 +244,21 @@ class LiteFile {
   ]) async {
     _mimeType ??= lookupMimeType(
           name,
-          headerBytes: bytes ?? await this.bytes,
+          headerBytes: bytes ?? await getBytesAsync(),
         )?.toLowerCase() ??
         ''.toLowerCase();
     return _mimeType!;
   }
 
   Uint8List? _bytes;
+  Uint8List? get bytes => _bytes;
 
   FutureOr<int> get kiloBytes async {
-    final numBytes = (await bytes)?.length ?? 0;
+    final numBytes = (await getBytesAsync())?.length ?? 0;
     return numBytes ~/ 1024;
   }
 
-  Future<Uint8List?> get bytes async {
+  Future<Uint8List?> getBytesAsync() async {
     if (_bytes != null) {
       return _bytes!;
     }
@@ -254,11 +274,52 @@ class LiteFile {
     return _bytes;
   }
 
-  Future<Map> toMap() async {
+  static LiteFile fromBytesData({
+    required List<int> bytes,
+    required String name,
+    String? mimeType,
+  }) {
+    mimeType ??= lookupMimeType(
+      name,
+      headerBytes: bytes,
+    );
+    final file = LiteFile(
+      xFile: XFile.fromData(
+        Uint8List.fromList(bytes),
+        name: name,
+        mimeType: mimeType,
+      ),
+      userSetName: name,
+    );
+
+    file._updateFileInfo().then((value) {
+      liteFormRebuildController.rebuild();
+    });
+    return file;
+  }
+
+  static Future<LiteFile> fromMapAsync(Map json) async {
+    final intList = (json['bytes'] as List).cast<int>();
+    final Uint8List bytes = Uint8List.fromList(intList);
+    // XFile();
+    final file = LiteFile(
+      xFile: XFile.fromData(
+        bytes,
+        mimeType: json['mimeType'],
+        name: json['name'],
+      ),
+      userSetName: json['name'],
+    );
+
+    await file._updateFileInfo();
+    return file;
+  }
+
+  Future<Map> toMapAsync() async {
     return {
       'name': name,
       'mimeType': await getMimeType(),
-      'bytes': await bytes,
+      'bytes': await getBytesAsync(),
     };
   }
 }

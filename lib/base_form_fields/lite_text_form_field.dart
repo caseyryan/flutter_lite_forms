@@ -3,6 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lite_forms/base_form_fields/label.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/utils/value_serializer.dart';
 import 'package:lite_forms/utils/value_validator.dart';
@@ -10,7 +11,7 @@ import 'package:lite_forms/utils/value_validator.dart';
 import 'error_line.dart';
 import 'mixins/form_field_mixin.dart';
 
-enum LiteTextEntryType {
+enum TextEntryType {
   normal,
   onModalRoute,
 }
@@ -28,7 +29,7 @@ class LiteTextFormField extends StatefulWidget {
   LiteTextFormField({
     Key? key,
     required this.name,
-    this.textEntryType = LiteTextEntryType.normal,
+    this.textEntryType = TextEntryType.normal,
     this.useSmoothError = true,
     this.allowErrorTexts = true,
     this.smoothErrorPadding = const EdgeInsets.only(
@@ -94,23 +95,25 @@ class LiteTextFormField extends StatefulWidget {
     this.paddingLeft = 0.0,
     this.paddingRight = 0.0,
     this.modalRouteSettings,
+    this.onSelectionChange,
   }) : super(key: key ?? Key(name));
 
   final String name;
   final String? hintText;
   final String? label;
   final TextEditingController? controller;
+  final ValueChanged<TextSelection?>? onSelectionChange;
 
-  /// makes sense only if [textEntryType] is [LiteTextEntryType.onModalRoute]
+  /// makes sense only if [textEntryType] is [TextEntryType.onModalRoute]
   final TextEntryModalRouteSettings? modalRouteSettings;
 
   /// makes sense only of [useSmoothError] is true
   final EdgeInsets? smoothErrorPadding;
 
-  /// if you pass [LiteTextEntryType.onModalRoute]
+  /// if you pass [TextEntryType.onModalRoute]
   /// then when you tap a text field a separate full screen
   /// route will be opened to enter a text
-  final LiteTextEntryType textEntryType;
+  final TextEntryType textEntryType;
 
   /// if true, this will use a smoothly animated error
   /// that uses AnimateSize to display, unlike the standard
@@ -140,7 +143,7 @@ class LiteTextFormField extends StatefulWidget {
   /// like so: initialValueDeserializer: (value) => DateTime.parse(value);
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
-  final LiteFormValueSerializer? initialValueDeserializer;
+  final LiteFormValueDeserializer? initialValueDeserializer;
   final List<LiteValidator>? validators;
   final String? restorationId;
   final Object? initialValue;
@@ -200,10 +203,9 @@ class LiteTextFormField extends StatefulWidget {
   State<LiteTextFormField> createState() => _LiteTextFormFieldState();
 }
 
-class _LiteTextFormFieldState extends State<LiteTextFormField>
-    with FormFieldMixin {
+class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMixin {
   VoidCallback? _getTapMethod() {
-    if (widget.textEntryType == LiteTextEntryType.onModalRoute) {
+    if (widget.textEntryType == TextEntryType.onModalRoute) {
       return _openTextEntryRoute;
     }
     return null;
@@ -228,12 +230,23 @@ class _LiteTextFormFieldState extends State<LiteTextFormField>
           isInitialValue: true,
           view: null,
         );
+        widget.onChanged?.call(result);
       }
     }
   }
 
   bool get _useErrorDecoration {
     return !widget.useSmoothError && widget.allowErrorTexts;
+  }
+
+  @override
+  void onSelectionChange(TextSelection? value) {
+    widget.onSelectionChange?.call(value);
+    super.onSelectionChange(value);
+  }
+
+  String? get _labelText {
+    return widget.label;
   }
 
   @override
@@ -278,13 +291,22 @@ class _LiteTextFormFieldState extends State<LiteTextFormField>
         right: widget.paddingRight,
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
+          if (_labelText?.isNotEmpty == true)
+            Label(
+              text: _labelText!,
+            ),
           TextFormField(
             restorationId: widget.restorationId,
             scrollController: widget.scrollController,
             validator: widget.validators != null
                 ? (value) {
-                    return group.translationBuilder(field.error);
+                    final error = group.translationBuilder(field.error);
+                    if (error?.isNotEmpty != true) {
+                      return null;
+                    }
+                    return error;
                   }
                 : null,
             autocorrect: widget.autocorrect,
@@ -292,9 +314,17 @@ class _LiteTextFormFieldState extends State<LiteTextFormField>
             autofocus: widget.autofocus,
             autovalidateMode: null,
             buildCounter: widget.buildCounter,
-            contextMenuBuilder: widget.contextMenuBuilder,
+
+            /// There's some bug with this in flutter. If we just pass null here
+            /// the context menu will not appear at all.
+            contextMenuBuilder: widget.contextMenuBuilder ??
+                (BuildContext context, EditableTextState editableTextState) {
+                  return AdaptiveTextSelectionToolbar.editableText(
+                    editableTextState: editableTextState,
+                  );
+                },
             controller: textEditingController,
-            cursorColor: widget.cursorColor,
+            cursorColor: widget.cursorColor ?? Theme.of(context).textTheme.bodyMedium?.color,
             cursorHeight: widget.cursorHeight,
             cursorRadius: widget.cursorRadius,
             cursorWidth: widget.cursorWidth,
@@ -302,7 +332,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField>
                 ? decoration
                 : decoration.copyWith(
                     errorStyle: const TextStyle(
-                      fontSize: .01,
+                      fontSize: 0.0,
                       color: Colors.transparent,
                     ),
                   ),
@@ -464,8 +494,7 @@ class __TextEntryPageState extends State<_TextEntryPage> {
   @override
   Widget build(BuildContext context) {
     final TextEntryModalRouteSettings? routeSettings =
-        widget.modalRouteSettings ??
-            liteFormController.config?.defaultTextEntryModalRouteSettings;
+        widget.modalRouteSettings ?? liteFormController.config?.defaultTextEntryModalRouteSettings;
     _textEditingController = TextEditingController(
       text: widget.text,
     );
@@ -505,7 +534,6 @@ class __TextEntryPageState extends State<_TextEntryPage> {
                   padding: EdgeInsets.zero,
                   child: const Icon(
                     Icons.close,
-                    color: CupertinoColors.label,
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -535,8 +563,7 @@ class __TextEntryPageState extends State<_TextEntryPage> {
                         right: 8.0,
                       ),
                       child: TextFormField(
-                        textCapitalization: routeSettings?.textCapitalization ??
-                            TextCapitalization.sentences,
+                        textCapitalization: routeSettings?.textCapitalization ?? TextCapitalization.sentences,
                         decoration: InputDecoration.collapsed(
                           hintText: widget.hintText,
                         ),

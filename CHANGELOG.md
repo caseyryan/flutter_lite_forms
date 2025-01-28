@@ -1,3 +1,9 @@
+## 0.0.25
+* Fixed phone input
+## 0.0.24
+* A lot of updates and breaking changes
+## 0.0.23
+* Fixes and updates for control settings
 ## 0.0.22
 * `LiteSearchField` can now accept custom `TextEditingController`
 ## 0.0.21

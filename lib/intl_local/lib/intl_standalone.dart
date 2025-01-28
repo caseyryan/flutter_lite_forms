@@ -10,9 +10,10 @@
 library intl_standalone;
 
 import 'dart:io';
+
 import 'intl.dart';
 
-// TODO(alanknight): The need to do this by forcing the user to specially
+// The need to do this by forcing the user to specially
 // import a particular library is a horrible hack, only done because there
 // seems to be no graceful way to do this at all. Either mirror access on
 // dart2js or the ability to do spawnUri in the browser would be promising
@@ -24,6 +25,7 @@ Future<String> findSystemLocale() {
   try {
     Intl.systemLocale = Intl.canonicalizedLocale(Platform.localeName);
   } catch (e) {
+    // ignore: null_argument_to_non_null_type
     return Future.value();
   }
   return Future.value(Intl.systemLocale);

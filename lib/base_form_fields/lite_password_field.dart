@@ -25,6 +25,7 @@ class LitePasswordField extends StatefulWidget {
       top: 6.0,
     ),
     this.hintText,
+    this.label,
     this.controller,
     this.restorationId,
     this.initialValue,
@@ -75,6 +76,7 @@ class LitePasswordField extends StatefulWidget {
   final bool readOnly;
   final String? repeatPlaceholder;
   final String? hintText;
+  final String? label;
   final TextEditingController? controller;
   final PasswordSettings settings;
 
@@ -148,8 +150,7 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
   }
 
   bool get _isDoubleLine {
-    return widget.settings.passwordFieldCheckType ==
-        PasswordFieldCheckType.repeatPassword;
+    return widget.settings.passwordFieldCheckType == PasswordFieldCheckType.repeatPassword;
   }
 
   bool get _requiresCheckerView {
@@ -158,13 +159,10 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
 
   @override
   Widget build(BuildContext context) {
-    final group = LiteFormGroup.of(context)!;
-    final repeatName = widget.repeatPlaceholder ??
-        '${group.translationBuilder('Confirm')} ${widget.name}';
+    final group = LiteForm.of(context)!;
+    final repeatName = widget.repeatPlaceholder ?? '${group.translationBuilder('Confirm')} ${widget.name}';
     final allowErrorTexts = widget.settings.validator != null;
-    var inputDecoration = widget.decoration ??
-        liteFormController.config?.inputDecoration ??
-        const InputDecoration();
+    var inputDecoration = widget.decoration ?? liteFormController.config?.inputDecoration ?? const InputDecoration();
     if (widget.settings.hasShowPasswordButton) {
       inputDecoration = inputDecoration.copyWith(
         suffixIcon: widget.settings.showPasswordIconBuilder?.call(_isObscure) ??
@@ -190,8 +188,10 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         LiteTextFormField(
+          useSmoothError: widget.useSmoothError,
           name: widget.name,
           allowErrorTexts: allowErrorTexts,
           autocorrect: false,
@@ -213,6 +213,7 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
           expands: widget.expands,
           focusNode: widget.focusNode,
           hintText: widget.hintText,
+          label: widget.label,
           initialValue: widget.initialValue,
           inputFormatters: null,
           initialValueDeserializer: null,
@@ -265,6 +266,7 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
         ),
         if (_isDoubleLine)
           LiteTextFormField(
+            useSmoothError: widget.useSmoothError,
             allowErrorTexts: allowErrorTexts,
             name: repeatName,
             validators: [
@@ -289,7 +291,7 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
             enabled: widget.enabled,
             expands: widget.expands,
             focusNode: widget.focusNode,
-            hintText: widget.hintText,
+            hintText: repeatName,
             inputFormatters: null,
             initialValueDeserializer: null,
             keyboardAppearance: widget.keyboardAppearance,
@@ -320,15 +322,21 @@ class _LitePasswordFieldState extends State<LitePasswordField> {
         if (_requiresCheckerView)
           LiteState<LiteFormRebuildController>(
             builder: (BuildContext c, LiteFormRebuildController controller) {
-              return widget.settings._buildChecker(
-                paddingTop: 0.0,
-                paddingBottom: widget.paddingBottom,
-                group: group,
-                name: widget.name,
-                repeatName: repeatName,
-                decoration: inputDecoration.copyWith(
-                  errorStyle: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
+              return Padding(
+                padding: EdgeInsets.only(
+                  left: widget.paddingLeft,
+                  right: widget.paddingRight,
+                ),
+                child: widget.settings._buildChecker(
+                  paddingTop: 0.0,
+                  paddingBottom: widget.paddingBottom,
+                  group: group,
+                  name: widget.name,
+                  repeatName: repeatName,
+                  decoration: inputDecoration.copyWith(
+                    errorStyle: TextStyle(
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
                   ),
                 ),
               );
@@ -348,7 +356,7 @@ class _PasswordValidator extends LiteValidator {
   });
   final String? firstValue;
   final String? secondValue;
-  final LiteFormGroup group;
+  final LiteForm group;
   final PasswordSettings settings;
 
   @override
@@ -361,6 +369,7 @@ class _PasswordValidator extends LiteValidator {
       value: value as String?,
       passwordsMatch: passwordsMatch,
       group: group,
+      fieldName: fieldName,
     );
   }
 }
@@ -400,8 +409,7 @@ class PasswordSettings {
     this.showPasswordIconBuilder,
     this.passwordFieldCheckType = PasswordFieldCheckType.repeatPassword,
   }) : assert(
-          (validator == null || requirements == null) &&
-              (validator != null || requirements != null),
+          (validator == null || requirements == null) && (validator != null || requirements != null),
           'You must provide either a validator or a requirements config',
         );
 
@@ -427,7 +435,7 @@ class PasswordSettings {
   Widget _buildChecker({
     required double paddingTop,
     required double paddingBottom,
-    required LiteFormGroup group,
+    required LiteForm group,
     required String name,
     required String repeatName,
     required InputDecoration decoration,
@@ -455,21 +463,13 @@ class PasswordSettings {
       passwordsMatch: passwordsMatch,
       group: group,
     );
-    if (firstFieldValue?.isNotEmpty != true &&
-        secondaryFieldValue?.isNotEmpty != true) {
+    if (firstFieldValue?.isNotEmpty != true && secondaryFieldValue?.isNotEmpty != true) {
       passwordsMatch = null;
     }
-    final digitsOk =
-        requirements!.minDigits < 1 ? null : requirements!._digitsOk;
-    final upperCaseOk = requirements!.minUpperCaseLetters < 1
-        ? null
-        : requirements!._upperCaseOk;
-    final lowerCaseOk = requirements!.minLowerCaseLetters < 1
-        ? null
-        : requirements!._lowerCaseOk;
-    final specialCharsOk = requirements!.minSpecialChars < 1
-        ? null
-        : requirements!._specialCharsOk;
+    final digitsOk = requirements!.minDigits < 1 ? null : requirements!._digitsOk;
+    final upperCaseOk = requirements!.minUpperCaseLetters < 1 ? null : requirements!._upperCaseOk;
+    final lowerCaseOk = requirements!.minLowerCaseLetters < 1 ? null : requirements!._lowerCaseOk;
+    final specialCharsOk = requirements!.minSpecialChars < 1 ? null : requirements!._specialCharsOk;
 
     return checkerBuilder?.call(
           digitsOk,
@@ -502,8 +502,9 @@ class PasswordSettings {
 
   Future<String?> _validate({
     required String? value,
+    required String? fieldName,
     required bool passwordsMatch,
-    required LiteFormGroup? group,
+    required LiteForm? group,
   }) async {
     if (validator != null) {
       if (passwordFieldCheckType == PasswordFieldCheckType.repeatPassword) {
@@ -515,7 +516,10 @@ class PasswordSettings {
           return errorText;
         }
       }
-      final result = await validator!.validate(value);
+      final result = await validator!.validate(
+        value,
+        fieldName: fieldName,
+      );
 
       return result;
     }
@@ -560,7 +564,7 @@ class PasswordRequirements {
   String? _validate({
     required String? value,
     required bool passwordsMatch,
-    required LiteFormGroup? group,
+    required LiteForm? group,
     bool rebuild = true,
   }) {
     if (value?.isNotEmpty != true) {
@@ -574,12 +578,7 @@ class PasswordRequirements {
     if (rebuild) {
       liteFormRebuildController.rebuild();
     }
-    final success = _digitsOk &
-        _lowerCaseOk &
-        _upperCaseOk &
-        _specialCharsOk &
-        _lengthOk &
-        passwordsMatch;
+    final success = _digitsOk & _lowerCaseOk & _upperCaseOk & _specialCharsOk & _lengthOk & passwordsMatch;
     if (!success) {
       return 'Invalid password';
     }
@@ -603,8 +602,7 @@ class PasswordRequirements {
     if (minLowerCaseLetters < 1) {
       return true;
     }
-    return _lowerCaseLettersRegex!.allMatches(value).length >=
-        minLowerCaseLetters;
+    return _lowerCaseLettersRegex!.allMatches(value).length >= minLowerCaseLetters;
   }
 
   bool _isUpperCaseOk(
@@ -613,8 +611,7 @@ class PasswordRequirements {
     if (minUpperCaseLetters < 1) {
       return true;
     }
-    return _upperCaseLettersRegex!.allMatches(value).length >=
-        minUpperCaseLetters;
+    return _upperCaseLettersRegex!.allMatches(value).length >= minUpperCaseLetters;
   }
 
   bool _isSpecialCharsOk(
@@ -686,7 +683,7 @@ class PasswordChecker extends StatelessWidget {
   final int minPasswordLength;
   final double paddingTop;
   final double paddingBottom;
-  final LiteFormGroup group;
+  final LiteForm group;
   final Color? errorColor;
   final Color? successColor;
   final Color? textColor;
@@ -713,21 +710,15 @@ class PasswordChecker extends StatelessWidget {
               isOk: lengthOk,
             ),
             _PasswordRequirementLine(
-              text: group.translationBuilder(
-                      'Special characters (min: $minSpecialCharacters)') ??
-                  '',
+              text: group.translationBuilder('Special characters (min: $minSpecialCharacters)') ?? '',
               isOk: specialCharsOk,
             ),
             _PasswordRequirementLine(
-              text: group.translationBuilder(
-                      'Lower case letters (min: $minLowerCaseLetters)') ??
-                  '',
+              text: group.translationBuilder('Lower case letters (min: $minLowerCaseLetters)') ?? '',
               isOk: lowerCaseOk,
             ),
             _PasswordRequirementLine(
-              text: group.translationBuilder(
-                      'Upper case letters (min: $minUpperCaseLetters)') ??
-                  '',
+              text: group.translationBuilder('Upper case letters (min: $minUpperCaseLetters)') ?? '',
               isOk: upperCaseOk,
             ),
             _PasswordRequirementLine(
@@ -760,8 +751,7 @@ class _PasswordRequirementLine extends StatefulWidget {
   final TextStyle? baseTextStyle;
 
   @override
-  State<_PasswordRequirementLine> createState() =>
-      __PasswordRequirementLineState();
+  State<_PasswordRequirementLine> createState() => __PasswordRequirementLineState();
 }
 
 class __PasswordRequirementLineState extends State<_PasswordRequirementLine> {

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:lite_forms/base_form_fields/lite_file_picker.dart';
 import 'package:lite_forms/base_form_fields/lite_phone_input_field.dart';
 import 'package:lite_forms/utils/age_difference.dart';
@@ -25,6 +26,10 @@ abstract class LiteValidator {
     return PhoneValidator();
   }
 
+  static LiteValidator name() {
+    return NameValidator();
+  }
+
   static LiteValidator dateOfBirth({
     int? minAgeYears,
     int? maxAgeYears,
@@ -47,6 +52,22 @@ abstract class LiteValidator {
     return RequiredFieldValidator(
       errorText: errorText,
     );
+  }
+
+  static LiteValidator youtube({
+    String? errorText,
+    bool allowEmpty = false,
+  }) {
+    return YoutubeUrlValidator(
+      errorText: errorText,
+      allowEmpty: allowEmpty,
+    );
+  }
+
+  static LiteValidator email({
+    String? errorText,
+  }) {
+    return EmailValidator();
   }
 
   static LiteValidator alwaysComplaining({
@@ -125,10 +146,7 @@ class DateOfBirthValidator extends LiteValidator {
   final String? errorText;
 
   bool get _isRequired {
-    return minAgeMonths != null ||
-        minAgeYears != null ||
-        maxAgeMonths != null ||
-        minAgeMonths != null;
+    return minAgeMonths != null || minAgeYears != null || maxAgeMonths != null || minAgeMonths != null;
   }
 
   @override
@@ -140,7 +158,7 @@ class DateOfBirthValidator extends LiteValidator {
       return null;
     }
     if (value == null) {
-      return errorText ?? '$fieldName is required';
+      return errorText ?? '${fieldName?.firstToUpper()} is required';
     }
     if (value is DateTime) {
       final difference = AgeDifference.fromNow(value);
@@ -197,6 +215,7 @@ class PhoneValidator extends LiteValidator {
     Object? value, {
     String? fieldName,
   }) {
+    debugPrint('VALIDATING PHONE: $value');
     if (value == null || value is! PhoneData) {
       return 'A phone is required';
     }
@@ -207,15 +226,38 @@ class PhoneValidator extends LiteValidator {
   }
 }
 
+final RegExp _emailRegex = RegExp(
+    r"^[\w!#$%&'*+\-/=?\^_`{|}~]+(\.[\w!#$%&'*+\-/=?\^_`{|}~]+)*@((([\-\w]+\.)+[a-zA-Z]{2,12})|(([0-9]{1,12}\.){12}[0-9]{1,12}))$");
+
+bool isEmailValid(String value) {
+  if (value.isEmpty) return false;
+  return _emailRegex.stringMatch(value) != null;
+}
+
+class EmailValidator extends LiteValidator {
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) {
+    if (value == null) {
+      return '${fieldName?.firstToUpper()} is required';
+    }
+    if (!isEmailValid(value.toString())) {
+      return '${fieldName?.firstToUpper()} is invalid';
+    }
+
+    return null;
+  }
+}
+
 class FileSize {
   final int megaBytes;
   final int kiloBytes;
   FileSize({
     this.megaBytes = 5,
     this.kiloBytes = 0,
-  }) : assert(megaBytes >= 0 &&
-            kiloBytes >= 0 &&
-            (kiloBytes > 0 || megaBytes > 0));
+  }) : assert(megaBytes >= 0 && kiloBytes >= 0 && (kiloBytes > 0 || megaBytes > 0));
 
   int get totalKilobytes {
     return megaBytes * 1024 + kiloBytes;
@@ -245,8 +287,91 @@ class RequiredFieldValidator extends LiteValidator {
     Object? value, {
     String? fieldName,
   }) {
-    if (value == null || (value is bool && value == false)) {
-      return errorText ?? '$fieldName is required';
+    if (value == null || (value is bool && value == false) || (value is String && value.isEmpty)) {
+      return errorText ?? '${fieldName?.firstToUpper()} is required';
+    }
+    return null;
+  }
+}
+
+class NameValidator extends LiteValidator {
+  final RegExp _nameValidatorRegExp = RegExp(r'^(?!\s)([А-Яа-яA-Za-z- ])+$');
+  final RegExp _doubleSpaceRegExp = RegExp(r'\s{2}');
+  final RegExp _dashKillerRegExp = RegExp(r'(-{2})|(-[\s]+)|(\s[-]+)');
+  final RegExp _lettersRegExp = RegExp(r'[А-Яа-яA-Za-z]+');
+
+  String _lastCharacter(String value) {
+    if (value.isEmpty) return '';
+    return value[value.length - 1];
+  }
+
+  String? _validateName(String? value) {
+    if (value?.isNotEmpty != true) {
+      return null;
+    }
+    if (!value!.startsWith(_lettersRegExp)) {
+      return 'This field must start with a letter';
+    }
+    if (!_lettersRegExp.hasMatch(_lastCharacter(value))) {
+      return 'This field must end with a letter';
+    }
+
+    if (!_nameValidatorRegExp.hasMatch(value.trim())) {
+      return 'This field must contain only letters, dashes, or spaces in the middle';
+    }
+
+    if (_doubleSpaceRegExp.hasMatch(value)) {
+      return 'Only a single space is allowed between words';
+    }
+
+    if (_dashKillerRegExp.hasMatch(value)) {
+      return 'Only a single dash is allowed between words';
+    }
+
+    return null;
+  }
+
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) {
+    if (value is String) {
+      if (value.isNotEmpty != true) {
+        return '${fieldName?.firstToUpper()} is required';
+      }
+      final error = _validateName(value.toString());
+      if (error?.isNotEmpty == true) {
+        return '${fieldName?.firstToUpper()} is required';
+      }
+    }
+
+    return null;
+  }
+}
+
+class YoutubeUrlValidator extends LiteValidator {
+  static final RegExp _youtubeRegexp = RegExp(r'^https:\/\/www\.youtube\.com\/watch\?v=[a-zA-Z0-9_]+');
+
+  YoutubeUrlValidator({
+    this.errorText,
+    this.allowEmpty = false,
+  });
+  final String? errorText;
+  final bool allowEmpty;
+
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) {
+    if (value is String && value.isNotEmpty == true) {
+      if (!_youtubeRegexp.hasMatch(value)) {
+        return errorText ?? '$fieldName must contain a valid YouTube url';
+      }
+    }
+    if (!allowEmpty) {
+      return errorText ?? '$fieldName must contain a valid YouTube url';
     }
     return null;
   }
@@ -283,3 +408,18 @@ class FileSizeValidator extends LiteValidator {
     return null;
   }
 }
+
+
+extension _ValidatorStringExtension on String {
+  String firstToUpper() {
+    if (isEmpty) {
+      return this;
+    }
+    if (length == 1) {
+      return toUpperCase();
+    }
+    final firstPart = substring(0, 1);
+    final secondPart = substring(1, length);
+    return '${firstPart.toUpperCase()}$secondPart';
+  }
+} 

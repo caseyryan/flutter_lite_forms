@@ -116,7 +116,7 @@ class LitePhoneInputField extends StatefulWidget {
     this.useSmoothError = true,
     this.allowErrorTexts = true,
     this.allowEndlessPhone = false,
-    this.countrySelectorViewType = LiteDropSelectorViewType.menu,
+    this.countrySelectorViewType = DropSelectorType.menu,
   }) : super(key: key ?? Key(name));
 
   final String name;
@@ -137,7 +137,7 @@ class LitePhoneInputField extends StatefulWidget {
   /// [countrySelectorViewType] specifies how the DropSelector sheet for
   /// the country code will look like. Makes sense only if [phoneInputType] is
   /// [LitePhoneInputType.manualCode]
-  final LiteDropSelectorViewType countrySelectorViewType;
+  final DropSelectorType countrySelectorViewType;
 
   /// [allowEndlessPhone] sometimes you might want to allow users to enter
   /// more numbers than a phone mask allows (very rare but potentially possible cases)
@@ -157,7 +157,7 @@ class LitePhoneInputField extends StatefulWidget {
   /// [leadingWidth] the width of the drop selector for a country code
   /// it makes sense only if [phoneInputType] == [LitePhoneInputType.manualCode]
   final double leadingWidth;
-  final LiteDropSelectorSettings? countrySelectorSettings;
+  final DropSelectorSettings? countrySelectorSettings;
 
   /// Pass false here if you don't want to display errors on invalid fields at all
   ///
@@ -215,7 +215,7 @@ class LitePhoneInputField extends StatefulWidget {
   /// like so: initialValueDeserializer: (value) => DateTime.parse(value);
   /// and you will get a DateTime as an initial value. You can use any custom
   /// conversions you want
-  final LiteFormValueSerializer? initialValueDeserializer;
+  final LiteFormValueDeserializer? initialValueDeserializer;
   final List<LiteValidator>? validators;
 
   @override
@@ -367,8 +367,7 @@ class PhonePreprocessor implements IPreprocessor {
   }
 }
 
-class _LitePhoneInputFieldState extends State<LitePhoneInputField>
-    with FormFieldMixin, PostFrameMixin {
+class _LitePhoneInputFieldState extends State<LitePhoneInputField> with FormFieldMixin, PostFrameMixin {
   double _dropSelectorHeight = 0.0;
   final _globalKey = GlobalKey<State<StatefulWidget>>();
 
@@ -437,13 +436,13 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
           menuItemBuilder: widget.menuItemBuilder,
           name: _dropSelectorName,
           style: _textStyle,
-          dropSelectorType: widget.countrySelectorViewType,
+
+          // dropSelectorType: widget.countrySelectorViewType,
           initialValue: _selectedCountry,
           onChanged: (value) {
             setState(() {
               _selectedCountry = (value as List).first.payload as CountryData;
-              final phoneCountryData =
-                  PhoneCodes.getPhoneCountryDataByCountryCode(
+              final phoneCountryData = PhoneCodes.getPhoneCountryDataByCountryCode(
                 _selectedCountry!.isoCode,
               );
               _selectedPhone?.countryData = _selectedCountry;
@@ -459,17 +458,17 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
             });
           },
           settings: widget.countrySelectorSettings ??
-              const LiteDropSelectorSettings(
-                menuSearchConfiguration: MenuSearchConfiguration(
+              DropSelectorSettings(
+                searchSettings: const MenuSearchConfiguration(
                   autofocusSearchField: true,
                 ),
+                dropSelectorActionType: DropSelectorActionType.simple,
+                dropSelectorType: widget.countrySelectorViewType,
                 maxMenuWidth: 330.0,
               ),
-          selectorViewBuilder: (context,
-              List<LiteDropSelectorItem> selectedItems, String? error) {
+          selectorViewBuilder: (context, List<LiteDropSelectorItem> selectedItems, String? error) {
             final countyData = selectedItems.first.payload as CountryData;
-            final padding = (decoration.contentPadding as EdgeInsets?)?.left ??
-                kDefaultPadding;
+            final padding = (decoration.contentPadding as EdgeInsets?)?.left ?? kDefaultPadding;
             return Padding(
               padding: EdgeInsets.only(
                 right: padding,
@@ -513,9 +512,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
   }
 
   TextStyle? get _textStyle {
-    return liteFormController.config?.defaultTextStyle ??
-        widget.style ??
-        Theme.of(context).textTheme.titleMedium;
+    return liteFormController.config?.defaultTextStyle ?? widget.style ?? Theme.of(context).textTheme.bodyMedium;
   }
 
   PhonePreprocessor get _preprocessor {
@@ -544,8 +541,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
         }
       }
     }
-    (field.preprocessor as PhonePreprocessor).textEditingController =
-        textEditingController;
+    (field.preprocessor as PhonePreprocessor).textEditingController = textEditingController;
 
     return field.preprocessor! as PhonePreprocessor;
   }
@@ -623,7 +619,11 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
                   restorationId: widget.restorationId,
                   validator: widget.validators != null
                       ? (value) {
-                          return group.translationBuilder(field.error);
+                          final error = group.translationBuilder(field.error);
+                          if (error?.isNotEmpty != true) {
+                            return null;
+                          }
+                          return error;
                         }
                       : null,
                   autovalidateMode: null,
@@ -652,8 +652,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField>
                       defaultCountryCode: _preprocessor._countryCode,
                       allowEndlessPhone: widget.allowEndlessPhone,
                       onCountrySelected: (value) {
-                        if (value is PhoneCountryData &&
-                            _selectedCountry == null) {}
+                        if (value is PhoneCountryData && _selectedCountry == null) {}
                       },
                     ),
                   ],
