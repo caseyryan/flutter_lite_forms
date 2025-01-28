@@ -257,8 +257,11 @@ class _LiteDropSelectorState extends State<LiteDropSelector>
         settings: widget.settings,
         menuItemBuilder: widget.menuItemBuilder,
       );
-      _updateList(list);
-      _trySortItems();
+      /// null means cancel
+      if (list != null) {
+        _updateList(list);
+        _trySortItems();
+      }
     }
   }
 
