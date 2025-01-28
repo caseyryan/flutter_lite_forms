@@ -1,14 +1,14 @@
 {
-    "dart.flutterSdkPath": "/Users/konstantin/FlutterProjects/flutter_ui_kit/.fvm/flutter_sdk",
-    "git-blame.gitWebUrl": "",
-    "cSpell.words": [
-        "ARGB",
-        "autocorrect",
-        "dparent",
-        "icondata",
-        "Kostyan",
-        "squircle",
-        "treemap",
-        "vanila"
-    ]
+  "dart.flutterSdkPath": ".fvm/versions/3.24.3",
+  "git-blame.gitWebUrl": "",
+  "cSpell.words": [
+    "ARGB",
+    "autocorrect",
+    "dparent",
+    "icondata",
+    "Kostyan",
+    "squircle",
+    "treemap",
+    "vanila"
+  ]
 }
