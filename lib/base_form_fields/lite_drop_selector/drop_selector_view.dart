@@ -184,41 +184,58 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       width: _menuWidth,
       child: Padding(
         padding: EdgeInsets.only(
-          bottom: _settings.sheetPadding.bottom,
+          bottom: _isBottomSheet ? _settings.sheetPadding.bottom : 0.0,
         ),
-        child: Row(
-          children: [
-            CupertinoButton(
-              key: const Key('drop_selector_cancel_button'),
-              onPressed: _onCancel,
-              child: Text(
-                widget.args.group.translationBuilder.call('Cancel')!,
-                style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                ),
-              ),
+        child: SizedBox(
+          height: 36.0,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 0.0,
             ),
-            const Spacer(),
-            CupertinoButton(
-              key: const Key('drop_selector_done_button'),
-              onPressed: () {
-                final selectedItems = widget.args.items
-                    .where(
-                      (e) => e.isSelected,
-                    )
-                    .toList();
-                Navigator.of(context).pop(
-                  selectedItems,
-                );
-              },
-              child: Text(
-                widget.args.group.translationBuilder.call('Done')!,
-                style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
+            child: Row(
+              children: [
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  key: const Key('drop_selector_cancel_button'),
+                  onPressed: _onCancel,
+                  child: const Icon(Icons.cancel_outlined),
+                  // child: Text(
+                  //   widget.args.group.translationBuilder.call('Cancel')!,
+                  //   style: TextStyle(
+                  //     color: Theme.of(context).textTheme.bodyMedium?.color,
+                  //   ),
+                  // ),
                 ),
-              ),
+                Expanded(
+                  child: Label(
+                    text: widget.args.title,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  key: const Key('drop_selector_done_button'),
+                  onPressed: () {
+                    final selectedItems = widget.args.items
+                        .where(
+                          (e) => e.isSelected,
+                        )
+                        .toList();
+                    Navigator.of(context).pop(
+                      selectedItems,
+                    );
+                  },
+                  child: const Icon(Icons.done_all),
+                  // child: Text(
+                  //   widget.args.group.translationBuilder.call('Done')!,
+                  //   style: TextStyle(
+                  //     color: Theme.of(context).textTheme.bodyMedium?.color,
+                  //   ),
+                  // ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -724,7 +741,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
   void _onCancel() {
     _reselectToInitial();
     // if (_isSimpleWithNoSelection || _isSimple) {
-      Navigator.of(context).pop(null);
+    Navigator.of(context).pop(null);
     // } else {
     //   Navigator.of(context).pop(
     //     widget.args.items.where((i) => i.isSelected).toList(),

@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/error_line.dart';
+import 'package:lite_forms/base_form_fields/label.dart';
 import 'package:lite_forms/base_form_fields/lite_drop_selector/lite_drop_selector_button.dart';
 import 'package:lite_forms/base_form_fields/lite_form.dart';
 import 'package:lite_forms/base_form_fields/lite_search_field.dart';
@@ -57,6 +58,7 @@ class LiteDropSelector extends StatefulWidget {
     this.pickerBackgroundColor,
     this.autovalidateMode,
     this.hintText,
+    this.title = '',
     this.label,
     this.decoration,
     this.width,
@@ -91,6 +93,8 @@ class LiteDropSelector extends StatefulWidget {
   }
 
   final String name;
+  /// [title] if a non empty string passed here it will be used as a title
+  final String title;
   final FocusNode? focusNode;
   final bool sortBySelection;
   final bool readOnly;
@@ -275,6 +279,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
 
       final list = await showDropSelector(
         buttonDatas: _items,
+        title: widget.title,
         style: widget.style,
         group: group,
         decoration: decoration,
@@ -284,6 +289,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
         settings: _settings,
         menuItemBuilder: widget.menuItemBuilder,
       );
+
       /// null means cancel
       if (list != null) {
         _updateList(list);
@@ -351,8 +357,12 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       } else if (preparedInitialValue is List) {
         preparedInitialValue = preparedInitialValue
             .map((e) {
-              final byPayload =
-                  widget.items.firstWhereOrNull((i) => i is LiteDropSelectorItem && i.payload == e.payload);
+              final byPayload = widget.items.firstWhereOrNull(
+                (i) {
+                  final otherValue = e is LiteDropSelectorItem ? e.payload : e;
+                  return i is LiteDropSelectorItem && i.payload == otherValue;
+                },
+              );
               if (byPayload != null) {
                 return byPayload;
               }

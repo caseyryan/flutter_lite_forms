@@ -16,11 +16,14 @@ Future showDropSelector({
   required DropSelectorSettings settings,
   required TextStyle? style,
   required LiteForm group,
+  /// [title] if a non empty string passed here it will be used as a title
+  String title = '',
   MenuItemBuilder? menuItemBuilder,
 }) async {
   FocusScope.of(context).unfocus();
   final args = LiteDropSelectorRouteArgs(
     items: buttonDatas,
+    title: title,
     style: style,
     group: group,
     dropSelectorSettings: settings,
@@ -182,6 +185,7 @@ class LiteDropSelectorRouteArgs {
     required this.style,
     required this.group,
     this.menuItemBuilder,
+    this.title = '',
   });
 
   final LiteForm group;
@@ -191,6 +195,8 @@ class LiteDropSelectorRouteArgs {
   final Size buttonSize;
   final DropSelectorSettings dropSelectorSettings;
   final TextStyle? style;
+  /// [title] if a non empty string passed here it will be used as a title
+  final String title;
   MenuItemBuilder? menuItemBuilder;
 }
 
