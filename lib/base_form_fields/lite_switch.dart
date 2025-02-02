@@ -311,6 +311,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
     );
     widget.onChanged?.call(value);
     liteFormRebuildController.rebuild();
+    liteFormController.rebuild();
   }
 
   TextStyle? get _textStyle {
