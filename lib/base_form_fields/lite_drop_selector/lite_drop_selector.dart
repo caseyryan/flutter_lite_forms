@@ -489,88 +489,92 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       );
     }
 
-    return Focus(
-      focusNode: node,
-      child: Container(
-        width: widget.width,
-        color: Colors.transparent,
-        child: Padding(
-          padding: EdgeInsets.only(
-            top: widget.paddingTop,
-            bottom: widget.paddingBottom,
-            left: widget.paddingLeft,
-            right: widget.paddingRight,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: _onTap,
-                    onLongPress: _onTap,
-                    child: Container(
-                      color: Colors.transparent,
-                      child: IgnorePointer(
-                        child: TextFormField(
-                          key: _globalKey,
-                          restorationId: widget.restorationId,
-                          validator: widget.validators != null
-                              ? (value) {
-                                  return group.translationBuilder(field.error);
-                                }
-                              : null,
-                          autovalidateMode: null,
-                          controller: textEditingController,
-                          decoration: _useErrorDecoration
-                              ? decoration
-                              : decoration.copyWith(
-                                  errorStyle: const TextStyle(
-                                    fontSize: .01,
-                                    color: Colors.transparent,
+    return AnimatedOpacity(
+      duration: kThemeAnimationDuration,
+      opacity: widget.readOnly ? .5 : 1.0,
+      child: Focus(
+        focusNode: node,
+        child: Container(
+          width: widget.width,
+          color: Colors.transparent,
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: widget.paddingTop,
+              bottom: widget.paddingBottom,
+              left: widget.paddingLeft,
+              right: widget.paddingRight,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: _onTap,
+                      onLongPress: _onTap,
+                      child: Container(
+                        color: Colors.transparent,
+                        child: IgnorePointer(
+                          child: TextFormField(
+                            key: _globalKey,
+                            restorationId: widget.restorationId,
+                            validator: widget.validators != null
+                                ? (value) {
+                                    return group.translationBuilder(field.error);
+                                  }
+                                : null,
+                            autovalidateMode: null,
+                            controller: textEditingController,
+                            decoration: _useErrorDecoration
+                                ? decoration
+                                : decoration.copyWith(
+                                    errorStyle: const TextStyle(
+                                      fontSize: .01,
+                                      color: Colors.transparent,
+                                    ),
                                   ),
-                                ),
-                          strutStyle: widget.strutStyle,
-                          style: liteFormController.config?.defaultTextStyle ?? widget.style,
-                          textAlign: widget.textAlign,
-                          textAlignVertical: widget.textAlignVertical,
-                          textCapitalization: widget.textCapitalization,
-                          textDirection: widget.textDirection,
+                            strutStyle: widget.strutStyle,
+                            style: liteFormController.config?.defaultTextStyle ?? widget.style,
+                            textAlign: widget.textAlign,
+                            textAlignVertical: widget.textAlignVertical,
+                            textCapitalization: widget.textCapitalization,
+                            textDirection: widget.textDirection,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  LiteState<LiteFormRebuildController>(
-                    builder: (BuildContext c, LiteFormRebuildController controller) {
-                      return LiteDropSelectorMultipleSheet(
-                        items: _selectedOptions,
-                        paddingTop: widget.multiselectorSpacing,
-                        settings: widget.settings,
-                        onRemove: (LiteDropSelectorItem item) {
-                          if (widget.readOnly) {
-                            return;
-                          }
-                          item.isSelected = false;
-                          _selectedOptions.remove(item);
-                          _updateList(_selectedOptions);
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-              if (widget.useSmoothError)
-                LiteFormErrorLine(
-                  fieldName: widget.name,
-                  formName: group.name,
-                  errorStyle: decoration.errorStyle,
-                  paddingBottom: widget.smoothErrorPadding?.bottom,
-                  paddingTop: widget.smoothErrorPadding?.top,
-                  paddingLeft: widget.smoothErrorPadding?.left,
-                  paddingRight: widget.smoothErrorPadding?.right,
+                    LiteState<LiteFormRebuildController>(
+                      builder: (BuildContext c, LiteFormRebuildController controller) {
+                        return LiteDropSelectorMultipleSheet(
+                          items: _selectedOptions,
+                          paddingTop: widget.multiselectorSpacing,
+                          settings: widget.settings,
+                          onRemove: (LiteDropSelectorItem item) {
+                            if (widget.readOnly) {
+                              return;
+                            }
+                            item.isSelected = false;
+                            _selectedOptions.remove(item);
+                            _updateList(_selectedOptions);
+                          },
+                        );
+                      },
+                    ),
+                  ],
                 ),
-            ],
+                if (widget.useSmoothError)
+                  LiteFormErrorLine(
+                    fieldName: widget.name,
+                    formName: group.name,
+                    errorStyle: decoration.errorStyle,
+                    paddingBottom: widget.smoothErrorPadding?.bottom,
+                    paddingTop: widget.smoothErrorPadding?.top,
+                    paddingLeft: widget.smoothErrorPadding?.left,
+                    paddingRight: widget.smoothErrorPadding?.right,
+                  ),
+              ],
+            ),
           ),
         ),
       ),

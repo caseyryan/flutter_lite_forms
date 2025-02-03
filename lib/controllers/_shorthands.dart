@@ -14,8 +14,11 @@ class _FormShorthand {
 
   _FormShorthand._({
     required this.formName,
-    // required this.fieldName,
   });
+
+  void dispose() {
+    clearLiteForm(formName);
+  }
 
   Future<bool> validate() async {
     return validateLiteForm(formName);

@@ -16,6 +16,7 @@ Future showDropSelector({
   required DropSelectorSettings settings,
   required TextStyle? style,
   required LiteForm group,
+
   /// [title] if a non empty string passed here it will be used as a title
   String title = '',
   MenuItemBuilder? menuItemBuilder,
@@ -90,8 +91,8 @@ class DropSelectorSettings {
     this.maxMenuWidth,
     this.maxVeilOpacity = .3,
     this.withScrollBar = true,
-    required this.dropSelectorType,
-    required this.dropSelectorActionType,
+    this.dropSelectorType,
+    this.dropSelectorActionType,
     this.sheetPadding = const EdgeInsets.all(
       8.0,
     ),
@@ -164,7 +165,6 @@ class DropSelectorSettings {
       searchSettings: menuSearchConfiguration ?? this.searchSettings,
       dropSelectorActionType: dropSelectorActionType ?? this.dropSelectorActionType,
       dropSelectorType: dropSelectorType ?? this.dropSelectorType,
-      
     );
   }
 }
@@ -195,6 +195,7 @@ class LiteDropSelectorRouteArgs {
   final Size buttonSize;
   final DropSelectorSettings dropSelectorSettings;
   final TextStyle? style;
+
   /// [title] if a non empty string passed here it will be used as a title
   final String title;
   MenuItemBuilder? menuItemBuilder;
