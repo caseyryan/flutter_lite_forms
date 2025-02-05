@@ -13,6 +13,7 @@ class LiteDropSelectorButton extends StatefulWidget {
     required this.style,
     required this.showSelection,
     required this.sheetSettings,
+    required this.onPressed,
     this.destructiveItemColor,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
@@ -31,6 +32,7 @@ class LiteDropSelectorButton extends StatefulWidget {
   final InputDecoration? decoration;
   final DropSelectorSettings sheetSettings;
   final bool showSelection;
+  final ValueChanged<LiteDropSelectorItem> onPressed;
 
   @override
   State<LiteDropSelectorButton> createState() => _LiteDropSelectorButtonState();
@@ -47,9 +49,7 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
         child: Theme(
           data: ThemeData(
             iconTheme: IconThemeData(
-              color: widget.data.isDestructive
-                  ? widget.destructiveItemColor ?? _errorColor
-                  : theme.iconTheme.color,
+              color: widget.data.isDestructive ? widget.destructiveItemColor ?? _errorColor : theme.iconTheme.color,
             ),
           ),
           child: SizedBox(
@@ -79,8 +79,7 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
 
   double get _selectedBorderWidth {
     if (widget.decoration != null) {
-      return widget.decoration?.focusedBorder?.borderSide.width ??
-          kDefaultSelectedBorderWidth;
+      return widget.decoration?.focusedBorder?.borderSide.width ?? kDefaultSelectedBorderWidth;
     }
     return kDefaultSelectedBorderWidth;
   }
@@ -90,15 +89,11 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
         ? BoxDecoration(
             border: Border.fromBorderSide(
               BorderSide(
-                color: widget.data.isSelected
-                    ? _selectedBorderColor
-                    : Colors.transparent,
+                color: widget.data.isSelected ? _selectedBorderColor : Colors.transparent,
                 width: widget.data.selectedBorderWidth ?? _selectedBorderWidth,
               ),
             ),
-            color: widget.data.isSelected
-                ? _selectedBorderColor.withOpacity(.03)
-                : Colors.transparent,
+            color: widget.data.isSelected ? _selectedBorderColor.withOpacity(.03) : Colors.transparent,
             borderRadius: _borderRadius,
           )
         : null;
@@ -113,15 +108,11 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
   }
 
   Color get _textColor {
-    return _textStyle?.color ??
-        Theme.of(context).textTheme.titleMedium?.color ??
-        Colors.black;
+    return _textStyle?.color ?? Theme.of(context).textTheme.titleMedium?.color ?? Colors.black;
   }
 
   TextStyle? get _textStyle {
-    final style = widget.style ??
-        formConfig?.defaultTextStyle ??
-        Theme.of(context).textTheme.titleMedium;
+    final style = widget.style ?? formConfig?.defaultTextStyle ?? Theme.of(context).textTheme.titleMedium;
     if (widget.data.isDestructive) {
       return style?.copyWith(
         color: widget.destructiveItemColor ?? _errorColor,
@@ -172,19 +163,45 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
   @override
   Widget build(BuildContext context) {
     if (widget.data.isSeparator) {
+      final title = widget.data.title;
       return SizedBox(
         width: widget.data.menuWidth ?? 0.0,
-        height: 20.0,
+        height: 15.0,
         child: Center(
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: widget.paddingLeft,
-              right: widget.paddingRight,
-            ),
-            child: Container(
-              height: .1,
-              color: _textColor,
-            ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: widget.paddingLeft,
+                    right: title.isNotEmpty ? widget.paddingRight : 0.0,
+                  ),
+                  child: Container(
+                    height: .1,
+                    color: _textColor,
+                  ),
+                ),
+              ),
+              Text(
+                title,
+                style: TextStyle(
+                  color: _textColor,
+                  fontSize: 11.0,
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: title.isNotEmpty ? widget.paddingLeft : 0.0,
+                    right: widget.paddingRight,
+                  ),
+                  child: Container(
+                    height: .1,
+                    color: _textColor,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       );
@@ -198,28 +215,37 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
           left: widget.paddingLeft,
           right: widget.paddingRight,
         ),
-        child: AnimatedContainer(
-          duration: kThemeAnimationDuration,
-          decoration: _buildDecoration(),
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: widget.paddingTop,
-              bottom: widget.paddingBottom,
-              left: widget.paddingLeft,
-              right: widget.paddingRight,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildIcon(),
-                Flexible(
-                  child: Text(
-                    widget.data.title,
-                    style: _textStyle,
-                  ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: _borderRadius,
+            onTap: () {
+              widget.onPressed(widget.data);
+            },
+            child: AnimatedContainer(
+              duration: kThemeAnimationDuration,
+              decoration: _buildDecoration(),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: widget.paddingTop,
+                  bottom: widget.paddingBottom,
+                  left: widget.paddingLeft,
+                  right: widget.paddingRight,
                 ),
-              ],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildIcon(),
+                    Flexible(
+                      child: Text(
+                        widget.data.title,
+                        style: _textStyle,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

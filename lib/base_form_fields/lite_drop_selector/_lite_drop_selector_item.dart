@@ -18,6 +18,7 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
     this.selectedBorderWidth,
     bool isSelected = false,
     this.isSeparator = false,
+    this.isSelectable = true,
     this.isSingleAction = false,
     this.isDestructive = false,
   }) : _isSelected = isSelected {
@@ -69,6 +70,9 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
   bool isSeparator;
   double? iconSize;
   bool isSingleAction;
+  /// [isSelectable] if false, the button will not display visual selection
+  /// this might come useful if you want to implement a regular menu
+  bool isSelectable;
 
   double? _menuWidth;
   double? get menuWidth => _menuWidth;

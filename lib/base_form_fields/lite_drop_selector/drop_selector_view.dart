@@ -361,7 +361,11 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       ),
       child: LiteDropSelectorButton(
         data: item,
-        showSelection: !_isSimpleWithNoSelection,
+        onPressed: (value) {
+          _onButtonPressed(value, _settings.dropSelectorType);
+        },
+        showSelection: !_isSimpleWithNoSelection && item.isSelectable,
+        // showSelection: !_isSimpleWithNoSelection,
         sheetSettings: _settings,
         decoration: widget.args.decoration,
         style: widget.args.style,
@@ -372,16 +376,11 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       ),
     );
 
-    return GestureDetector(
-      onTap: () {
-        _onButtonPressed(item, _settings.dropSelectorType);
-      },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          button,
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        button,
+      ],
     );
   }
 

@@ -21,7 +21,7 @@ class TextEntryModalRouteSettings {
   final TextCapitalization textCapitalization;
   TextEntryModalRouteSettings({
     this.textCapitalization = TextCapitalization.sentences,
-    this.backgroundOpacity = 0.95,
+    this.backgroundOpacity = 1.0,
   });
 }
 
@@ -203,24 +203,45 @@ class LiteTextFormField extends StatefulWidget {
   State<LiteTextFormField> createState() => _LiteTextFormFieldState();
 }
 
+Future<String?> openTextEditingDialog({
+  required BuildContext context,
+  required String text,
+  TextEntryModalRouteSettings? modalRouteSettings,
+  String? hintText,
+  TextSelection? selection,
+  int? maxLines,
+}) async {
+  final result = await Navigator.of(context).push(
+    _TextEntryRoute(
+      modalRouteSettings: modalRouteSettings,
+      hintText: hintText,
+      selection: selection,
+      text: text,
+      maxLines: maxLines,
+    ),
+  );
+  if (result is String) {
+    return result;
+  }
+  return null;
+}
+
 class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMixin {
   VoidCallback? _getTapMethod() {
     if (widget.textEntryType == TextEntryType.onModalRoute) {
-      return _openTextEntryRoute;
+      return _openFormTextEntryRoute;
     }
     return null;
   }
 
-  Future _openTextEntryRoute() async {
+  Future _openFormTextEntryRoute() async {
     if (mounted) {
-      final result = await Navigator.of(context).push(
-        _TextEntryRoute(
-          modalRouteSettings: widget.modalRouteSettings,
-          hintText: hintText,
-          selection: field.textEditingController?.selection,
-          text: field.textEditingController?.text ?? '',
-          maxLines: widget.maxLines,
-        ),
+      final result = await openTextEditingDialog(
+        context: context,
+        text: field.textEditingController?.text ?? '',
+        modalRouteSettings: widget.modalRouteSettings,
+        hintText: hintText,
+        selection: field.textEditingController?.selection,
       );
       if (result is String) {
         liteFormController.onValueChanged(
@@ -501,7 +522,7 @@ class __TextEntryPageState extends State<_TextEntryPage> {
     if (widget.selection != null) {
       _textEditingController.selection = widget.selection!;
     }
-    final brightness = Theme.of(context).brightness;
+    // final brightness = Theme.of(context).brightness;
     final moveAnimation = Tween<double>(
       begin: 10.0,
       end: 0.0,
@@ -528,8 +549,11 @@ class __TextEntryPageState extends State<_TextEntryPage> {
           child: Opacity(
             opacity: opacityAnimation.value,
             child: Scaffold(
-              appBar: CupertinoNavigationBar(
-                backgroundColor: Colors.transparent,
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                elevation: 0.0,
+                scrolledUnderElevation: 1.0,
+                backgroundColor: Theme.of(context).colorScheme.onPrimary,
                 leading: CupertinoButton(
                   padding: EdgeInsets.zero,
                   child: const Icon(
@@ -539,44 +563,45 @@ class __TextEntryPageState extends State<_TextEntryPage> {
                     Navigator.of(context).pop();
                   },
                 ),
-                trailing: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  child: const Icon(Icons.check),
-                  onPressed: () {
-                    Navigator.of(context).pop(
-                      _textEditingController.text,
-                    );
-                  },
-                ),
-                brightness: brightness,
-                padding: const EdgeInsetsDirectional.all(
-                  8.0,
-                ),
+                actions: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: const Icon(Icons.check),
+                    onPressed: () {
+                      Navigator.of(context).pop(
+                        _textEditingController.text,
+                      );
+                    },
+                  )
+                ],
+                // brightness: brightness,
+                // padding: const EdgeInsetsDirectional.all(
+                //   8.0,
+                // ),
               ),
               body: Column(
                 children: [
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 8.0,
-                        left: 8.0,
-                        right: 8.0,
+                    child: TextFormField(
+                      textCapitalization: routeSettings?.textCapitalization ?? TextCapitalization.sentences,
+                      decoration: InputDecoration.collapsed(
+                        hintText: widget.hintText,
+                      ).copyWith(
+                        contentPadding: const EdgeInsets.all(12.0),
                       ),
-                      child: TextFormField(
-                        textCapitalization: routeSettings?.textCapitalization ?? TextCapitalization.sentences,
-                        decoration: InputDecoration.collapsed(
-                          hintText: widget.hintText,
-                        ),
-                        controller: _textEditingController,
-                        onFieldSubmitted: (value) {
-                          Navigator.of(context).pop(value);
-                        },
-                        textInputAction: _textInputAction,
-                        autofocus: true,
-                        maxLines: 1000000,
-                      ),
+                      controller: _textEditingController,
+                      onFieldSubmitted: (value) {
+                        Navigator.of(context).pop(value);
+                      },
+                      clipBehavior: Clip.none,
+                      textInputAction: _textInputAction,
+                      autofocus: true,
+                      maxLines: 1000000,
                     ),
                   ),
+                  SizedBox(
+                    height: MediaQuery.of(context).viewInsets.bottom,
+                  )
                 ],
               ),
             ),

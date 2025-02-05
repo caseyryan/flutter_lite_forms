@@ -377,6 +377,36 @@ class YoutubeUrlValidator extends LiteValidator {
   }
 }
 
+class UrlValidator extends LiteValidator {
+  static final RegExp _regexp = RegExp(
+    r'^https?:\/\/(www\.)?[a-zA-Z0-9.-]*\.[a-zA-Z]{2,}$',
+    caseSensitive: false,
+  );
+
+  UrlValidator({
+    this.errorText,
+    this.allowEmpty = false,
+  });
+  final String? errorText;
+  final bool allowEmpty;
+
+  @override
+  FutureOr<String?> validate(
+    Object? value, {
+    String? fieldName,
+  }) {
+    if (value is String && value.isNotEmpty == true) {
+      if (!_regexp.hasMatch(value)) {
+        return errorText ?? '$fieldName must contain a valid YouTube url';
+      }
+    }
+    if (!allowEmpty) {
+      return errorText ?? '$fieldName must contain a valid YouTube url';
+    }
+    return null;
+  }
+}
+
 class FileSizeValidator extends LiteValidator {
   FileSizeValidator({
     required this.maxSize,
@@ -409,7 +439,6 @@ class FileSizeValidator extends LiteValidator {
   }
 }
 
-
 extension _ValidatorStringExtension on String {
   String firstToUpper() {
     if (isEmpty) {
@@ -422,4 +451,4 @@ extension _ValidatorStringExtension on String {
     final secondPart = substring(1, length);
     return '${firstPart.toUpperCase()}$secondPart';
   }
-} 
+}
