@@ -417,6 +417,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
       return null;
     }
     final timeOfDay = await showTimePicker(
+      // ignore: use_build_context_synchronously
       context: context,
       initialEntryMode: widget.initialEntryMode,
       initialTime: TimeOfDay.fromDateTime(dateTime),

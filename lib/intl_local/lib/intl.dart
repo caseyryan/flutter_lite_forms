@@ -422,9 +422,9 @@ class Intl {
     ArgumentError.checkNotNull(other, 'other');
     switch (targetGender) {
       case 'female':
-        return female == null ? other : female;
+        return female ?? other;
       case 'male':
-        return male == null ? other : male;
+        return male ?? other;
       default:
         return other;
     }

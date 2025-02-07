@@ -176,6 +176,12 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     return true;
   }
 
+  List<LiteDropSelectorItem> get selectedItems => widget.args.items
+      .where(
+        (e) => e.isSelected,
+      )
+      .toList();
+
   Widget _buildButtonRow() {
     if (_isSimple) {
       return const SizedBox.shrink();
@@ -199,12 +205,6 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                   key: const Key('drop_selector_cancel_button'),
                   onPressed: _onCancel,
                   child: const Icon(Icons.cancel_outlined),
-                  // child: Text(
-                  //   widget.args.group.translationBuilder.call('Cancel')!,
-                  //   style: TextStyle(
-                  //     color: Theme.of(context).textTheme.bodyMedium?.color,
-                  //   ),
-                  // ),
                 ),
                 Expanded(
                   child: Label(
@@ -215,12 +215,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   key: const Key('drop_selector_done_button'),
-                  onPressed: () {
-                    final selectedItems = widget.args.items
-                        .where(
-                          (e) => e.isSelected,
-                        )
-                        .toList();
+                  onPressed: selectedItems.isEmpty ? null : () {
                     Navigator.of(context).pop(
                       selectedItems,
                     );

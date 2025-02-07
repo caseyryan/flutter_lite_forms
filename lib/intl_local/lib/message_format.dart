@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-// ignore_for_file: unnecessary_type_check
+// ignore_for_file: unnecessary_type_check, no_leading_underscores_for_local_identifiers
 
 // `MessageFormat` is a "locale aware printf", with plural / gender support.
 ///

@@ -14,12 +14,17 @@ class Squarify extends Tile {
   const Squarify();
 
   factory Squarify.ratio(double ratio) {
-    return Squarify().._setRatio = ratio;
+    return const Squarify().._setRatio = ratio;
   }
 
   @override
   position(
-      TreeNode node, double left, double top, double right, double bottom) {
+    TreeNode node,
+    double left,
+    double top,
+    double right,
+    double bottom,
+  ) {
     int i0 = 0, i1 = 0;
     num? sumValue, minValue, maxValue, childValue;
     var value = node.value;
@@ -41,7 +46,6 @@ class Squarify extends Tile {
       beta = sumValue * sumValue * alpha;
       minRatio = max(maxValue / beta, beta / minValue);
 
-      // Keep adding nodes while the aspect ratio maintains or improves.
       for (; i1 < nodes.length; ++i1) {
         sumValue = sumValue! + (childValue = nodes[i1].value);
         if (childValue < minValue!) minValue = childValue;
@@ -57,12 +61,11 @@ class Squarify extends Tile {
 
       // Position and record the row orientation.
       var row = TreeNodeBase(children: nodes.sublist(i0, i1), value: sumValue);
-      if (width < height)
-        dice(row, left, top, right,
-            value > 0 ? top += height * sumValue! / value : bottom);
-      else
-        slice(row, left, top,
-            value > 0 ? left += width * sumValue! / value : right, bottom);
+      if (width < height) {
+        dice(row, left, top, right, value > 0 ? top += height * sumValue! / value : bottom);
+      } else {
+        slice(row, left, top, value > 0 ? left += width * sumValue! / value : right, bottom);
+      }
 
       value -= sumValue!;
       i0 = i1;

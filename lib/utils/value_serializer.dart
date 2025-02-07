@@ -36,7 +36,7 @@ class LiteSerializers {
     Object? value,
   ) async {
     if (value is LiteFile) {
-      final bytes = await value.getBytesAsync as List<int>;
+      final bytes = value.getBytesAsync as List<int>;
       return [bytes];
     } else if (value is List) {
       final tempList = <List<int>>[];

@@ -108,16 +108,19 @@ class _DateFormatLiteralField extends _DateFormatField {
 class _DateFormatQuotedField extends _DateFormatField {
   final String _fullPattern;
 
+  @override
   String fullPattern() => _fullPattern;
 
   _DateFormatQuotedField(String pattern, DateFormat parent)
       : _fullPattern = pattern,
         super(_patchQuotes(pattern), parent);
 
+  @override
   void parse(IntlStream input, DateBuilder dateFields) {
     parseLiteral(input);
   }
 
+  @override
   void parseLoose(IntlStream input, DateBuilder dateFields) =>
       parseLiteralLoose(input);
 
