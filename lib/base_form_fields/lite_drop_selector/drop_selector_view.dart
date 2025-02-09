@@ -204,10 +204,15 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                   padding: EdgeInsets.zero,
                   key: const Key('drop_selector_cancel_button'),
                   onPressed: _onCancel,
-                  child: const Icon(Icons.cancel_outlined),
+                  child: Icon(
+                    Icons.cancel_outlined,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
                 Expanded(
                   child: Label(
+                    paddingTop: 0.0,
+                    paddingBottom: 0.0,
                     text: widget.args.title,
                     textAlign: TextAlign.center,
                   ),
@@ -215,12 +220,17 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   key: const Key('drop_selector_done_button'),
-                  onPressed: selectedItems.isEmpty ? null : () {
-                    Navigator.of(context).pop(
-                      selectedItems,
-                    );
-                  },
-                  child: const Icon(Icons.done_all),
+                  onPressed: selectedItems.isEmpty
+                      ? null
+                      : () {
+                          Navigator.of(context).pop(
+                            selectedItems,
+                          );
+                        },
+                  child: Icon(
+                    Icons.done_all,
+                    color: selectedItems.isEmpty ? null : Theme.of(context).primaryColor,
+                  ),
                   // child: Text(
                   //   widget.args.group.translationBuilder.call('Done')!,
                   //   style: TextStyle(
