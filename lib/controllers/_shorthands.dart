@@ -7,7 +7,6 @@ _FormShorthand form(String formGroupName) {
   return _FormShorthand.fromFormName(formGroupName);
 }
 
-
 class _FormShorthand {
   final String formName;
   // final String fieldName;
@@ -194,12 +193,12 @@ class _PhoneFieldShorthand {
 
   /// Usage example
   /// form('signupForm.phone').phone.set('(999) 444 66-77', country: CountryData.find('RU'));
-  void set(
+  _PhoneFieldShorthand set(
     Object? value, {
     CountryData? country,
   }) {
     if (_formField == null) {
-      return;
+      return this;
     }
     if (country != null) {
       /// We can be sure that preprocessor here is available
@@ -229,6 +228,7 @@ class _PhoneFieldShorthand {
       view: null,
       isInitialValue: true,
     );
+    return this;
   }
 }
 
@@ -241,12 +241,17 @@ class _GeneralFieldShorthand {
     return _formField?.getValue(serialize) as T?;
   }
 
+  /// Makes sense only for the fields of String type like [LiteTextFormField]
+  String getText() {
+    return get<String>() ?? '';
+  }
+
   /// Returns the current text selection if any
   TextSelection? getSelection() {
     return _formField?.selection;
   }
 
-  void selectText([
+  _GeneralFieldShorthand selectText([
     int start = 0,
     int end = 999999999,
   ]) {
@@ -256,11 +261,53 @@ class _GeneralFieldShorthand {
         end,
       );
     });
+    return this;
   }
 
-  void set(Object? value) {
+  _GeneralFieldShorthand unfocus() {
     if (_formField == null) {
-      return;
+      return this;
+    }
+    _formField!.unfocus();
+    return this;
+  }
+
+  _GeneralFieldShorthand focus() {
+    if (_formField == null) {
+      return this;
+    }
+    _formField!.requestFocus();
+    return this;
+  }
+
+  bool get hasError {
+    return _formField?.hasError == true;
+  }
+
+  
+
+  _GeneralFieldShorthand clearText() {
+    return set('');
+  }
+
+  _GeneralFieldShorthand clearError() {
+    if (!hasError) {
+      return this;
+    }
+    _formField!._clearError();
+    return this;
+  }
+
+  String? get errorText {
+    if (!hasError) {
+      return null;
+    }
+    return _formField?.error;
+  }
+
+  _GeneralFieldShorthand set(Object? value) {
+    if (_formField == null) {
+      return this;
     }
     liteFormController.onValueChanged(
       formName: _formField!.formName,
@@ -269,5 +316,6 @@ class _GeneralFieldShorthand {
       view: null,
       isInitialValue: true,
     );
+    return this;
   }
 }

@@ -300,6 +300,11 @@ class FormGroupField<T> {
     _error = error;
   }
 
+  void _clearError() {
+    _error = null;
+    liteFormController.rebuild();
+  } 
+
   Future<Object?> getSerializedValue() async {
     return await _serializer?.call(_value) ?? _value;
   }
