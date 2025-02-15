@@ -96,6 +96,7 @@ class LiteTextFormField extends StatefulWidget {
     this.paddingRight = 0.0,
     this.modalRouteSettings,
     this.onSelectionChange,
+    this.hasClearButton = false,
   }) : super(key: key ?? Key(name));
 
   final String name;
@@ -198,6 +199,7 @@ class LiteTextFormField extends StatefulWidget {
   final double paddingBottom;
   final double paddingLeft;
   final double paddingRight;
+  final bool hasClearButton;
 
   @override
   State<LiteTextFormField> createState() => _LiteTextFormFieldState();
@@ -268,6 +270,18 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
 
   String? get _labelText {
     return widget.label;
+  }
+
+  Widget? _buildClearButton() {
+    if (widget.hasClearButton == false || form(group.name).field(widget.name).getText().isEmpty) {
+      return null;
+    }
+    return IconButton(
+      icon: const Icon(Icons.close),
+      onPressed: () {
+        form(group.name).field(widget.name).clearText();
+      },
+    );
   }
 
   @override
@@ -350,12 +364,15 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
             cursorRadius: widget.cursorRadius,
             cursorWidth: widget.cursorWidth,
             decoration: _useErrorDecoration
-                ? decoration
+                ? decoration.copyWith(
+                    suffixIcon: _buildClearButton(),
+                  )
                 : decoration.copyWith(
                     errorStyle: const TextStyle(
                       fontSize: 0.0,
                       color: Colors.transparent,
                     ),
+                    suffixIcon: _buildClearButton(),
                   ),
             enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
             enableInteractiveSelection: widget.enableInteractiveSelection,
