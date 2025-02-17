@@ -23,6 +23,15 @@ class _FormShorthand {
     return validateLiteForm(formName);
   }
 
+  Future<Map<String, dynamic>> getData({
+    bool applySerializers = true,
+  }) async {
+    return getFormData(
+      formName: formName,
+      applySerializers: applySerializers,
+    );
+  }
+
   /// Just requests a focus on a field next to
   /// the current focused one. If non is focused
   /// it will request a focus on the first field

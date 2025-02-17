@@ -368,9 +368,10 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
                     suffixIcon: _buildClearButton(),
                   )
                 : decoration.copyWith(
-                    errorStyle: const TextStyle(
+                    errorStyle: TextStyle(
                       fontSize: 0.0,
-                      color: Colors.transparent,
+                      /// without this the cursor will disappear if error displays
+                      color: widget.cursorColor ?? Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                     suffixIcon: _buildClearButton(),
                   ),
