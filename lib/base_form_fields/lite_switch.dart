@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:lite_forms/base_form_fields/error_line.dart';
+import 'package:lite_forms/base_form_fields/label.dart';
 import 'package:lite_forms/base_form_fields/mixins/form_field_mixin.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
@@ -323,7 +324,8 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
 
   Widget _buildChild() {
     Widget child = const SizedBox.shrink();
-    if (widget.text != null) {
+    String? text = widget.text ?? widget.label;
+    if (text != null) {
       if (widget.useMarkdown) {
         child = MarkdownBody(
           selectable: false,
@@ -340,13 +342,13 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
                 p: _textStyle,
               ),
           softLineBreak: true,
-          data: widget.text!,
+          data: text,
           shrinkWrap: true,
           fitContent: true,
         );
       } else {
         child = Text(
-          widget.text!,
+          text,
           style: _textStyle,
         );
       }
@@ -426,7 +428,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
         ),
         child: LiteState<LiteFormRebuildController>(
           builder: (BuildContext c, LiteFormRebuildController controller) {
-            final hasChild = widget.child != null || widget.text != null;
+            final hasChild = widget.child != null || widget.text != null || widget.label != null;
             List<Widget>? children;
 
             if (hasChild) {
@@ -456,6 +458,8 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // if (widget.label != null)
+                //   Label(text: widget.label!, paddingBottom: 0.0,),
                 Row(
                   children: children,
                 ),
