@@ -1,11 +1,11 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/konstantin/fvm/versions/3.19.6"
-export "FLUTTER_APPLICATION_PATH=/Users/konstantin/FlutterProjects/flutter_pinguo/flutter_pinguo/local_plugins/lite_forms"
+export "FLUTTER_ROOT=/Users/konstantin/fvm/versions/3.24.5"
+export "FLUTTER_APPLICATION_PATH=/Users/konstantin/FlutterProjects/telega_scrapper_flutter/lite_forms"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
-export "FLUTTER_BUILD_NAME=0.0.24"
-export "FLUTTER_BUILD_NUMBER=0.0.24"
+export "FLUTTER_BUILD_NAME=0.0.25"
+export "FLUTTER_BUILD_NUMBER=0.0.25"
 export "DART_OBFUSCATION=false"
 export "TRACK_WIDGET_CREATION=true"
 export "TREE_SHAKE_ICONS=false"

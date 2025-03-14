@@ -14,7 +14,7 @@ dependencies:
   flutter_multi_formatter: ^2.12.3
   flutter_markdown: ^0.6.1
   collection: ^1.17.0
-  figma_squircle: ^0.5.3
+  # figma_squircle: ^0.5.3
   font_awesome_flutter: ^10.4.0
   country_icons: ^2.0.2
   path: ^1.8.2

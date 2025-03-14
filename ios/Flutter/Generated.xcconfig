@@ -1,11 +1,11 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/konstantin/fvm/versions/3.24.3
-FLUTTER_APPLICATION_PATH=/Users/konstantin/FlutterProjects/lite_forms/lite_forms
+FLUTTER_ROOT=/Users/konstantin/fvm/versions/3.24.5
+FLUTTER_APPLICATION_PATH=/Users/konstantin/FlutterProjects/telega_scrapper_flutter/lite_forms
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_TARGET=lib/main.dart
 FLUTTER_BUILD_DIR=build
-FLUTTER_BUILD_NAME=0.0.22
-FLUTTER_BUILD_NUMBER=0.0.22
+FLUTTER_BUILD_NAME=0.0.25
+FLUTTER_BUILD_NUMBER=0.0.25
 EXCLUDED_ARCHS[sdk=iphonesimulator*]=i386
 EXCLUDED_ARCHS[sdk=iphoneos*]=armv7
 DART_OBFUSCATION=false

@@ -1,6 +1,6 @@
 library lite_forms;
 
-export 'package:figma_squircle/figma_squircle.dart';
+// export 'package:figma_squircle/figma_squircle.dart';
 export 'package:file_picker/file_picker.dart';
 export 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 export 'package:image_picker/image_picker.dart';

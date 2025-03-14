@@ -1,4 +1,4 @@
-import 'package:figma_squircle/figma_squircle.dart';
+// import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/lite_drop_selector/lite_drop_selector.dart';
 import 'package:lite_forms/constants.dart';
@@ -127,35 +127,63 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
         Theme.of(context).colorScheme.error;
   }
 
+  // BorderRadius? get _borderRadius {
+  //   return SmoothBorderRadius.only(
+  //     topLeft: SmoothRadius(
+  //       cornerRadius: widget.sheetSettings.topLeftRadius ??
+  //           formConfig?.dropSelectorSettings.topLeftRadius ??
+  //           _defaultRadius?.topLeft.x ??
+  //           kDefaultFormSmoothRadius,
+  //       cornerSmoothing: 1.0,
+  //     ),
+  //     topRight: SmoothRadius(
+  //       cornerRadius: widget.sheetSettings.topRightRadius ??
+  //           formConfig?.dropSelectorSettings.topRightRadius ??
+  //           _defaultRadius?.topRight.x ??
+  //           kDefaultFormSmoothRadius,
+  //       cornerSmoothing: 1.0,
+  //     ),
+  //     bottomLeft: SmoothRadius(
+  //       cornerRadius: widget.sheetSettings.bottomLeftRadius ??
+  //           formConfig?.dropSelectorSettings.bottomLeftRadius ??
+  //           _defaultRadius?.bottomLeft.x ??
+  //           kDefaultFormSmoothRadius,
+  //       cornerSmoothing: 1.0,
+  //     ),
+  //     bottomRight: SmoothRadius(
+  //       cornerRadius: widget.sheetSettings.bottomRightRadius ??
+  //           formConfig?.dropSelectorSettings.bottomRightRadius ??
+  //           _defaultRadius?.bottomRight.x ??
+  //           kDefaultFormSmoothRadius,
+  //       cornerSmoothing: 1.0,
+  //     ),
+  //   );
+  // }
   BorderRadius? get _borderRadius {
-    return SmoothBorderRadius.only(
-      topLeft: SmoothRadius(
-        cornerRadius: widget.sheetSettings.topLeftRadius ??
+    return BorderRadius.only(
+      topLeft: Radius.circular(
+        widget.sheetSettings.topLeftRadius ??
             formConfig?.dropSelectorSettings.topLeftRadius ??
             _defaultRadius?.topLeft.x ??
             kDefaultFormSmoothRadius,
-        cornerSmoothing: 1.0,
       ),
-      topRight: SmoothRadius(
-        cornerRadius: widget.sheetSettings.topRightRadius ??
+      topRight: Radius.circular(
+        widget.sheetSettings.topRightRadius ??
             formConfig?.dropSelectorSettings.topRightRadius ??
             _defaultRadius?.topRight.x ??
             kDefaultFormSmoothRadius,
-        cornerSmoothing: 1.0,
       ),
-      bottomLeft: SmoothRadius(
-        cornerRadius: widget.sheetSettings.bottomLeftRadius ??
+      bottomLeft: Radius.circular(
+        widget.sheetSettings.bottomLeftRadius ??
             formConfig?.dropSelectorSettings.bottomLeftRadius ??
             _defaultRadius?.bottomLeft.x ??
             kDefaultFormSmoothRadius,
-        cornerSmoothing: 1.0,
       ),
-      bottomRight: SmoothRadius(
-        cornerRadius: widget.sheetSettings.bottomRightRadius ??
+      bottomRight: Radius.circular(
+        widget.sheetSettings.bottomRightRadius ??
             formConfig?.dropSelectorSettings.bottomRightRadius ??
             _defaultRadius?.bottomRight.x ??
             kDefaultFormSmoothRadius,
-        cornerSmoothing: 1.0,
       ),
     );
   }

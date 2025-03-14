@@ -1,10 +1,10 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/konstantin/fvm/versions/3.19.6
-FLUTTER_APPLICATION_PATH=/Users/konstantin/FlutterProjects/flutter_pinguo/flutter_pinguo/local_plugins/lite_forms
+FLUTTER_ROOT=/Users/konstantin/fvm/versions/3.24.5
+FLUTTER_APPLICATION_PATH=/Users/konstantin/FlutterProjects/telega_scrapper_flutter/lite_forms
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
-FLUTTER_BUILD_NAME=0.0.24
-FLUTTER_BUILD_NUMBER=0.0.24
+FLUTTER_BUILD_NAME=0.0.25
+FLUTTER_BUILD_NUMBER=0.0.25
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=true
 TREE_SHAKE_ICONS=false

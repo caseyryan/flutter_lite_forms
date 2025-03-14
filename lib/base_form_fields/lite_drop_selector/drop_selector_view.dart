@@ -551,24 +551,42 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     return _screenHeight - max(_keyboardHeight, 0) - _topInset;
   }
 
+  // ShapeBorder? get _shape {
+  //   return SmoothRectangleBorder(
+  //     borderRadius: SmoothBorderRadius.only(
+  //       topLeft: SmoothRadius(
+  //         cornerRadius: _settings.topLeftRadius ?? kDefaultFormSmoothRadius,
+  //         cornerSmoothing: 1.0,
+  //       ),
+  //       topRight: SmoothRadius(
+  //         cornerRadius: _settings.topRightRadius ?? kDefaultFormSmoothRadius,
+  //         cornerSmoothing: 1.0,
+  //       ),
+  //       bottomLeft: SmoothRadius(
+  //         cornerRadius: _settings.bottomLeftRadius ?? kDefaultFormSmoothRadius,
+  //         cornerSmoothing: 1.0,
+  //       ),
+  //       bottomRight: SmoothRadius(
+  //         cornerRadius: _settings.bottomRightRadius ?? kDefaultFormSmoothRadius,
+  //         cornerSmoothing: 1.0,
+  //       ),
+  //     ),
+  //   );
+  // }
   ShapeBorder? get _shape {
-    return SmoothRectangleBorder(
-      borderRadius: SmoothBorderRadius.only(
-        topLeft: SmoothRadius(
-          cornerRadius: _settings.topLeftRadius ?? kDefaultFormSmoothRadius,
-          cornerSmoothing: 1.0,
+    return RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(
+          _settings.topLeftRadius ?? kDefaultFormSmoothRadius,
         ),
-        topRight: SmoothRadius(
-          cornerRadius: _settings.topRightRadius ?? kDefaultFormSmoothRadius,
-          cornerSmoothing: 1.0,
+        topRight: Radius.circular(
+          _settings.topRightRadius ?? kDefaultFormSmoothRadius,
         ),
-        bottomLeft: SmoothRadius(
-          cornerRadius: _settings.bottomLeftRadius ?? kDefaultFormSmoothRadius,
-          cornerSmoothing: 1.0,
+        bottomLeft: Radius.circular(
+          _settings.bottomLeftRadius ?? kDefaultFormSmoothRadius,
         ),
-        bottomRight: SmoothRadius(
-          cornerRadius: _settings.bottomRightRadius ?? kDefaultFormSmoothRadius,
-          cornerSmoothing: 1.0,
+        bottomRight: Radius.circular(
+          _settings.bottomRightRadius ?? kDefaultFormSmoothRadius,
         ),
       ),
     );
