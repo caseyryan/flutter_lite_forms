@@ -15,7 +15,17 @@ class ExtendedPlatform {
     return false;
   }
 
+  static bool get isAndroid {
+    if (kIsWeb) {
+      return false;
+    }
+    return Platform.isAndroid;
+  }
+
   static bool get isIOS {
+    if (kIsWeb) {
+      return false;
+    }
     return Platform.isIOS;
   }
 }
