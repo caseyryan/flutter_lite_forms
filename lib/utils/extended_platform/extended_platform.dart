@@ -5,6 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'os_stub.dart' if (dart.library.html) 'web_stub.dart';
 
 class ExtendedPlatform {
+
+  static bool get isWebHtmlRenderer {
+    return isHtmlRenderer;
+  }
+
   static bool get isWebIOS {
     if (kIsWeb) {
       final userAgentLower = window.navigator.userAgent.toLowerCase();

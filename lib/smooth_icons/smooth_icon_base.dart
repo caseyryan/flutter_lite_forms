@@ -1,5 +1,6 @@
-// import 'package:figma_squircle/figma_squircle.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:lite_forms/utils/extended_platform/extended_platform.dart';
 
 /// https://www.johndcook.com/blog/2018/02/13/squircle-curvature/
 class SmoothIconBase extends StatelessWidget {
@@ -49,15 +50,14 @@ class SmoothIconBase extends StatelessWidget {
                       (iconColor ?? Theme.of(context).iconTheme.color)!.withOpacity(
                         defaultBackgroundOpacity,
                       ),
-                  // shape: SmoothRectangleBorder(
-                  //   borderRadius: SmoothBorderRadius(
-                  //     cornerRadius: biggestSide / 3.75,
-                  //     cornerSmoothing: 1.0,
-                  //   ),
-                  // ),
-                  shape: RoundedRectangleBorder(
+                  shape: ExtendedPlatform.isWebHtmlRenderer ? RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
                       biggestSide / 3.75,
+                    ),
+                  ) : SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: biggestSide / 3.75,
+                      cornerSmoothing: 1.0,
                     ),
                   ),
                 ),
