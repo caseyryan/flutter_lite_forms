@@ -9,7 +9,6 @@
 
 library intl_browser;
 
-// import 'dart:html';
 import 'package:universal_html/html.dart';
 
 import 'intl.dart';
