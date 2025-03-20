@@ -18,10 +18,12 @@ enum TextEntryType {
 
 class TextEntryModalRouteSettings {
   final double backgroundOpacity;
+  final Widget? title;
   final TextCapitalization textCapitalization;
   TextEntryModalRouteSettings({
     this.textCapitalization = TextCapitalization.sentences,
     this.backgroundOpacity = 1.0,
+    this.title,
   });
 }
 
@@ -370,6 +372,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
                 : decoration.copyWith(
                     errorStyle: TextStyle(
                       fontSize: 0.0,
+
                       /// without this the cursor will disappear if error displays
                       color: widget.cursorColor ?? Theme.of(context).textTheme.bodyMedium?.color,
                     ),
@@ -570,21 +573,26 @@ class __TextEntryPageState extends State<_TextEntryPage> {
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
                 elevation: 0.0,
-                scrolledUnderElevation: 1.0,
-                backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                scrolledUnderElevation: .2,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 leading: CupertinoButton(
                   padding: EdgeInsets.zero,
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                 ),
+                title: routeSettings?.title,
                 actions: [
                   CupertinoButton(
                     padding: EdgeInsets.zero,
-                    child: const Icon(Icons.check),
+                    child: Icon(
+                      Icons.check,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
                     onPressed: () {
                       Navigator.of(context).pop(
                         _textEditingController.text,
