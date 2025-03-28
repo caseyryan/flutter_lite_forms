@@ -10,26 +10,26 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  lite_state: ^3.2.4
+  lite_state: ^4.0.0
   flutter_multi_formatter: ^2.12.3
-  flutter_markdown: ^0.6.1
+  flutter_markdown: ^0.7.6+2
   collection: ^1.17.0
   figma_squircle: ^0.6.3
   font_awesome_flutter: ^10.4.0
-  country_icons: ^2.0.2
+  country_icons: ^3.0.0
   path: ^1.8.2
   clock: ^1.1.1
   image_picker: ^1.1.2
   file_picker: ^9.1.0
   universal_html: any
-  mime: ^1.0.4
+  mime: ^2.0.0
   video_compress: ^3.1.2
-  jiffy: ^5.0.0
+  jiffy: ^6.4.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^5.0.0
   
 flutter:
   assets:

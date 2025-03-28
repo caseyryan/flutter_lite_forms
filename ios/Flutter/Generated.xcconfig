@@ -1,5 +1,5 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/konstantin/fvm/versions/3.24.5
+FLUTTER_ROOT=/Users/konstantin/fvm/versions/3.29.2
 FLUTTER_APPLICATION_PATH=/Users/konstantin/FlutterProjects/telega_scrapper_flutter/lite_forms
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_TARGET=lib/main.dart

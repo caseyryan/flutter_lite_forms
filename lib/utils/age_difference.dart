@@ -11,31 +11,31 @@ class AgeDifference {
   });
 
   static int _getDifferenceInUnits(
-    Units units,
+    Unit unit,
     DateTime anotherDate,
   ) {
     var now = DateTime.now();
-    return Jiffy([
+    return Jiffy.parseFromList([
       now.year,
       now.month,
       now.day,
     ])
         .diff(
-          Jiffy([
+          Jiffy.parseFromList([
             anotherDate.year,
             anotherDate.month,
             anotherDate.day,
           ]),
-          units,
+          unit: unit,
         )
         .toInt();
   }
 
   static AgeDifference fromNow(DateTime? anotherDate) {
     if (anotherDate != null) {
-      int years = _getDifferenceInUnits(Units.YEAR, anotherDate);
-      int months = _getDifferenceInUnits(Units.MONTH, anotherDate);
-      int days = _getDifferenceInUnits(Units.DAY, anotherDate);
+      int years = _getDifferenceInUnits(Unit.year, anotherDate);
+      int months = _getDifferenceInUnits(Unit.month, anotherDate);
+      int days = _getDifferenceInUnits(Unit.day, anotherDate);
       return AgeDifference(
         years: years,
         months: months,
