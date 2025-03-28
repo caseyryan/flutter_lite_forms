@@ -23,7 +23,7 @@ dependencies:
   file_picker: ^9.1.0
   universal_html: any
   mime: ^2.0.0
-  video_compress: ^3.1.2
+  # video_compress: ^3.1.2
   jiffy: ^6.4.2
 
 dev_dependencies:
