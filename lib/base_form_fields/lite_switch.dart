@@ -6,12 +6,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:lite_forms/base_form_fields/error_line.dart';
-import 'package:lite_forms/base_form_fields/label.dart';
 import 'package:lite_forms/base_form_fields/mixins/form_field_mixin.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_form_rebuild_controller.dart';
 import 'package:lite_forms/lite_forms.dart';
-import 'package:lite_forms/utils/extended_platform/extended_platform.dart';
 
 typedef CustomLiteToggleBuilder = Widget Function(
   BuildContext context,

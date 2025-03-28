@@ -223,15 +223,15 @@ class LiteFile {
           _bytes!,
         );
       } else if (isVideo) {
-        final thumbBytes = await VideoCompress.getByteThumbnail(
-          xFile!.path,
-          quality: 50,
-          position: -1,
-        );
-        image = Image.memory(thumbBytes!);
-        _imageProvider = MemoryImage(
-          thumbBytes,
-        );
+        // final thumbBytes = await VideoCompress.getByteThumbnail(
+        //   xFile!.path,
+        //   quality: 50,
+        //   position: -1,
+        // );
+        // image = Image.memory(thumbBytes!);
+        // _imageProvider = MemoryImage(
+        //   thumbBytes,
+        // );
       }
     }
     await _imageToImageInfo(image);
