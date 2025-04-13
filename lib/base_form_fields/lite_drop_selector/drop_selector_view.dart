@@ -5,10 +5,10 @@ class DropSelectorView extends StatefulWidget {
   final LiteDropSelectorRouteArgs args;
 
   const DropSelectorView({
-    Key? key,
+    super.key,
     required this.animation,
     required this.args,
-  }) : super(key: key);
+  });
 
   @override
   State<DropSelectorView> createState() => _DropSelectorViewState();
@@ -551,46 +551,46 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     return _screenHeight - max(_keyboardHeight, 0) - _topInset;
   }
 
-  // ShapeBorder? get _shape {
-  //   return SmoothRectangleBorder(
-  //     borderRadius: SmoothBorderRadius.only(
-  //       topLeft: SmoothRadius(
-  //         cornerRadius: _settings.topLeftRadius ?? kDefaultFormSmoothRadius,
-  //         cornerSmoothing: 1.0,
-  //       ),
-  //       topRight: SmoothRadius(
-  //         cornerRadius: _settings.topRightRadius ?? kDefaultFormSmoothRadius,
-  //         cornerSmoothing: 1.0,
-  //       ),
-  //       bottomLeft: SmoothRadius(
-  //         cornerRadius: _settings.bottomLeftRadius ?? kDefaultFormSmoothRadius,
-  //         cornerSmoothing: 1.0,
-  //       ),
-  //       bottomRight: SmoothRadius(
-  //         cornerRadius: _settings.bottomRightRadius ?? kDefaultFormSmoothRadius,
-  //         cornerSmoothing: 1.0,
-  //       ),
-  //     ),
-  //   );
-  // }
   ShapeBorder? get _shape {
-    return RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(
-          _settings.topLeftRadius ?? kDefaultFormSmoothRadius,
+    return SmoothRectangleBorder(
+      borderRadius: SmoothBorderRadius.only(
+        topLeft: SmoothRadius(
+          cornerRadius: _settings.topLeftRadius ?? kDefaultFormSmoothRadius,
+          cornerSmoothing: 1.0,
         ),
-        topRight: Radius.circular(
-          _settings.topRightRadius ?? kDefaultFormSmoothRadius,
+        topRight: SmoothRadius(
+          cornerRadius: _settings.topRightRadius ?? kDefaultFormSmoothRadius,
+          cornerSmoothing: 1.0,
         ),
-        bottomLeft: Radius.circular(
-          _settings.bottomLeftRadius ?? kDefaultFormSmoothRadius,
+        bottomLeft: SmoothRadius(
+          cornerRadius: _settings.bottomLeftRadius ?? kDefaultFormSmoothRadius,
+          cornerSmoothing: 1.0,
         ),
-        bottomRight: Radius.circular(
-          _settings.bottomRightRadius ?? kDefaultFormSmoothRadius,
+        bottomRight: SmoothRadius(
+          cornerRadius: _settings.bottomRightRadius ?? kDefaultFormSmoothRadius,
+          cornerSmoothing: 1.0,
         ),
       ),
     );
   }
+  // ShapeBorder? get _shape {
+  //   return RoundedRectangleBorder(
+  //     borderRadius: BorderRadius.only(
+  //       topLeft: Radius.circular(
+  //         _settings.topLeftRadius ?? kDefaultFormSmoothRadius,
+  //       ),
+  //       topRight: Radius.circular(
+  //         _settings.topRightRadius ?? kDefaultFormSmoothRadius,
+  //       ),
+  //       bottomLeft: Radius.circular(
+  //         _settings.bottomLeftRadius ?? kDefaultFormSmoothRadius,
+  //       ),
+  //       bottomRight: Radius.circular(
+  //         _settings.bottomRightRadius ?? kDefaultFormSmoothRadius,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildMenu() {
     if (_isBottomSheet) {

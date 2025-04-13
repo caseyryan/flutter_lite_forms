@@ -7,7 +7,7 @@ import 'package:lite_forms/utils/extended_platform/extended_platform.dart';
 
 class LiteDropSelectorButton extends StatefulWidget {
   const LiteDropSelectorButton({
-    Key? key,
+    super.key,
     required this.data,
     required this.buttonHeight,
     required this.decoration,
@@ -20,7 +20,7 @@ class LiteDropSelectorButton extends StatefulWidget {
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
     this.paddingRight = 0.0,
-  }) : super(key: key);
+  });
 
   final LiteDropSelectorItem data;
   final double buttonHeight;
@@ -94,7 +94,7 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
                 width: widget.data.selectedBorderWidth ?? _selectedBorderWidth,
               ),
             ),
-            color: widget.data.isSelected ? _selectedBorderColor.withOpacity(.03) : Colors.transparent,
+            color: widget.data.isSelected ? _selectedBorderColor.withValues(alpha: .03) : Colors.transparent,
             borderRadius: _borderRadius,
           )
         : null;

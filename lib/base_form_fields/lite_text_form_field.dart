@@ -18,12 +18,16 @@ enum TextEntryType {
 
 class TextEntryModalRouteSettings {
   final double backgroundOpacity;
+  final double textScaleFactor;
+  final TextStyle? style;
   final Widget? title;
   final TextCapitalization textCapitalization;
   TextEntryModalRouteSettings({
     this.textCapitalization = TextCapitalization.sentences,
     this.backgroundOpacity = 1.0,
+    this.textScaleFactor = 1.0,
     this.title,
+    this.style,
   });
 }
 
@@ -232,7 +236,7 @@ Future<String?> openTextEditingDialog({
 
 class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMixin {
   VoidCallback? _getTapMethod() {
-    if (widget.textEntryType == TextEntryType.onModalRoute) {
+    if (widget.textEntryType == TextEntryType.onModalRoute && !widget.readOnly) {
       return _openFormTextEntryRoute;
     }
     return null;
@@ -319,7 +323,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
         );
       },
     );
-
+    
     return Padding(
       padding: EdgeInsets.only(
         top: widget.paddingTop,
@@ -334,101 +338,105 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
             Label(
               text: _labelText!,
             ),
-          TextFormField(
-            restorationId: widget.restorationId,
-            scrollController: widget.scrollController,
-            validator: widget.validators != null
-                ? (value) {
-                    final error = group.translationBuilder(field.error);
-                    if (error?.isNotEmpty != true) {
-                      return null;
+          AnimatedOpacity(
+            duration: kThemeAnimationDuration,
+            opacity: widget.readOnly ? .5 : 1.0,
+            child: TextFormField(
+              restorationId: widget.restorationId,
+              scrollController: widget.scrollController,
+              validator: widget.validators != null
+                  ? (value) {
+                      final error = group.translationBuilder(field.error);
+                      if (error?.isNotEmpty != true) {
+                        return null;
+                      }
+                      return error;
                     }
-                    return error;
-                  }
-                : null,
-            autocorrect: widget.autocorrect,
-            autofillHints: widget.autofillHints,
-            autofocus: widget.autofocus,
-            autovalidateMode: null,
-            buildCounter: widget.buildCounter,
-
-            /// There's some bug with this in flutter. If we just pass null here
-            /// the context menu will not appear at all.
-            contextMenuBuilder: widget.contextMenuBuilder ??
-                (BuildContext context, EditableTextState editableTextState) {
-                  return AdaptiveTextSelectionToolbar.editableText(
-                    editableTextState: editableTextState,
-                  );
-                },
-            controller: textEditingController,
-            cursorColor: widget.cursorColor ?? Theme.of(context).textTheme.bodyMedium?.color,
-            cursorHeight: widget.cursorHeight,
-            cursorRadius: widget.cursorRadius,
-            cursorWidth: widget.cursorWidth,
-            decoration: _useErrorDecoration
-                ? decoration.copyWith(
-                    suffixIcon: _buildClearButton(),
-                  )
-                : decoration.copyWith(
-                    errorStyle: TextStyle(
-                      fontSize: 0.0,
-
-                      /// without this the cursor will disappear if error displays
-                      color: widget.cursorColor ?? Theme.of(context).textTheme.bodyMedium?.color,
+                  : null,
+              autocorrect: widget.autocorrect,
+              autofillHints: widget.autofillHints,
+              autofocus: widget.autofocus,
+              autovalidateMode: null,
+              buildCounter: widget.buildCounter,
+            
+              /// There's some bug with this in flutter. If we just pass null here
+              /// the context menu will not appear at all.
+              contextMenuBuilder: widget.contextMenuBuilder ??
+                  (BuildContext context, EditableTextState editableTextState) {
+                    return AdaptiveTextSelectionToolbar.editableText(
+                      editableTextState: editableTextState,
+                    );
+                  },
+              controller: textEditingController,
+              cursorColor: widget.cursorColor ?? Theme.of(context).textTheme.bodyMedium?.color,
+              cursorHeight: widget.cursorHeight,
+              cursorRadius: widget.cursorRadius,
+              cursorWidth: widget.cursorWidth,
+              decoration: _useErrorDecoration
+                  ? decoration.copyWith(
+                      suffixIcon: _buildClearButton(),
+                    )
+                  : decoration.copyWith(
+                      errorStyle: TextStyle(
+                        fontSize: 0.0,
+            
+                        /// without this the cursor will disappear if error displays
+                        color: widget.cursorColor ?? Theme.of(context).textTheme.bodyMedium?.color,
+                      ),
+                      suffixIcon: _buildClearButton(),
                     ),
-                    suffixIcon: _buildClearButton(),
-                  ),
-            enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
-            enableInteractiveSelection: widget.enableInteractiveSelection,
-            enableSuggestions: widget.enableSuggestions,
-            enabled: widget.enabled,
-            expands: widget.expands,
-            focusNode: field.getOrCreateFocusNode(
-              focusNode: widget.focusNode,
+              enableIMEPersonalizedLearning: widget.enableIMEPersonalizedLearning,
+              enableInteractiveSelection: widget.enableInteractiveSelection,
+              enableSuggestions: widget.enableSuggestions,
+              enabled: widget.enabled,
+              expands: widget.expands,
+              focusNode: field.getOrCreateFocusNode(
+                focusNode: widget.focusNode,
+              ),
+              inputFormatters: widget.inputFormatters,
+              keyboardAppearance: widget.keyboardAppearance,
+              keyboardType: widget.keyboardType,
+              maxLength: widget.maxLength,
+              maxLines: widget.maxLines,
+              maxLengthEnforcement: widget.maxLengthEnforcement,
+              minLines: widget.minLines,
+              mouseCursor: widget.mouseCursor,
+              obscureText: widget.obscureText,
+              obscuringCharacter: widget.obscuringCharacter,
+              onChanged: (value) {
+                liteFormController.onValueChanged(
+                  formName: group.name,
+                  fieldName: widget.name,
+                  value: value,
+                  view: null,
+                );
+                widget.onChanged?.call(value);
+              },
+              onEditingComplete: widget.onEditingComplete,
+              onFieldSubmitted: (value) {
+                if (widget.onFieldSubmitted == null) {
+                  form(group.name).focusNextField();
+                } else {
+                  widget.onFieldSubmitted!.call(value);
+                }
+              },
+              onTap: _getTapMethod(),
+              onTapOutside: widget.onTapOutside,
+              scrollPadding: widget.scrollPadding,
+              readOnly: widget.readOnly,
+              scrollPhysics: widget.scrollPhysics,
+              selectionControls: widget.selectionControls,
+              smartDashesType: widget.smartDashesType,
+              smartQuotesType: widget.smartQuotesType,
+              showCursor: widget.showCursor,
+              strutStyle: widget.strutStyle,
+              style: widget.style ?? liteFormController.config?.defaultTextStyle,
+              textAlign: widget.textAlign,
+              textAlignVertical: widget.textAlignVertical,
+              textCapitalization: widget.textCapitalization,
+              textDirection: widget.textDirection,
+              textInputAction: widget.textInputAction,
             ),
-            inputFormatters: widget.inputFormatters,
-            keyboardAppearance: widget.keyboardAppearance,
-            keyboardType: widget.keyboardType,
-            maxLength: widget.maxLength,
-            maxLines: widget.maxLines,
-            maxLengthEnforcement: widget.maxLengthEnforcement,
-            minLines: widget.minLines,
-            mouseCursor: widget.mouseCursor,
-            obscureText: widget.obscureText,
-            obscuringCharacter: widget.obscuringCharacter,
-            onChanged: (value) {
-              liteFormController.onValueChanged(
-                formName: group.name,
-                fieldName: widget.name,
-                value: value,
-                view: null,
-              );
-              widget.onChanged?.call(value);
-            },
-            onEditingComplete: widget.onEditingComplete,
-            onFieldSubmitted: (value) {
-              if (widget.onFieldSubmitted == null) {
-                form(group.name).focusNextField();
-              } else {
-                widget.onFieldSubmitted!.call(value);
-              }
-            },
-            onTap: _getTapMethod(),
-            onTapOutside: widget.onTapOutside,
-            scrollPadding: widget.scrollPadding,
-            readOnly: widget.readOnly,
-            scrollPhysics: widget.scrollPhysics,
-            selectionControls: widget.selectionControls,
-            smartDashesType: widget.smartDashesType,
-            smartQuotesType: widget.smartQuotesType,
-            showCursor: widget.showCursor,
-            strutStyle: widget.strutStyle,
-            style: widget.style ?? liteFormController.config?.defaultTextStyle,
-            textAlign: widget.textAlign,
-            textAlignVertical: widget.textAlignVertical,
-            textCapitalization: widget.textCapitalization,
-            textDirection: widget.textDirection,
-            textInputAction: widget.textInputAction,
           ),
           if (widget.useSmoothError)
             LiteFormErrorLine(
@@ -562,6 +570,13 @@ class __TextEntryPageState extends State<_TextEntryPage> {
         parent: widget.animation,
       ),
     );
+    var style = widget.modalRouteSettings?.style ?? liteFormController.config?.defaultTextStyle;
+    final textScaleFactor = widget.modalRouteSettings?.textScaleFactor ?? 1.0;
+    if (textScaleFactor != 1.0 && style != null) {
+      style = style.copyWith(
+        fontSize: style.fontSize! * textScaleFactor,
+      );
+    }
     return AnimatedBuilder(
       animation: widget.animation,
       builder: (context, child) {
@@ -623,6 +638,7 @@ class __TextEntryPageState extends State<_TextEntryPage> {
                       textInputAction: _textInputAction,
                       autofocus: true,
                       maxLines: 1000000,
+                      style: style,
                     ),
                   ),
                   SizedBox(

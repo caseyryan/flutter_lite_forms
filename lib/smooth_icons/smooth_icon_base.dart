@@ -15,7 +15,7 @@ class SmoothIconBase extends StatelessWidget {
   final Color? backgroundColor;
 
   const SmoothIconBase({
-    Key? key,
+    super.key,
     required this.child,
     this.size = 200.0,
     this.iconColor,
@@ -25,7 +25,7 @@ class SmoothIconBase extends StatelessWidget {
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
     this.paddingRight = 0.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,19 +47,21 @@ class SmoothIconBase extends StatelessWidget {
               return Container(
                 decoration: ShapeDecoration(
                   color: backgroundColor ??
-                      (iconColor ?? Theme.of(context).iconTheme.color)!.withOpacity(
-                        defaultBackgroundOpacity,
+                      (iconColor ?? Theme.of(context).iconTheme.color)!.withValues(
+                        alpha: defaultBackgroundOpacity,
                       ),
-                  shape: ExtendedPlatform.isWebHtmlRenderer ? RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      biggestSide / 3.75,
-                    ),
-                  ) : SmoothRectangleBorder(
-                    borderRadius: SmoothBorderRadius(
-                      cornerRadius: biggestSide / 3.75,
-                      cornerSmoothing: 1.0,
-                    ),
-                  ),
+                  shape: ExtendedPlatform.isWebHtmlRenderer
+                      ? RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            biggestSide / 3.75,
+                          ),
+                        )
+                      : SmoothRectangleBorder(
+                          borderRadius: SmoothBorderRadius(
+                            cornerRadius: biggestSide / 3.75,
+                            cornerSmoothing: 1.0,
+                          ),
+                        ),
                 ),
                 child: Center(
                   child: child,
