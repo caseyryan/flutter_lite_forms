@@ -356,7 +356,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
               autocorrect: widget.autocorrect,
               autofillHints: widget.autofillHints,
               autofocus: widget.autofocus,
-              autovalidateMode: null,
+              autovalidateMode: widget.autovalidateMode,
               buildCounter: widget.buildCounter,
             
               /// There's some bug with this in flutter. If we just pass null here
