@@ -105,6 +105,16 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     return _formGroups[formName]?.tryFindField(fieldName);
   }
 
+  _FormGroupWrapper? _tryGetFormGroupWrapper(String formName) {
+    return _formGroups[formName];
+  }
+
+  void tryUnregisterField(String formName, String fieldName) {
+    _tryGetFormGroupWrapper(formName)?.unregisterField(
+      fieldName: fieldName,
+    );
+  }
+
   Future<bool> validateForm({
     required String formName,
   }) async {
@@ -119,7 +129,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     required String fieldName,
     required bool isRemoved,
   }) {
-    final field = tryGetField(
+    final FormGroupField? field = tryGetField(
       fieldName: fieldName,
       formName: formName,
     );

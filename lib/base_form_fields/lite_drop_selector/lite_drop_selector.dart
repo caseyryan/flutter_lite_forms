@@ -94,6 +94,7 @@ class LiteDropSelector extends StatefulWidget {
   }
 
   final String name;
+
   /// [title] if a non empty string passed here it will be used as a title
   final String title;
   final FocusNode? focusNode;
@@ -198,7 +199,21 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
   }
 
   List<LiteDropSelectorItem> get _selectedOptions {
-    final value = form(formName).field(widget.name).get();
+    dynamic value = form(formName).field(widget.name).get();
+    if (value is! List) {
+      if (value is LiteDropSelectorItem) {
+        return [value];
+      } else {
+        final inItemsPayload = _items.firstWhereOrNull(
+          (e) => e.payload == value,
+        );
+        if (inItemsPayload != null) {
+          return [
+            inItemsPayload,
+          ];
+        }
+      }
+    }
     return value ?? <LiteDropSelectorItem>[];
   }
 
@@ -224,7 +239,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       } else {
         widget.onChanged?.call(list);
       }
-      textEditingController?.text = _getLabelView(list as dynamic) ?? '';
+      // textEditingController?.text = _getLabelView(list as dynamic) ?? '';
       liteFormRebuildController.rebuild();
     }
   }
@@ -378,7 +393,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
               }
               return null;
             })
-            .whereNotNull()
+            .nonNulls
             .cast<LiteDropSelectorItem>()
             .toList();
       } else {
@@ -489,6 +504,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
         ),
       );
     }
+    textEditingController?.text = _getLabelView(_selectedOptions as dynamic) ?? '';
 
     return AnimatedOpacity(
       duration: kThemeAnimationDuration,

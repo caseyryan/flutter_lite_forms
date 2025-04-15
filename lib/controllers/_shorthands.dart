@@ -9,7 +9,6 @@ _FormShorthand form(String formGroupName) {
 
 class _FormShorthand {
   final String formName;
-  // final String fieldName;
 
   _FormShorthand._({
     required this.formName,
@@ -133,11 +132,13 @@ class _FormShorthand {
   /// General field expects the exact data type
   /// which it stores
   _GeneralFieldShorthand field(String fieldName) {
-    final formField = liteFormController.tryGetField(
+    final FormGroupField? formField = liteFormController.tryGetField(
       formName: formName,
       fieldName: fieldName,
     );
-    return _GeneralFieldShorthand().._formField = formField;
+    return _GeneralFieldShorthand()
+      .._formField = formField
+      .._formName = formName;
   }
 
   _PhoneFieldShorthand phone(String fieldName) {
@@ -243,11 +244,24 @@ class _PhoneFieldShorthand {
 
 class _GeneralFieldShorthand {
   FormGroupField? _formField;
+  String? _formName;
 
   T? get<T>([
     bool serialize = false,
   ]) {
     return _formField?.getValue(serialize) as T?;
+  }
+
+  /// effectively removes the field from the form,
+  /// so its validators / serializer are not called anymore
+  /// and the field data is not added to the final form 
+  void unregister() {
+    if (_formName != null && _formField != null) {
+      liteFormController.tryUnregisterField(
+        _formName!,
+        _formField!.name,
+      );
+    }
   }
 
   /// Makes sense only for the fields of String type like [LiteTextFormField]
@@ -292,8 +306,6 @@ class _GeneralFieldShorthand {
   bool get hasError {
     return _formField?.hasError == true;
   }
-
-  
 
   _GeneralFieldShorthand clearText() {
     return set('');
