@@ -466,9 +466,9 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
     );
     WidgetsBinding.instance.ensureVisualUpdate();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (initialValue is List) {
-        textEditingController?.text = _getLabelView(_selectedOptions) ?? '';
-      }
+      // if (initialValue is List) {
+      textEditingController?.text = _getLabelView(_selectedOptions) ?? '';
+      // }
     });
 
     final node = field.getOrCreateFocusNode(
@@ -504,7 +504,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
         ),
       );
     }
-    textEditingController?.text = _getLabelView(_selectedOptions as dynamic) ?? '';
+    // textEditingController?.text = _getLabelView(_selectedOptions as dynamic) ?? '';
 
     return AnimatedOpacity(
       duration: kThemeAnimationDuration,
