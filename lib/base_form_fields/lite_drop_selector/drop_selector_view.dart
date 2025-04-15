@@ -333,6 +333,37 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     return _totalButtonsHeight > _viewportHeight;
   }
 
+
+  BorderRadius? get _borderRadius {
+    return SmoothBorderRadius.only(
+      topLeft: SmoothRadius(
+        cornerRadius: _settings.topLeftRadius ??
+            formConfig?.dropSelectorSettings.topLeftRadius ??
+            kDefaultFormSmoothRadius,
+        cornerSmoothing: 1.0,
+      ),
+      topRight: SmoothRadius(
+        cornerRadius: _settings.topRightRadius ??
+            formConfig?.dropSelectorSettings.topRightRadius ??
+            kDefaultFormSmoothRadius,
+        cornerSmoothing: 1.0,
+      ),
+      bottomLeft: SmoothRadius(
+        cornerRadius: _settings.bottomLeftRadius ??
+            formConfig?.dropSelectorSettings.bottomLeftRadius ??
+            kDefaultFormSmoothRadius,
+        cornerSmoothing: 1.0,
+      ),
+      bottomRight: SmoothRadius(
+        cornerRadius: _settings.bottomRightRadius ??
+            formConfig?.dropSelectorSettings.bottomRightRadius ??
+            kDefaultFormSmoothRadius,
+        cornerSmoothing: 1.0,
+      ),
+    );
+  }
+
+
   Widget _buildButton(
     int index,
     LiteDropSelectorItem item,
@@ -344,19 +375,38 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     /// in case the builder returns null it will use a general view for an item
     if (widget.args.menuItemBuilder != null && !item.isSeparator) {
       final menuWidth = _isBottomSheet ? MediaQuery.of(context).size.width : _maxMenuWidth;
-      final builtItem = widget.args.menuItemBuilder!(
+      Widget? builtItem = widget.args.menuItemBuilder!(
         index,
         item,
         isLast,
         menuWidth,
       );
       if (builtItem != null) {
-        button = ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: menuWidth,
-            maxHeight: _viewportHeight,
+        button = Flexible(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: _settings.sheetPadding.left,
+              right: _settings.sheetPadding.right,
+            ),
+            child: InkWell(
+              borderRadius: _borderRadius,
+              onTap: () {
+                _onButtonPressed(item, _settings.dropSelectorType);
+              },
+              child: Container(
+                color: Colors.transparent,
+                child: IgnorePointer(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: menuWidth,
+                      maxHeight: _viewportHeight,
+                    ),
+                    child: builtItem,
+                  ),
+                ),
+              ),
+            ),
           ),
-          child: builtItem,
         );
       }
     }

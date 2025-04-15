@@ -129,34 +129,6 @@ class _LiteDropSelectorButtonState extends State<LiteDropSelectorButton> {
   }
 
   BorderRadius? get _borderRadius {
-    if (ExtendedPlatform.isWebHtmlRenderer) {
-      return BorderRadius.only(
-        topLeft: Radius.circular(
-          widget.sheetSettings.topLeftRadius ??
-              formConfig?.dropSelectorSettings.topLeftRadius ??
-              _defaultRadius?.topLeft.x ??
-              kDefaultFormSmoothRadius,
-        ),
-        topRight: Radius.circular(
-          widget.sheetSettings.topRightRadius ??
-              formConfig?.dropSelectorSettings.topRightRadius ??
-              _defaultRadius?.topRight.x ??
-              kDefaultFormSmoothRadius,
-        ),
-        bottomLeft: Radius.circular(
-          widget.sheetSettings.bottomLeftRadius ??
-              formConfig?.dropSelectorSettings.bottomLeftRadius ??
-              _defaultRadius?.bottomLeft.x ??
-              kDefaultFormSmoothRadius,
-        ),
-        bottomRight: Radius.circular(
-          widget.sheetSettings.bottomRightRadius ??
-              formConfig?.dropSelectorSettings.bottomRightRadius ??
-              _defaultRadius?.bottomRight.x ??
-              kDefaultFormSmoothRadius,
-        ),
-      );
-    }
     return SmoothBorderRadius.only(
       topLeft: SmoothRadius(
         cornerRadius: widget.sheetSettings.topLeftRadius ??
