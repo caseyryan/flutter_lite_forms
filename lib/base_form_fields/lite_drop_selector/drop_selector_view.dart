@@ -220,13 +220,11 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   key: const Key('drop_selector_done_button'),
-                  onPressed: selectedItems.isEmpty
-                      ? null
-                      : () {
-                          Navigator.of(context).pop(
-                            selectedItems,
-                          );
-                        },
+                  onPressed: () {
+                    Navigator.of(context).pop(
+                      selectedItems,
+                    );
+                  },
                   child: Icon(
                     Icons.done_all,
                     color: selectedItems.isEmpty ? null : Theme.of(context).primaryColor,
@@ -333,25 +331,21 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     return _totalButtonsHeight > _viewportHeight;
   }
 
-
   BorderRadius? get _borderRadius {
     return SmoothBorderRadius.only(
       topLeft: SmoothRadius(
-        cornerRadius: _settings.topLeftRadius ??
-            formConfig?.dropSelectorSettings.topLeftRadius ??
-            kDefaultFormSmoothRadius,
+        cornerRadius:
+            _settings.topLeftRadius ?? formConfig?.dropSelectorSettings.topLeftRadius ?? kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,
       ),
       topRight: SmoothRadius(
-        cornerRadius: _settings.topRightRadius ??
-            formConfig?.dropSelectorSettings.topRightRadius ??
-            kDefaultFormSmoothRadius,
+        cornerRadius:
+            _settings.topRightRadius ?? formConfig?.dropSelectorSettings.topRightRadius ?? kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,
       ),
       bottomLeft: SmoothRadius(
-        cornerRadius: _settings.bottomLeftRadius ??
-            formConfig?.dropSelectorSettings.bottomLeftRadius ??
-            kDefaultFormSmoothRadius,
+        cornerRadius:
+            _settings.bottomLeftRadius ?? formConfig?.dropSelectorSettings.bottomLeftRadius ?? kDefaultFormSmoothRadius,
         cornerSmoothing: 1.0,
       ),
       bottomRight: SmoothRadius(
@@ -362,7 +356,6 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       ),
     );
   }
-
 
   Widget _buildButton(
     int index,

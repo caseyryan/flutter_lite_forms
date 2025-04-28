@@ -18,7 +18,6 @@ export 'src/data/dates/locale_list.dart';
 /// This should be called for at least one [locale] before any date formatting
 /// methods are called. It sets up the lookup for date symbols using [url].
 /// The [url] parameter should end with a "/". For example,
-///   "http://localhost:8000/dates/"
 Future<void> initializeDateFormatting(String locale, String url) {
   var reader = HttpRequestDataReader('${url}symbols/');
   initializeDateSymbols(() => LazyLocaleData(

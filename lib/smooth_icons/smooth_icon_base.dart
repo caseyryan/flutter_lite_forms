@@ -50,18 +50,12 @@ class SmoothIconBase extends StatelessWidget {
                       (iconColor ?? Theme.of(context).iconTheme.color)!.withValues(
                         alpha: defaultBackgroundOpacity,
                       ),
-                  shape: ExtendedPlatform.isWebHtmlRenderer
-                      ? RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            biggestSide / 3.75,
-                          ),
-                        )
-                      : SmoothRectangleBorder(
-                          borderRadius: SmoothBorderRadius(
-                            cornerRadius: biggestSide / 3.75,
-                            cornerSmoothing: 1.0,
-                          ),
-                        ),
+                  shape: SmoothRectangleBorder(
+                    borderRadius: SmoothBorderRadius(
+                      cornerRadius: biggestSide / 3.75,
+                      cornerSmoothing: 1.0,
+                    ),
+                  ),
                 ),
                 child: Center(
                   child: child,
