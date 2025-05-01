@@ -323,7 +323,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
         );
       },
     );
-    
+
     return Padding(
       padding: EdgeInsets.only(
         top: widget.paddingTop,
@@ -358,7 +358,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
               autofocus: widget.autofocus,
               autovalidateMode: widget.autovalidateMode,
               buildCounter: widget.buildCounter,
-            
+
               /// There's some bug with this in flutter. If we just pass null here
               /// the context menu will not appear at all.
               contextMenuBuilder: widget.contextMenuBuilder ??
@@ -379,7 +379,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
                   : decoration.copyWith(
                       errorStyle: TextStyle(
                         fontSize: 0.0,
-            
+
                         /// without this the cursor will disappear if error displays
                         color: widget.cursorColor ?? Theme.of(context).textTheme.bodyMedium?.color,
                       ),
@@ -479,6 +479,9 @@ class _TextEntryRoute extends ModalRoute {
   String? get barrierLabel => null;
 
   @override
+  bool get maintainState => true;
+
+  @override
   Widget buildPage(
     BuildContext context,
     Animation<double> animation,
@@ -493,9 +496,6 @@ class _TextEntryRoute extends ModalRoute {
       maxLines: maxLines,
     );
   }
-
-  @override
-  bool get maintainState => true;
 
   @override
   bool get opaque => false;
@@ -529,6 +529,14 @@ class __TextEntryPageState extends State<_TextEntryPage> {
   late TextEditingController _textEditingController;
 
   @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController(
+      text: widget.text,
+    );
+  }
+
+  @override
   void dispose() {
     _textEditingController.dispose();
     super.dispose();
@@ -545,9 +553,6 @@ class __TextEntryPageState extends State<_TextEntryPage> {
   Widget build(BuildContext context) {
     final TextEntryModalRouteSettings? routeSettings =
         widget.modalRouteSettings ?? liteFormController.config?.defaultTextEntryModalRouteSettings;
-    _textEditingController = TextEditingController(
-      text: widget.text,
-    );
     if (widget.selection != null) {
       _textEditingController.selection = widget.selection!;
     }
