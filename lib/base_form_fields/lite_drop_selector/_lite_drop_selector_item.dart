@@ -16,6 +16,7 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
     this.type,
     this.selectedBorderColor,
     this.selectedBorderWidth,
+    this.maxItemHeight,
     bool isSelected = false,
     this.isSeparator = false,
     this.isSelectable = true,
@@ -36,6 +37,7 @@ class LiteDropSelectorItem<T> with SearchQueryMixin {
   }
   final Color? selectedBorderColor;
   final double? selectedBorderWidth;
+  final double? maxItemHeight;
   final String title;
   final String? subtitle;
   final T payload;

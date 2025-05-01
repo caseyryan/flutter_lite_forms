@@ -387,6 +387,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                 _onButtonPressed(item, _settings.dropSelectorType);
               },
               child: Container(
+                height: item.maxItemHeight,
                 color: Colors.transparent,
                 child: IgnorePointer(
                   child: ConstrainedBox(
@@ -420,7 +421,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
         paddingLeft: _settings.sheetPadding.left,
         paddingRight: _settings.sheetPadding.right,
         key: ValueKey(item),
-        buttonHeight: _singleButtonHeight,
+        buttonHeight: item.maxItemHeight ?? _singleButtonHeight,
       ),
     );
 
