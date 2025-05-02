@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:lite_forms/controllers/lite_form_controller.dart';
-import 'package:lite_forms/intl_local/lib/intl.dart' as local_intl;
+// import 'package:lite_forms/intl_local/lib/intl.dart' as local_intl;
 import 'package:lite_forms/lite_forms.dart';
-import 'package:lite_forms/utils/extended_platform/extended_platform.dart';
 
 import 'error_line.dart';
 import 'mixins/form_field_mixin.dart';
@@ -74,7 +75,7 @@ class LiteDatePicker extends StatefulWidget {
   final Object? initialValue;
   final DateTime? maxDate;
   final DateTime? minDate;
-  final local_intl.DateFormat? format;
+  final intl.DateFormat? format;
   final DateInputType dateInputType;
   final Color? pickerBackgroundColor;
   final AutovalidateMode? autovalidateMode;
@@ -222,13 +223,23 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
     return finalValue;
   }
 
-  local_intl.DateFormat get _dateFormat {
+  intl.DateFormat get _dateFormat {
+    final locale = Localizations.localeOf(context);
+    final stringLocale = 'ru_RU';
     if (widget.dateInputType == DateInputType.date) {
-      return widget.format ?? local_intl.DateFormat(liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy');
+      return widget.format ??
+          intl.DateFormat(
+            liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy',
+            stringLocale,
+          );
     }
 
     if (widget.dateInputType == DateInputType.time) {
-      return widget.format ?? local_intl.DateFormat(liteFormController.config?.defaultTimeFormat ?? _timeFormat);
+      return widget.format ??
+          intl.DateFormat(
+            liteFormController.config?.defaultTimeFormat ?? _timeFormat,
+            stringLocale,
+          );
     }
 
     if (widget.dateInputType == DateInputType.both) {
@@ -238,10 +249,16 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
       final timeFormatPattern = liteFormController.config?.defaultTimeFormat ?? _timeFormat;
       final dateFormatPattern = liteFormController.config?.defaultDateFormat ?? 'dd MMMM, yyyy';
 
-      return local_intl.DateFormat('$dateFormatPattern | $timeFormatPattern');
+      return intl.DateFormat(
+        '$dateFormatPattern | $timeFormatPattern',
+        stringLocale,
+      );
     }
 
-    return local_intl.DateFormat('dd MMMM, yyyy');
+    return intl.DateFormat(
+      'dd MMMM, yyyy',
+      stringLocale,
+    );
   }
 
   String get _timeFormat {
@@ -343,7 +360,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                       children: [
                         CupertinoButton(
                           child: Text(
-                            'Cancel',
+                            group.translationBuilder('Cancel') ?? 'Cancel',
                             style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
                                   color: CupertinoDynamicColor.resolve(
                                     CupertinoColors.placeholderText,
@@ -361,8 +378,8 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                           onPressed: () {
                             Navigator.of(context).pop(dateTime);
                           },
-                          child: const Text(
-                            'Done',
+                          child: Text(
+                            group.translationBuilder('Done') ?? 'Done',
                           ),
                         ),
                       ],
@@ -472,6 +489,15 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
     }
   }
 
+  String _viewConverter(Object? value) {
+    if (value == null) {
+      return '';
+    } else if (value is DateTime) {
+      return _dateFormat.format(value);
+    }
+    return value.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     initializeFormField<DateTime>(
@@ -485,6 +511,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
       focusNode: widget.focusNode,
+      viewConverter: _viewConverter,
     );
 
     tryDeserializeInitialValueIfNecessary<DateTime>(
@@ -548,7 +575,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
                             ),
                           ),
                     strutStyle: widget.strutStyle,
-                    style: liteFormController.config?.defaultTextStyle ?? widget.style,
+                    style: widget.style ?? liteFormController.config?.defaultTextStyle,
                     textAlign: widget.textAlign,
                     textAlignVertical: widget.textAlignVertical,
                     textCapitalization: widget.textCapitalization,

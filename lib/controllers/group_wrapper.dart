@@ -54,6 +54,7 @@ class _FormGroupWrapper {
     required List<LiteValidator>? validators,
     required AutovalidateMode? autovalidateMode,
     required InputDecoration? decoration,
+    required ViewConverter? viewConverter,
   }) {
     if (_fields[name] == null) {
       _fields[name] = FormGroupField<T>(
@@ -65,6 +66,7 @@ class _FormGroupWrapper {
     field._serializer = serializer;
     field._validators = validators;
     field._formName = formName;
+    field._viewConverter = viewConverter;
     field._autovalidateMode = autovalidateMode;
     field._parent = this;
     field._decoration = decoration;

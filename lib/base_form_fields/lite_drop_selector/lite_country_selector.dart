@@ -231,6 +231,7 @@ class _LiteCountrySelectorState extends State<LiteCountrySelector>
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
       focusNode: widget.focusNode,
+      viewConverter: null
     );
 
     List<LiteDropSelectorItem> items = [];

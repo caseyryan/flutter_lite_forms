@@ -559,6 +559,7 @@ class _LitePhoneInputFieldState extends State<LitePhoneInputField> with FormFiel
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
       focusNode: widget.focusNode,
+      viewConverter: null,
     );
 
     tryDeserializeInitialValueIfNecessary(

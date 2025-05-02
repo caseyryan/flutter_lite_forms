@@ -631,6 +631,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
       errorStyle: widget.errorStyle,
       focusNode: widget.focusNode,
       addFocusNodeListener: false,
+      viewConverter: null,
     );
     if (widget.initialValue != null) {
       dynamic initValue = widget.initialValue;

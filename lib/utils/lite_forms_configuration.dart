@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lite_forms/base_form_fields/lite_drop_selector/lite_drop_selector.dart';
+import 'package:lite_forms/base_form_fields/lite_form.dart';
 import 'package:lite_forms/base_form_fields/lite_text_form_field.dart';
 import 'package:lite_forms/constants.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
@@ -9,7 +10,7 @@ part 'config_presets/_vanila.dart';
 
 class LiteFormsConfiguration {
   final AutovalidateMode? autovalidateMode;
-
+  final TranslationBuilder? translationBuilder;
   final String? defaultDateFormat;
   final String? defaultTimeFormat;
 
@@ -78,6 +79,7 @@ class LiteFormsConfiguration {
     this.lightTheme,
     this.darkTheme,
     this.autovalidateMode,
+    required this.translationBuilder,
     this.dropSelectorSettings = const DropSelectorSettings(
       topLeftRadius: kDefaultFormSmoothRadius,
       topRightRadius: kDefaultFormSmoothRadius,

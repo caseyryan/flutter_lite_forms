@@ -2,6 +2,11 @@
 
 part of 'lite_form_controller.dart';
 
+/// Any field type can have its own converter
+/// So that the value presented to users maybe converter to any
+/// presentation we want. For example a date in some specific format
+typedef ViewConverter = String Function(Object? value);
+
 class FormGroupField<T> {
   final String name;
   String? label;
@@ -10,6 +15,7 @@ class FormGroupField<T> {
   AutovalidateMode? _autovalidateMode;
   InputDecoration? _decoration;
   _FormGroupWrapper? _parent;
+  ViewConverter? _viewConverter;
 
   void updateValidatorsAndSerializer({
     required List<LiteValidator>? validators,
@@ -46,7 +52,7 @@ class FormGroupField<T> {
   void unmount() {
     _isMounted = false;
     _context = null;
-  } 
+  }
 
   void mount([
     BuildContext? context,
@@ -215,7 +221,13 @@ class FormGroupField<T> {
 
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           try {
-            textEditingController?.text = view ?? _value.toString();
+            /// View converter can be its own for every type of field
+            /// and is set via initializeFormField() method
+            if (_viewConverter != null) {
+              textEditingController?.text = _viewConverter!(_value);
+            } else {
+              textEditingController?.text = view ?? _value.toString();
+            }
           } catch (e) {
             if (kDebugMode) {
               print(e);
@@ -303,7 +315,7 @@ class FormGroupField<T> {
   void _clearError() {
     _error = null;
     liteFormController.rebuild();
-  } 
+  }
 
   Future<Object?> getSerializedValue() async {
     return await _serializer?.call(_value) ?? _value;

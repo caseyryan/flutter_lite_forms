@@ -19,6 +19,10 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     return _initialValue;
   }
 
+  void setViewConverter(ViewConverter converter) {
+    
+  }
+
   String? hintText;
   TextStyle? _errorStyle;
 
@@ -129,6 +133,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     required InputDecoration? decoration,
     required TextStyle? errorStyle,
     required FocusNode? focusNode,
+    required ViewConverter? viewConverter,
 
     /// [addFocusNodeListener] must be false your field contains more basic form fields inside
     /// to avoid focus interception. E.g. [LiteFilePicker]
@@ -204,6 +209,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
         validators: validators,
         decoration: decoration,
         autovalidateMode: autovalidateMode,
+        viewConverter: viewConverter
       );
     } else {
       _reactivate();

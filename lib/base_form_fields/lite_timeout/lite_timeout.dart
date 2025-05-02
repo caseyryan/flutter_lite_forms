@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lite_forms/controllers/lite_form_controller.dart';
 import 'package:lite_forms/controllers/lite_timer_controller.dart';
-import 'package:lite_forms/intl_local/lib/intl.dart';
 import 'package:lite_forms/lite_forms.dart';
 import 'package:lite_forms/utils/on_post_frame.dart';
 

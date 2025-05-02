@@ -389,6 +389,7 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
       decoration: null,
       errorStyle: widget.errorStyle,
       focusNode: widget.focusNode,
+      viewConverter: null,
     );
     tryDeserializeInitialValueIfNecessary<bool>(
       initialValueDeserializer: widget.initialValueDeserializer,

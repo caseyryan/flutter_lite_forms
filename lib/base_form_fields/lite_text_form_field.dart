@@ -303,6 +303,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
       decoration: widget.decoration,
       errorStyle: widget.errorStyle,
       focusNode: widget.focusNode,
+      viewConverter: null,
     );
 
     tryDeserializeInitialValueIfNecessary<String>(

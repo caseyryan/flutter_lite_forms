@@ -229,6 +229,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     required List<LiteValidator>? validators,
     required AutovalidateMode? autovalidateMode,
     required InputDecoration? decoration,
+    required ViewConverter? viewConverter,
   }) {
     // createFormIfNull(formName: formName);
     final groupWrapper = _formGroups[formName]!;
@@ -240,6 +241,7 @@ class LiteFormController extends LiteStateController<LiteFormController> {
       validators: validators,
       decoration: decoration,
       autovalidateMode: autovalidateMode,
+      viewConverter: viewConverter
     );
   }
 

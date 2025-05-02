@@ -15,12 +15,7 @@ import 'package:lite_forms/lite_forms.dart';
 typedef TranslationBuilder = String? Function(String? value);
 
 String? defaultTranslationBuilder(String? value) {
-  // if (kDebugMode) {
-  //   if (value != null) {
-  //     print('LiteFormGroup.defaultTranslationBuilder("$value")');
-  //   }
-  // }
-  return value;
+  return liteFormController.config?.translationBuilder?.call(value) ?? value;
 }
 
 typedef LiteFormBuilder = Widget Function(
@@ -45,7 +40,7 @@ class LiteForm extends InheritedWidget {
   /// can use a cupertino or a material style, or use an adaptive view.
   /// It can be used to pick date, date and time, or time only
   LiteForm({
-    Key? key,
+    super.key,
     required this.name,
     this.autoDispose = true,
     this.autoRemoveUnregisteredFields = true,
@@ -84,7 +79,6 @@ class LiteForm extends InheritedWidget {
               },
             ),
           ),
-          key: key,
         ) {
     _scrollController = scrollController;
   }
@@ -121,8 +115,7 @@ class LiteForm extends InheritedWidget {
 
   @override
   bool updateShouldNotify(LiteForm oldWidget) => false;
-  static LiteForm? of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<LiteForm>();
+  static LiteForm? of(BuildContext context) => context.dependOnInheritedWidgetOfExactType<LiteForm>();
 }
 
 class _LiteGroupWrapper extends StatefulWidget {
@@ -140,7 +133,8 @@ class _LiteGroupWrapper extends StatefulWidget {
   final VoidCallback onDispose;
   final bool? allowUnfocusOnTapOutside;
   final bool autoRemoveUnregisteredFields;
-  /// can be used, for example for setting some values manually or 
+
+  /// can be used, for example for setting some values manually or
   /// to select some text. Called after the form has been built
   final VoidCallback? onPostFrame;
 
@@ -148,8 +142,7 @@ class _LiteGroupWrapper extends StatefulWidget {
   State<_LiteGroupWrapper> createState() => __LiteGroupWrapperState();
 }
 
-class __LiteGroupWrapperState extends State<_LiteGroupWrapper>
-    with PostFrameMixin {
+class __LiteGroupWrapperState extends State<_LiteGroupWrapper> with PostFrameMixin {
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -189,9 +182,8 @@ class __LiteGroupWrapperState extends State<_LiteGroupWrapper>
     );
     bool isUnfocuserEnabled = false;
     if (!kIsWeb) {
-      isUnfocuserEnabled = widget.allowUnfocusOnTapOutside ??
-          liteFormController.config?.allowUnfocusOnTapOutside ??
-          true;
+      isUnfocuserEnabled =
+          widget.allowUnfocusOnTapOutside ?? liteFormController.config?.allowUnfocusOnTapOutside ?? true;
     }
     return Unfocuser(
       isEnabled: isUnfocuserEnabled,
