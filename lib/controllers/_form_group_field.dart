@@ -16,11 +16,15 @@ class FormGroupField<T> {
   InputDecoration? _decoration;
   _FormGroupWrapper? _parent;
   ViewConverter? _viewConverter;
+  bool _isReadOnly = false;
+  bool get isReadOnly => _isReadOnly;
 
   void updateValidatorsAndSerializer({
     required List<LiteValidator>? validators,
     required LiteFormValueSerializer? serializer,
+    required bool isReadOnly,
   }) {
+    _isReadOnly = isReadOnly;
     _serializer = serializer;
     _validators = validators;
   }
@@ -274,7 +278,7 @@ class FormGroupField<T> {
   }
 
   Future _checkError() async {
-    if (isRemoved) {
+    if (isRemoved || isReadOnly) {
       _error = null;
       return;
     }

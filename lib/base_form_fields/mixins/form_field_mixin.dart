@@ -134,6 +134,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     required TextStyle? errorStyle,
     required FocusNode? focusNode,
     required ViewConverter? viewConverter,
+    required bool isReadOnly,
 
     /// [addFocusNodeListener] must be false your field contains more basic form fields inside
     /// to avoid focus interception. E.g. [LiteFilePicker]
@@ -217,6 +218,7 @@ mixin FormFieldMixin<T extends StatefulWidget> on State<T> {
     field.updateValidatorsAndSerializer(
       validators: validators,
       serializer: serializer,
+      isReadOnly: isReadOnly,
     );
     field.onSelectionChange = onSelectionChange;
 

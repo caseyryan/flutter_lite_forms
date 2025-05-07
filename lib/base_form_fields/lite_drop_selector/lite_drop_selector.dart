@@ -426,6 +426,7 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
       errorStyle: widget.errorStyle,
       focusNode: widget.focusNode,
       viewConverter: null,
+      isReadOnly: widget.readOnly,
     );
 
     tryDeserializeInitialValueIfNecessary(

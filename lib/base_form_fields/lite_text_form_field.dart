@@ -304,6 +304,7 @@ class _LiteTextFormFieldState extends State<LiteTextFormField> with FormFieldMix
       errorStyle: widget.errorStyle,
       focusNode: widget.focusNode,
       viewConverter: null,
+      isReadOnly: widget.readOnly,
     );
 
     tryDeserializeInitialValueIfNecessary<String>(

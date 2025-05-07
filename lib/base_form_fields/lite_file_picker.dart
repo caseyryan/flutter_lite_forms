@@ -61,6 +61,7 @@ class LiteFilePicker extends StatefulWidget {
     this.allowVideo = true,
     this.allowImages = true,
     this.focusNode,
+    this.readOnly = false,
     this.sources = const [
       FileSource.camera,
       FileSource.gallery,
@@ -90,6 +91,7 @@ class LiteFilePicker extends StatefulWidget {
   final double menuButtonHeight;
   final ValueChanged<Object?>? onChanged;
   final FileType? fileType;
+  final bool readOnly;
 
   /// [allowedExtensions] files extensions accepted by file picker
   /// this will make sense only if you add
@@ -332,7 +334,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
   }
 
   Future _onImageTap(LiteFile value) async {
-    if (_selectedFiles.length < 2) {
+    if (_selectedFiles.length < 2 || widget.readOnly) {
       return;
     }
     value.isSelected = !value.isSelected;
@@ -632,6 +634,7 @@ class _LiteFilePickerState extends State<LiteFilePicker> with FormFieldMixin, Po
       focusNode: widget.focusNode,
       addFocusNodeListener: false,
       viewConverter: null,
+      isReadOnly: widget.readOnly,
     );
     if (widget.initialValue != null) {
       dynamic initValue = widget.initialValue;

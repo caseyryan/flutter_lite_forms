@@ -512,6 +512,7 @@ class _LiteDatePickerState extends State<LiteDatePicker> with FormFieldMixin {
       errorStyle: widget.errorStyle,
       focusNode: widget.focusNode,
       viewConverter: _viewConverter,
+      isReadOnly: widget.readOnly,
     );
 
     tryDeserializeInitialValueIfNecessary<DateTime>(
