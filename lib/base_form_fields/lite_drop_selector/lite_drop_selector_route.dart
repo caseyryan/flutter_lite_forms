@@ -7,6 +7,16 @@ typedef MenuItemBuilder = Widget? Function(
   double menuWidth,
 );
 
+Completer? _completer;
+OverlayEntry? _overlayEntry;
+
+void _closeDropSelector(Object? value) {
+  _overlayEntry?.remove();
+  _overlayEntry = null;
+  _completer?.complete(value);
+  _completer = null;
+}
+
 Future showDropSelector({
   required List<LiteDropSelectorItem> buttonDatas,
   required Offset tapPosition,
@@ -21,6 +31,9 @@ Future showDropSelector({
   String title = '',
   MenuItemBuilder? menuItemBuilder,
 }) async {
+  if (_completer != null) {
+    return _completer!.future;
+  }
   FocusScope.of(context).unfocus();
   final args = LiteDropSelectorRouteArgs(
     items: buttonDatas,
@@ -36,10 +49,16 @@ Future showDropSelector({
     buttonSize: buttonSize,
     menuItemBuilder: menuItemBuilder,
   );
-
-  return await Navigator.of(context).push(
-    LiteDropSelectorRoute(args),
+  _overlayEntry = OverlayEntry(
+    builder: (context) {
+      return DropSelectorView(
+        args: args,
+      );
+    },
   );
+  _completer = Completer();
+  Overlay.of(context).insert(_overlayEntry!);
+  return _completer!.future;
 }
 
 class MenuSearchConfiguration {
@@ -201,38 +220,37 @@ class LiteDropSelectorRouteArgs {
   MenuItemBuilder? menuItemBuilder;
 }
 
-class LiteDropSelectorRoute extends ModalRoute {
-  final LiteDropSelectorRouteArgs args;
+// class LiteDropSelectorRoute extends ModalRoute {
+//   final LiteDropSelectorRouteArgs args;
 
-  LiteDropSelectorRoute(this.args);
+//   LiteDropSelectorRoute(this.args);
 
-  @override
-  Color? get barrierColor => null;
+//   @override
+//   Color? get barrierColor => null;
 
-  @override
-  bool get barrierDismissible => false;
+//   @override
+//   bool get barrierDismissible => false;
 
-  @override
-  String? get barrierLabel => null;
+//   @override
+//   String? get barrierLabel => null;
 
-  @override
-  Widget buildPage(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-  ) {
-    return DropSelectorView(
-      animation: animation,
-      args: args,
-    );
-  }
+//   @override
+//   Widget buildPage(
+//     BuildContext context,
+//     Animation<double> animation,
+//     Animation<double> secondaryAnimation,
+//   ) {
+//     return DropSelectorView(
+//       args: args,
+//     );
+//   }
 
-  @override
-  bool get maintainState => true;
+//   @override
+//   bool get maintainState => true;
 
-  @override
-  bool get opaque => false;
+//   @override
+//   bool get opaque => false;
 
-  @override
-  Duration get transitionDuration => kThemeAnimationDuration;
-}
+//   @override
+//   Duration get transitionDuration => kThemeAnimationDuration;
+// }

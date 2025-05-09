@@ -1,12 +1,10 @@
 part of 'lite_drop_selector.dart';
 
 class DropSelectorView extends StatefulWidget {
-  final Animation<double> animation;
   final LiteDropSelectorRouteArgs args;
 
   const DropSelectorView({
     super.key,
-    required this.animation,
     required this.args,
   });
 
@@ -21,7 +19,7 @@ class _TempSelection {
   });
 }
 
-class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin {
+class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin, SingleTickerProviderStateMixin {
   final _sizeKey = GlobalKey();
   double _menuWidth = 0.0;
   Size? _size;
@@ -37,6 +35,24 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
   /// for cancellation case
   List<_TempSelection> _initialSelection = [];
   bool _sizeCalculated = false;
+  late final AnimationController _animationController;
+
+  @override
+  void initState() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: kThemeAnimationDuration,
+    );
+    _initialSelection = widget.args.items
+        .where(
+          (e) => e.isSelected,
+        )
+        .map((e) => _TempSelection(title: e.title))
+        .toList();
+    _setInitialHeights();
+    super.initState();
+    _animationController.forward();
+  }
 
   @override
   void didFirstLayoutFinished(BuildContext context) {
@@ -76,22 +92,15 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     return _settings.maxMenuWidth ?? kMaxDropSelectorWidth;
   }
 
-  @override
-  void initState() {
-    _initialSelection = widget.args.items
-        .where(
-          (e) => e.isSelected,
-        )
-        .map((e) => _TempSelection(title: e.title))
-        .toList();
-    _setInitialHeights();
-    super.initState();
+  Animation<double> get _animation {
+    return _animationController;
   }
 
   @override
   void dispose() {
     _draggableScrollableController.dispose();
     _scrollController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -118,10 +127,10 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     return _isSimpleWithNoSelection || _settings.dropSelectorActionType == DropSelectorActionType.simple;
   }
 
-  void _onButtonPressed(
+  Future _onButtonPressed(
     LiteDropSelectorItem value,
     DropSelectorType? type,
-  ) {
+  ) async {
     FocusScope.of(context).unfocus();
     if (value.isSelected) {
       if (value.isSingleAction) {
@@ -132,7 +141,8 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
 
     if (value.type != null) {
       if (_isSimple) {
-        Navigator.of(context).pop(value);
+        await _animationController.reverse();
+        _closeDropSelector(value);
         value.onPressed?.call(value);
       }
     } else {
@@ -149,7 +159,8 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
         }
       }
       if (_isSimple) {
-        Navigator.of(context).pop([value]);
+        await _animationController.reverse();
+        _closeDropSelector([value]);
       } else {
         setState(() {});
       }
@@ -220,10 +231,9 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   key: const Key('drop_selector_done_button'),
-                  onPressed: () {
-                    Navigator.of(context).pop(
-                      selectedItems,
-                    );
+                  onPressed: () async {
+                    await _animationController.reverse();
+                    _closeDropSelector(selectedItems);
                   },
                   child: Icon(
                     Icons.done_all,
@@ -617,24 +627,6 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       ),
     );
   }
-  // ShapeBorder? get _shape {
-  //   return RoundedRectangleBorder(
-  //     borderRadius: BorderRadius.only(
-  //       topLeft: Radius.circular(
-  //         _settings.topLeftRadius ?? kDefaultFormSmoothRadius,
-  //       ),
-  //       topRight: Radius.circular(
-  //         _settings.topRightRadius ?? kDefaultFormSmoothRadius,
-  //       ),
-  //       bottomLeft: Radius.circular(
-  //         _settings.bottomLeftRadius ?? kDefaultFormSmoothRadius,
-  //       ),
-  //       bottomRight: Radius.circular(
-  //         _settings.bottomRightRadius ?? kDefaultFormSmoothRadius,
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _buildMenu() {
     if (_isBottomSheet) {
@@ -662,10 +654,10 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
               return Transform.translate(
                 offset: Offset(
                   0.0,
-                  min(_viewportHeight, _totalButtonsHeight) * (1.0 - widget.animation.value),
+                  min(_viewportHeight, _totalButtonsHeight) * (1.0 - _animation.value),
                 ),
                 child: Opacity(
-                  opacity: widget.animation.value,
+                  opacity: _animation.value,
                   child: ConstrainedBox(
                     key: _sizeKey,
                     constraints: BoxConstraints(
@@ -673,7 +665,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                       maxWidth: _screenWidth,
                     ),
                     child: Material(
-                      shadowColor: formConfig?.shadowColor ?? Colors.black.withOpacity(.3),
+                      shadowColor: formConfig?.shadowColor ?? Colors.black.withValues(alpha: .3),
                       elevation: 10.0,
                       color: Theme.of(context).cardColor,
                       shape: _shape,
@@ -756,10 +748,10 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
       child: Transform.translate(
         offset: Offset(
           0.0,
-          initialOffset * (1.0 - widget.animation.value),
+          initialOffset * (1.0 - _animation.value),
         ),
         child: Opacity(
-          opacity: widget.animation.value * (_sizeKey.currentContext != null ? 1.0 : 0.0),
+          opacity: _animation.value * (_sizeKey.currentContext != null ? 1.0 : 0.0),
           child: ConstrainedBox(
             key: _sizeKey,
             constraints: BoxConstraints(
@@ -767,7 +759,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
               maxWidth: _screenWidth,
             ),
             child: Material(
-              shadowColor: formConfig?.shadowColor ?? Colors.black.withOpacity(.3),
+              shadowColor: formConfig?.shadowColor ?? Colors.black.withValues(alpha: .3),
               elevation: 10.0,
               color: Theme.of(context).cardColor,
               shape: _shape,
@@ -787,12 +779,12 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
 
   Color _getVeilColor(double animationValue) {
     if (_settings.veilColor != null) {
-      return _settings.veilColor!.withOpacity(
-        _settings.maxVeilOpacity * widget.animation.value,
+      return _settings.veilColor!.withValues(
+        alpha: _settings.maxVeilOpacity * _animation.value,
       );
     }
-    return Colors.black.withOpacity(
-      _settings.maxVeilOpacity * widget.animation.value,
+    return Colors.black.withValues(
+      alpha: _settings.maxVeilOpacity * _animation.value,
     );
   }
 
@@ -804,22 +796,17 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
     }
   }
 
-  void _onCancel() {
+  Future _onCancel() async {
     _reselectToInitial();
-    // if (_isSimpleWithNoSelection || _isSimple) {
-    Navigator.of(context).pop(null);
-    // } else {
-    //   Navigator.of(context).pop(
-    //     widget.args.items.where((i) => i.isSelected).toList(),
-    //   );
-    // }
+    await _animationController.reverse();
+    _closeDropSelector(null);
   }
 
   @override
   Widget build(BuildContext context) {
     _size = MediaQuery.of(context).size;
     return AnimatedBuilder(
-      animation: widget.animation,
+      animation: _animation,
       builder: (c, w) {
         _tryCalculateSizes();
         return Scaffold(
@@ -838,7 +825,7 @@ class _DropSelectorViewState extends State<DropSelectorView> with PostFrameMixin
                       width: double.infinity,
                       height: double.infinity,
                       color: _getVeilColor(
-                        widget.animation.value,
+                        _animation.value,
                       ),
                     ),
                   ),
