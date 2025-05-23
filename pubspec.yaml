@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  lite_state: ^4.0.0
+  lite_state: ^4.1.0
   flutter_multi_formatter: ^2.12.3
   flutter_markdown: ^0.7.6+2
   collection: ^1.17.0

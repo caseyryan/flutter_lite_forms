@@ -81,10 +81,12 @@ class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin 
   String? _hintText;
   String _searchValue = '';
   TextEditingController? _myTextEditingController;
+  FocusNode? _focusNode;
 
   @override
   void initState() {
     _hintText = widget.hintText;
+    _focusNode = widget.focusNode ?? FocusNode();
     _updateSettings();
     _myTextEditingController = widget.textEditingController ?? textEditingController;
     super.initState();
@@ -92,6 +94,16 @@ class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin 
       _myTextEditingController!.text = widget.initialValue!;
     }
     _searchValue = _myTextEditingController!.text;
+    _tryFocus();
+  }
+
+  Future _tryFocus() async {
+    if (widget.autofocus && _focusNode?.hasFocus == false) {
+      await Future.delayed(kThemeAnimationDuration);
+      if (mounted) {
+        _focusNode?.requestFocus();
+      }
+    }
   }
 
   @override
@@ -138,6 +150,14 @@ class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin 
   }
 
   @override
+  void dispose() {
+    if (widget.focusNode == null) {
+      _focusNode?.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Future onChanged(
     String? value, {
     bool triggerImmediately = false,
@@ -175,7 +195,7 @@ class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin 
               triggerImmediately: true,
             );
           } else {
-            if (_searchValue.isNotEmpty) {
+            if (_myTextEditingController?.text.isNotEmpty == true) {
               _myTextEditingController!.clear();
               _onSearch('');
             }
@@ -207,8 +227,8 @@ class _LiteSearchFieldState extends State<LiteSearchField> with LiteSearchMixin 
       child: TextFormField(
         readOnly: widget.readOnly,
         style: widget.style ?? liteFormController.config?.defaultTextStyle,
-        focusNode: widget.focusNode,
-        autofocus: widget.autofocus,
+        focusNode: _focusNode,
+        autofocus: false,
         onFieldSubmitted: (value) {
           onChanged(
             value,
