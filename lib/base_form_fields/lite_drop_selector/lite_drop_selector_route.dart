@@ -1,5 +1,9 @@
 part of 'lite_drop_selector.dart';
 
+bool get isShowingDropSelector {
+  return _overlayEntry != null;
+}
+
 typedef MenuItemBuilder = Widget? Function(
   int index,
   LiteDropSelectorItem item,
