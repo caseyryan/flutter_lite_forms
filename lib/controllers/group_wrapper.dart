@@ -183,6 +183,8 @@ class _FormGroupWrapper {
             );
           }
         }
+      } else {
+        debugPrint('SCROLL CONTROLLER OF THE FORM ${field.formName} IS NOT ATTACHED TO ANY SCROLL VIEWS');
       }
     }
   }

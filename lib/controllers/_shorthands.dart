@@ -18,8 +18,27 @@ class _FormShorthand {
     clearLiteForm(formName);
   }
 
-  Future<bool> validate() async {
-    return validateLiteForm(formName);
+  Future scrollToFirstInvalidField([
+    Duration? duration,
+  ]) async {
+    liteFormController.scrollToFirstInvalidField(
+      formName,
+      duration,
+    );
+  }
+
+  /// [scrollToFirstInvalidField] will try to scroll the form to
+  /// the first invalid field if true
+  Future<bool> validate([
+    bool shouldScrollToFirstInvalidField = false,
+  ]) async {
+    final success = await validateLiteForm(formName);
+    if (shouldScrollToFirstInvalidField && !success) {
+      await scrollToFirstInvalidField(
+        kThemeAnimationDuration,
+      );
+    }
+    return success;
   }
 
   Future<Map<String, dynamic>> getData({
@@ -254,7 +273,7 @@ class _GeneralFieldShorthand {
 
   /// effectively removes the field from the form,
   /// so its validators / serializer are not called anymore
-  /// and the field data is not added to the final form 
+  /// and the field data is not added to the final form
   void unregister() {
     if (_formName != null && _formField != null) {
       liteFormController.tryUnregisterField(

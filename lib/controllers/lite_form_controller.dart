@@ -208,6 +208,15 @@ class LiteFormController extends LiteStateController<LiteFormController> {
     }
   }
 
+  Future scrollToFirstInvalidField(String formName, [
+    Duration? duration,
+  ]) async {
+    _FormGroupWrapper? group = _formGroups[formName];
+    if (group != null) {
+      await group.scrollToFirstInvalidField(duration);
+    }
+  }
+
   bool _isFormBeingValidated(String formName) {
     return _formGroups[formName]?.isBeingValidated == true;
   }
