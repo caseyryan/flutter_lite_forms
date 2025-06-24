@@ -426,56 +426,60 @@ class _LiteSwitchState extends State<LiteSwitch> with FormFieldMixin {
           top: widget.paddingTop,
           bottom: widget.paddingBottom,
         ),
-        child: LiteState<LiteFormRebuildController>(
-          builder: (BuildContext c, LiteFormRebuildController controller) {
-            final hasChild = widget.child != null || widget.text != null || widget.label != null;
-            List<Widget>? children;
-
-            if (hasChild) {
-              if (widget.switchPosition == LiteSwitchPosition.right) {
-                children = [
-                  _buildChild(),
-                  _buildToggle(
-                    formName: group.name,
-                  ),
-                ];
+        child: AnimatedOpacity(
+          opacity: widget.readOnly ? 0.3 : 1,
+          duration: kThemeAnimationDuration,
+          child: LiteState<LiteFormRebuildController>(
+            builder: (BuildContext c, LiteFormRebuildController controller) {
+              final hasChild = widget.child != null || widget.text != null || widget.label != null;
+              List<Widget>? children;
+          
+              if (hasChild) {
+                if (widget.switchPosition == LiteSwitchPosition.right) {
+                  children = [
+                    _buildChild(),
+                    _buildToggle(
+                      formName: group.name,
+                    ),
+                  ];
+                } else {
+                  children = [
+                    _buildToggle(
+                      formName: group.name,
+                    ),
+                    _buildChild(),
+                  ];
+                }
               } else {
                 children = [
                   _buildToggle(
                     formName: group.name,
                   ),
-                  _buildChild(),
                 ];
               }
-            } else {
-              children = [
-                _buildToggle(
-                  formName: group.name,
-                ),
-              ];
-            }
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // if (widget.label != null)
-                //   Label(text: widget.label!, paddingBottom: 0.0,),
-                Row(
-                  children: children,
-                ),
-                if (widget.useSmoothError)
-                  LiteFormErrorLine(
-                    fieldName: widget.name,
-                    formName: group.name,
-                    errorStyle: errorStyle,
-                    paddingBottom: widget.smoothErrorPadding?.bottom,
-                    paddingTop: widget.smoothErrorPadding?.top,
-                    paddingLeft: widget.smoothErrorPadding?.left,
-                    paddingRight: widget.smoothErrorPadding?.right,
+          
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // if (widget.label != null)
+                  //   Label(text: widget.label!, paddingBottom: 0.0,),
+                  Row(
+                    children: children,
                   ),
-              ],
-            );
-          },
+                  if (widget.useSmoothError)
+                    LiteFormErrorLine(
+                      fieldName: widget.name,
+                      formName: group.name,
+                      errorStyle: errorStyle,
+                      paddingBottom: widget.smoothErrorPadding?.bottom,
+                      paddingTop: widget.smoothErrorPadding?.top,
+                      paddingLeft: widget.smoothErrorPadding?.left,
+                      paddingRight: widget.smoothErrorPadding?.right,
+                    ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
