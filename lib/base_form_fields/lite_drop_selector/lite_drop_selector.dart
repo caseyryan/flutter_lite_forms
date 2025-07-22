@@ -354,7 +354,12 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
     if (preparedInitialValue != null) {
       if (preparedInitialValue is String) {
         final contained = _items.firstWhereOrNull(
-          (e) => e.payload == preparedInitialValue || e.title == preparedInitialValue,
+          (e) {
+            if (e.payload is String) {
+              return e.payload == preparedInitialValue || e.title == preparedInitialValue;
+            }
+            return e.title == preparedInitialValue.toString();
+          },
         );
         if (contained != null) {
           preparedInitialValue = [contained];
