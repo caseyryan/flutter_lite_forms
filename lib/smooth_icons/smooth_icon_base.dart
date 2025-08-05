@@ -1,6 +1,5 @@
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
-import 'package:lite_forms/utils/extended_platform/extended_platform.dart';
 
 /// https://www.johndcook.com/blog/2018/02/13/squircle-curvature/
 class SmoothIconBase extends StatelessWidget {
