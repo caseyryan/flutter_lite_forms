@@ -67,7 +67,9 @@ abstract class LiteValidator {
   static LiteValidator email({
     String? errorText,
   }) {
-    return EmailValidator();
+    return EmailValidator(
+      errorText: errorText,
+    );
   }
 
   static LiteValidator alwaysComplaining({
@@ -210,6 +212,13 @@ class PositiveNumberValidator extends LiteValidator {
 }
 
 class PhoneValidator extends LiteValidator {
+
+  final String? errorText;
+
+  PhoneValidator({
+    this.errorText,
+  });
+
   @override
   FutureOr<String?> validate(
     Object? value, {
@@ -217,10 +226,10 @@ class PhoneValidator extends LiteValidator {
   }) {
     debugPrint('VALIDATING PHONE: $value');
     if (value == null || value is! PhoneData) {
-      return 'A phone is required';
+      return errorText ?? 'A phone is required';
     }
     if (value.isValid != true) {
-      return 'A phone is invalid';
+      return errorText ?? 'A phone is invalid';
     }
     return null;
   }
@@ -235,16 +244,23 @@ bool isEmailValid(String value) {
 }
 
 class EmailValidator extends LiteValidator {
+
+  final String? errorText;
+
+  EmailValidator({
+    this.errorText,
+  });
+
   @override
   FutureOr<String?> validate(
     Object? value, {
     String? fieldName,
   }) {
     if (value == null) {
-      return '${fieldName?.firstToUpper()} is required';
+      return errorText ?? '${fieldName?.firstToUpper()} is required';
     }
     if (!isEmailValid(value.toString())) {
-      return '${fieldName?.firstToUpper()} is invalid';
+      return errorText ?? '${fieldName?.firstToUpper()} is invalid';
     }
 
     return null;
