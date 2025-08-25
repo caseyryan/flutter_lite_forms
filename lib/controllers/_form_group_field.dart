@@ -211,39 +211,39 @@ class FormGroupField<T> {
     String? view,
   ]) {
     _value = value;
-    if (value != null) {
-      _isInitiallySet = true;
-      if (isInitialValue) {
-        /// Some fields might have a preprocessor
-        /// e.g. [LitePhoneInputField]
-        if (preprocessor != null) {
-          try {
-            _value = preprocessor!.preprocess(value);
-          } catch (e) {}
-          view = preprocessor?.view;
-        }
+    // if (value != null) {
+    _isInitiallySet = true;
+    if (isInitialValue) {
+      /// Some fields might have a preprocessor
+      /// e.g. [LitePhoneInputField]
+      if (preprocessor != null) {
+        try {
+          _value = preprocessor!.preprocess(value);
+        } catch (e) {}
+        view = preprocessor?.view;
+      }
 
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          try {
-            /// View converter can be its own for every type of field
-            /// and is set via initializeFormField() method
-            if (_viewConverter != null) {
-              textEditingController?.text = _viewConverter!(_value);
-            } else {
-              textEditingController?.text = view ?? _value.toString();
-            }
-          } catch (e) {
-            if (kDebugMode) {
-              print(e);
-            }
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        try {
+          /// View converter can be its own for every type of field
+          /// and is set via initializeFormField() method
+          if (_viewConverter != null) {
+            textEditingController?.text = _viewConverter!(_value);
+          } else {
+            textEditingController?.text = view ?? _value.toString();
           }
-        });
-      } else {
-        if (view != null) {
-          textEditingController?.text = view;
+        } catch (e) {
+          if (kDebugMode) {
+            print(e);
+          }
         }
+      });
+    } else {
+      if (view != null) {
+        textEditingController?.text = view;
       }
     }
+    // }
     if (_isSelfValidating && !isInitialValue) {
       _checkError().then((value) {
         return _parent?._validateNativeForm();

@@ -350,8 +350,8 @@ class _GeneralFieldShorthand {
       return this;
     }
     liteFormController.onValueChanged(
-      formName: _formField!.formName,
-      fieldName: _formField!.name,
+      formName: _formField?.formName ?? '',
+      fieldName: _formField?.name ?? '',
       value: value,
       view: null,
       isInitialValue: true,
