@@ -230,7 +230,11 @@ class FormGroupField<T> {
           if (_viewConverter != null) {
             textEditingController?.text = _viewConverter!(_value);
           } else {
-            textEditingController?.text = view ?? _value.toString();
+            if (view != null || _value != null) {
+              textEditingController?.text = view ?? _value.toString();
+            } else {
+              textEditingController?.text = '';
+            }
           }
         } catch (e) {
           if (kDebugMode) {
