@@ -281,10 +281,10 @@ class FormGroupField<T> {
     return false;
   }
 
-  Future _checkError() async {
+  Future<String?> _checkError() async {
     if (isRemoved || isReadOnly) {
       _error = null;
-      return;
+      return null;
     }
     _numValidations++;
     dynamic fieldAsDynamic = this as dynamic;
@@ -305,6 +305,7 @@ class FormGroupField<T> {
     if (error != lastError) {
       liteFormController.rebuild();
     }
+    return error?.toString();
   }
 
   String? _error;

@@ -271,6 +271,13 @@ class _GeneralFieldShorthand {
     return _formField?.getValue(serialize) as T?;
   }
 
+  /// Returns the error if any or null if 
+  /// validation succeeded with no errors
+  Future<String?> validate() async {
+    final error = await _formField?._checkError();
+    return error;
+  }
+
   /// effectively removes the field from the form,
   /// so its validators / serializer are not called anymore
   /// and the field data is not added to the final form
