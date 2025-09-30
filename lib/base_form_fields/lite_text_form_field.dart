@@ -2,6 +2,7 @@
 
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lite_forms/base_form_fields/label.dart';
@@ -30,6 +31,11 @@ class TextEntryModalRouteSettings {
     this.title,
     this.style,
   });
+}
+
+
+Widget noContextMenu(BuildContext context, EditableTextState editableTextState) {
+  return SizedBox.shrink();
 }
 
 class LiteTextFormField extends StatefulWidget {
@@ -96,7 +102,8 @@ class LiteTextFormField extends StatefulWidget {
     this.scrollController,
     this.enableIMEPersonalizedLearning = true,
     this.mouseCursor,
-    this.contextMenuBuilder,
+    // because on the web it will be duplicated by the browser's menu and it will conflict
+    this.contextMenuBuilder = kIsWeb ? noContextMenu : null,
     this.paddingTop = 0.0,
     this.paddingBottom = 0.0,
     this.paddingLeft = 0.0,
