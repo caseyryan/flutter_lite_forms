@@ -529,7 +529,9 @@ class _LiteDropSelectorState extends State<LiteDropSelector> with FormFieldMixin
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (widget.label?.isNotEmpty == true) Label(text: widget.label ?? ''),
                     GestureDetector(
                       onTap: _onTap,
                       onLongPress: _onTap,
