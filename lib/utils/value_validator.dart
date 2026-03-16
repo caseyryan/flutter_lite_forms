@@ -395,7 +395,7 @@ class YoutubeUrlValidator extends LiteValidator {
 
 class UrlValidator extends LiteValidator {
   static final RegExp _regexp = RegExp(
-    r'^https?:\/\/(www\.)?[a-zA-Z0-9.-]*\.[a-zA-Z]{2,}$',
+    r'^https?:\/\/(www\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}([\/?#][^\s]*)?$',
     caseSensitive: false,
   );
 
@@ -403,6 +403,7 @@ class UrlValidator extends LiteValidator {
     this.errorText,
     this.allowEmpty = false,
   });
+
   final String? errorText;
   final bool allowEmpty;
 
@@ -411,14 +412,17 @@ class UrlValidator extends LiteValidator {
     Object? value, {
     String? fieldName,
   }) {
-    if (value is String && value.isNotEmpty == true) {
+    if (value is String && value.isNotEmpty) {
       if (!_regexp.hasMatch(value)) {
-        return errorText ?? '$fieldName must contain a valid YouTube url';
+        return errorText ?? '$fieldName must contain a valid URL';
       }
+      return null;
     }
+
     if (!allowEmpty) {
-      return errorText ?? '$fieldName must contain a valid YouTube url';
+      return errorText ?? '$fieldName must contain a valid URL';
     }
+
     return null;
   }
 }
